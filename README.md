@@ -128,19 +128,7 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Created by
 
-Myself, [Zach Andelman](https://linktr.ee/zachspam06)
-With help from ClaudeCode
+Myself, Fevers.
+*Built and documented with assistance from [Claude Code](https://code.claude.com/docs/en/best-practices) by Anthropic.*
 
 *Not affiliated with FIFA or any official organization.*
-
----
-
-## 📚 Resources
-
-- [Football Data API Docs](https://www.football-data.org/documentation/quickstart)
-- [Leaflet.js Map Library](https://leafletjs.com/examples.html)
-- [2026 World Cup Official Info](https://www.fifa.com/)
-
----
-
-**Enjoy the tournament! ⚽🏆**
