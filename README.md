@@ -116,41 +116,6 @@ world-cup-2026/
 
 ---
 
-## 🌐 Deployment to GitHub Pages
-
-### 1. Create a GitHub Repository
-```bash
-git init
-git add .
-git commit -m "Initial commit: World Cup 2026 fan site"
-git remote add origin https://github.com/yourusername/world-cup-2026.git
-git branch -M main
-git push -u origin main
-```
-
-### 2. Enable GitHub Pages
-1. Go to **Settings** → **Pages**
-2. Set **Source** to `main` branch, `/root` directory
-3. GitHub will deploy to `https://yourusername.github.io/world-cup-2026`
-
-### 3. Note on API Proxy
-The local `proxy.py` won't run on GitHub Pages (static hosting only). For the Teams API feature to work on the live site, you have two options:
-
-**Option A: Use a Public CORS Proxy**
-```javascript
-// In teams.html, change:
-const API_BASE = 'https://cors-anywhere.herokuapp.com/https://api.football-data.org/v4';
-```
-
-**Option B: Deploy Proxy to Heroku/Railway**
-```bash
-heroku create your-app-name
-git push heroku main
-```
-Then update `API_BASE` to point to your deployed proxy.
-
----
-
 ## 📝 Data
 
 All 104 matches are hardcoded in `data.js` with:
@@ -202,7 +167,8 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Created by
 
-[Zach Andelman](https://linktr.ee/zachspam06)
+Myself, [Zach Andelman](https://linktr.ee/zachspam06)
+With help from ClaudeCode
 
 *Not affiliated with FIFA or any official organization.*
 
