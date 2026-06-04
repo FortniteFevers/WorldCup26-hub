@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2026 FIFA World Cup</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
 </head>
 <body>
@@ -22,6 +24,16 @@
       <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
     </div>
   </nav>
+
+  <!-- Mobile Menu Modal -->
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
+  <div class="mobile-menu-modal" id="mobileMenuModal">
+    <a href="index.html" class="active" onclick="closeMobileMenu()">Home</a>
+    <a href="games.html" onclick="closeMobileMenu()">Games</a>
+    <a href="locations.html" onclick="closeMobileMenu()">Locations</a>
+    <a href="calendar.html" onclick="closeMobileMenu()">Calendar</a>
+    <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
+  </div>
 
   <div class="container">
     <div class="hero">
@@ -100,6 +112,12 @@
 
   <script src="data.js"></script>
   <script>
+    // Initialize Lenis smooth scrolling
+    const lenis = new Lenis();
+    lenis.on('scroll', (e) => {});
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
     function createGameCard(game) {
       const ko = game.type !== 'Group';
       return `<div class="game-card">

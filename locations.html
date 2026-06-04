@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Locations – 2026 FIFA World Cup</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
   <style>
     #map {
@@ -32,6 +34,16 @@
       <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
     </div>
   </nav>
+
+  <!-- Mobile Menu Modal -->
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
+  <div class="mobile-menu-modal" id="mobileMenuModal">
+    <a href="index.html" onclick="closeMobileMenu()">Home</a>
+    <a href="games.html" onclick="closeMobileMenu()">Games</a>
+    <a href="locations.html" class="active" onclick="closeMobileMenu()">Locations</a>
+    <a href="calendar.html" onclick="closeMobileMenu()">Calendar</a>
+    <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
+  </div>
 
   <div class="container">
     <div class="hero" style="padding:3rem 1.5rem 2.5rem;">
@@ -75,6 +87,12 @@
   <script src="data.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    // Initialize Lenis smooth scrolling
+    const lenis = new Lenis();
+    lenis.on('scroll', (e) => {});
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
     const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
 
     const DARK_TILE  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';

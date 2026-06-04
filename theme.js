@@ -22,8 +22,24 @@ function updateThemeBtn() {
 }
 
 function toggleMobileNav() {
-  const ul = document.querySelector('nav ul');
-  ul.classList.toggle('open');
+  const backdrop = document.getElementById('mobileMenuBackdrop');
+  const modal = document.getElementById('mobileMenuModal');
+  const isOpen = backdrop?.classList.contains('open');
+
+  if (isOpen) {
+    backdrop?.classList.remove('open');
+    modal?.classList.remove('open');
+  } else {
+    backdrop?.classList.add('open');
+    modal?.classList.add('open');
+  }
+}
+
+function closeMobileMenu() {
+  const backdrop = document.getElementById('mobileMenuBackdrop');
+  const modal = document.getElementById('mobileMenuModal');
+  backdrop?.classList.remove('open');
+  modal?.classList.remove('open');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

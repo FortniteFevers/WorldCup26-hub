@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teams – 2026 FIFA World Cup</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
 </head>
 <body>
@@ -22,6 +24,16 @@
       <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
     </div>
   </nav>
+
+  <!-- Mobile Menu Modal -->
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
+  <div class="mobile-menu-modal" id="mobileMenuModal">
+    <a href="index.html" onclick="closeMobileMenu()">Home</a>
+    <a href="games.html" onclick="closeMobileMenu()">Games</a>
+    <a href="locations.html" onclick="closeMobileMenu()">Locations</a>
+    <a href="calendar.html" onclick="closeMobileMenu()">Calendar</a>
+    <a href="teams.html" class="active" onclick="closeMobileMenu()">Teams</a>
+  </div>
 
   <div class="container">
     <div class="hero" style="padding:3rem 1.5rem 2.5rem;">
@@ -75,7 +87,7 @@
 
   <!-- Squad Modal -->
   <div class="modal-backdrop" id="modalBackdrop" onclick="handleModalClick(event)">
-    <div class="modal" id="modal">
+    <div class="modal" id="modal" data-lenis-prevent>
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Squad</div>
         <button class="modal-close" onclick="closeModal()">✕</button>
@@ -93,6 +105,12 @@
 
   <script src="data.js"></script>
   <script>
+    // Initialize Lenis smooth scrolling
+    const lenis = new Lenis();
+    lenis.on('scroll', (e) => {});
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
     // Requests go through local proxy (proxy.py on :8003) to avoid CORS issues
     const API_BASE   = 'http://localhost:8003';
     const CACHE_KEY  = 'wc2026_all_squads';    // Single cache for all 48 teams
@@ -303,6 +321,7 @@
       document.getElementById('modalTitle').innerHTML =
         `${getFlag(teamName)} ${teamName} <span style="font-size:0.7em;color:var(--text-muted);font-weight:500;">Group ${info?.group}</span>`;
       document.getElementById('modalBackdrop').classList.add('open');
+      lenis.stop(); // pause page scroll while modal is open
 
       const body = document.getElementById('modalBody');
       const teamGames = GAMES.filter(g => g.team1 === teamName || g.team2 === teamName);
@@ -338,13 +357,51 @@
       }
     }
 
-    function renderSquadTable(squad) {
+    let _currentSquad = null;
+    let _currentSort  = 'position'; // 'position' | 'name' | filter: 'GK'|'DEF'|'MID'|'FWD'
+
+    function renderSquadTable(squad, sortBy) {
       if (!squad?.length) return '<p style="color:var(--text-muted);font-size:0.85rem;">No squad data available.</p>';
-      const sorted = [...squad].sort((a,b) => {
-        const order = ['Goalkeeper','Defence','Midfield','Offence'];
-        return order.findIndex(o=>(a.position||'').includes(o)) - order.findIndex(o=>(b.position||'').includes(o));
-      });
+      _currentSquad = squad;
+      const s = sortBy || _currentSort;
+      _currentSort  = s;
+
+      const posOrder = ['Goalkeeper','Defence','Midfield','Offence'];
+      function posGroup(p) {
+        const pos = (p.position||'').toLowerCase();
+        if (pos.includes('goalkeeper')) return 0;
+        if (pos.includes('defence')||pos.includes('defender')) return 1;
+        if (pos.includes('midfield')) return 2;
+        return 3;
+      }
+
+      let rows = [...squad];
+
+      // Filter by position if a position tab is active
+      const posFilter = {'GK':'goalkeeper','DEF':'defence','MID':'midfield','FWD':'offence'};
+      if (posFilter[s]) {
+        rows = rows.filter(p => (p.position||'').toLowerCase().includes(posFilter[s]) ||
+          (s==='DEF' && (p.position||'').toLowerCase().includes('defender')) ||
+          (s==='FWD' && ((p.position||'').toLowerCase().includes('forward')||(p.position||'').toLowerCase().includes('attack'))));
+      }
+
+      // Sort
+      if (s === 'name') {
+        rows.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+      } else {
+        rows.sort((a,b) => posGroup(a) - posGroup(b));
+      }
+
       const pos = countPositions(squad);
+      const tabs = [
+        { key:'position', label:'By Position' },
+        { key:'name',     label:'A → Z' },
+        { key:'GK',       label:`🧤 GK (${pos.gk})` },
+        { key:'DEF',      label:`🛡️ DEF (${pos.def})` },
+        { key:'MID',      label:`⚙️ MID (${pos.mid})` },
+        { key:'FWD',      label:`⚡ FWD (${pos.fwd})` },
+      ];
+
       return `
         <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap;">
           ${[['Total',squad.length,'var(--gold)'],['GK',pos.gk,'var(--gold)'],['DEF',pos.def,'#22c55e'],['MID',pos.mid,'#60a5fa'],['FWD',pos.fwd,'var(--red)']].map(([label,val,col])=>`
@@ -353,11 +410,18 @@
               <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);">${label}</div>
             </div>`).join('')}
         </div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1rem;">
+          ${tabs.map(t=>`<button onclick="resortSquad('${t.key}')" style="
+            padding:0.3rem 0.75rem;border-radius:100px;border:1px solid ${s===t.key?'var(--gold)':'var(--border)'};
+            background:${s===t.key?'var(--gold-dim)':'var(--input-bg)'};
+            color:${s===t.key?'var(--gold)':'var(--text-secondary)'};
+            font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;">${t.label}</button>`).join('')}
+        </div>
         <div style="overflow-x:auto;">
           <table class="player-table">
             <thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Age</th><th>Nationality</th></tr></thead>
             <tbody>
-              ${sorted.map(p=>`
+              ${rows.map(p=>`
                 <tr>
                   <td style="color:var(--text-muted);">${p.shirtNumber??'—'}</td>
                   <td style="font-weight:600;">${p.name}</td>
@@ -370,9 +434,30 @@
         </div>`;
     }
 
-    function closeModal() { document.getElementById('modalBackdrop').classList.remove('open'); }
+    function resortSquad(sortBy) {
+      if (!_currentSquad) return;
+      // Replace only the squad table part, not the games section
+      const body = document.getElementById('modalBody');
+      const gamesSection = body.querySelector('.team-games-section');
+      const gamesHtml = gamesSection ? gamesSection.outerHTML : '';
+      // Get scroll position to restore
+      const modal = document.getElementById('modal');
+      const scrollTop = modal.scrollTop;
+      body.innerHTML = renderSquadTable(_currentSquad, sortBy) + `<div class="team-games-section">${gamesSection ? gamesSection.innerHTML : ''}</div>`;
+      modal.scrollTop = scrollTop;
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.remove('open');
+      lenis.start();
+    }
     function handleModalClick(e) { if (e.target===document.getElementById('modalBackdrop')) closeModal(); }
     document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+    // Prevent Lenis from stealing wheel/touch events inside the modal
+    const modalEl = document.getElementById('modal');
+    modalEl.addEventListener('wheel', e => { e.stopPropagation(); }, { passive: true });
+    modalEl.addEventListener('touchmove', e => { e.stopPropagation(); }, { passive: true });
 
     // ── Init ─────────────────────────────────────────────
     document.getElementById('searchTeam').addEventListener('input', renderTeams);
