@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teams – 2026 FIFA World Cup</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="theme.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">⚽ <span>WC</span> 2026</a>
+    <ul id="navMenu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="locations.html">Locations</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="teams.html" class="active">Teams</a></li>
+    </ul>
+    <div class="nav-right">
+      <button id="themeToggle" class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+      <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="hero" style="padding:3rem 1.5rem 2.5rem;">
+      <div class="hero-eyebrow">🌍 48 Nations</div>
+      <h1 style="font-size:clamp(2rem,5vw,3rem);">World Cup <em>Teams</em></h1>
+      <p class="hero-sub" style="margin-bottom:0;">All 48 teams competing in the 2026 FIFA World Cup, across 12 groups</p>
+    </div>
+
+    <!-- API Panel -->
+    <div class="api-panel">
+      <div class="api-panel-text">
+        <h3>🔗 Connect football-data.org for live squad data</h3>
+        <p>Get a free API key at <strong>football-data.org</strong> to unlock full player rosters, positions, and ages for every team. Squad data is cached so it only loads once.</p>
+      </div>
+      <div style="min-width:260px;">
+        <div class="api-input-row">
+          <input type="password" id="apiKeyInput" class="api-key-input" placeholder="Paste your API key…">
+          <button class="btn btn-sm" onclick="connectAPI()">Connect</button>
+          <button class="btn btn-sm btn-outline" onclick="disconnectAPI()" id="disconnectBtn" style="display:none;">Disconnect</button>
+        </div>
+        <div class="api-status" id="apiStatus" style="margin-top:0.5rem;"></div>
+        <!-- Progress bar -->
+        <div id="progressWrap" style="display:none;margin-top:0.75rem;">
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-bottom:0.3rem;">
+            <span id="progressLabel">Loading squads…</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+            <div id="progressBar" style="height:100%;background:var(--gold);border-radius:2px;width:0%;transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters" style="margin-bottom:1.5rem;">
+      <input type="text" id="searchTeam" class="filter-input" placeholder="🔍  Search teams…">
+      <select id="groupFilter" class="filter-select">
+        <option value="">All Groups</option>
+        <option value="A">Group A</option><option value="B">Group B</option>
+        <option value="C">Group C</option><option value="D">Group D</option>
+        <option value="E">Group E</option><option value="F">Group F</option>
+        <option value="G">Group G</option><option value="H">Group H</option>
+        <option value="I">Group I</option><option value="J">Group J</option>
+        <option value="K">Group K</option><option value="L">Group L</option>
+      </select>
+    </div>
+
+    <div class="teams-grid" id="teamsGrid"></div>
+  </div>
+
+  <!-- Squad Modal -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="handleModalClick(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Squad</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>© 2026 FIFA World Cup Fan Site &nbsp;·&nbsp; Created by <a href="https://linktr.ee/zachspam06" target="_blank" rel="noopener noreferrer">Zach Andelman</a></p>
+      <p>Not affiliated with FIFA or any official organization.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+    // Requests go through local proxy (proxy.py on :8003) to avoid CORS issues
+    const API_BASE    = 'http://localhost:8003';
+    const CACHE_PFX   = 'wc2026_sq_';          // localStorage key prefix per team id
+    const FETCH_DELAY = 6000;                   // ms between squad requests (exactly 10 req/min = API free tier limit)
+
+    let apiKey    = localStorage.getItem('wc2026_api_key') || '';
+    let teamsData = {};   // teamName → { squad:[], apiId }
+    let wcTeams   = [];   // raw API team objects
+    let fetchStop = false;
+
+    // ── All teams ordered from GROUPS ──────────────────
+    const ALL_TEAMS = [];
+    for (const [grp, teams] of Object.entries(GROUPS)) {
+      teams.forEach(t => ALL_TEAMS.push({ name: t, group: grp }));
+    }
+
+    // ── Helpers ─────────────────────────────────────────
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    function normName(s) { return (s||'').toLowerCase().replace(/[^a-z]/g,''); }
+
+    // Map API team object → our internal team name
+    function matchName(apiTeam) {
+      const candidates = [apiTeam.name, apiTeam.shortName, apiTeam.tla];
+      for (const c of candidates) {
+        const hit = ALL_TEAMS.find(t =>
+          normName(t.name) === normName(c) ||
+          t.name === c
+        );
+        if (hit) return hit.name;
+      }
+      // Fuzzy fallback — check if our name is a substring
+      return ALL_TEAMS.find(t =>
+        normName(apiTeam.name).includes(normName(t.name)) ||
+        normName(t.name).includes(normName(apiTeam.name))
+      )?.name || null;
+    }
+
+    function countPositions(squad) {
+      const c = { gk:0, def:0, mid:0, fwd:0 };
+      (squad||[]).forEach(p => {
+        const pos = (p.position||'').toLowerCase();
+        if (pos.includes('goalkeeper'))                              c.gk++;
+        else if (pos.includes('defence')||pos.includes('defender')) c.def++;
+        else if (pos.includes('midfield'))                          c.mid++;
+        else if (pos.includes('offence')||pos.includes('forward')||pos.includes('attack')) c.fwd++;
+      });
+      return c;
+    }
+
+    function calcAge(dob) {
+      if (!dob) return '—';
+      const b=new Date(dob), now=new Date('2026-06-11');
+      let age=now.getFullYear()-b.getFullYear();
+      const m=now.getMonth()-b.getMonth();
+      if(m<0||(m===0&&now.getDate()<b.getDate())) age--;
+      return age;
+    }
+
+    function posBadge(pos) {
+      const p=(pos||'').toLowerCase();
+      if(p.includes('goalkeeper')) return `<span class="pos-badge pos-gk">GK</span>`;
+      if(p.includes('defence')||p.includes('defender')) return `<span class="pos-badge pos-def">DEF</span>`;
+      if(p.includes('midfield')) return `<span class="pos-badge pos-mid">MID</span>`;
+      if(p.includes('offence')||p.includes('forward')||p.includes('attack')) return `<span class="pos-badge pos-fwd">FWD</span>`;
+      return `<span class="pos-badge" style="background:var(--input-bg);color:var(--text-muted);">${pos||'?'}</span>`;
+    }
+
+    function setStatus(msg, type) {
+      const el = document.getElementById('apiStatus');
+      el.textContent = msg;
+      el.className = 'api-status' + (type ? ` ${type}` : '');
+    }
+
+    function setProgress(done, total) {
+      const wrap = document.getElementById('progressWrap');
+      if (!total) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      const pct = Math.round((done / total) * 100);
+      document.getElementById('progressBar').style.width  = pct + '%';
+      document.getElementById('progressPct').textContent  = pct + '%';
+      document.getElementById('progressLabel').textContent =
+        done < total ? `Loading squads… ${done}/${total}` : `✓ All ${total} squads loaded`;
+    }
+
+    // ── API fetch ────────────────────────────────────────
+    async function fetchFromAPI(path) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        headers: { 'X-Auth-Token': apiKey }
+      });
+      if (res.status === 429) throw new Error('429 rate limited');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    // ── Load cache into teamsData ────────────────────────
+    function loadCachedSquads() {
+      let loaded = 0;
+      wcTeams.forEach(apiTeam => {
+        const raw = localStorage.getItem(CACHE_PFX + apiTeam.id);
+        if (!raw) return;
+        try {
+          const squad = JSON.parse(raw);
+          const name = matchName(apiTeam);
+          if (name) { teamsData[name] = { squad, apiId: apiTeam.id }; loaded++; }
+        } catch(e) {}
+      });
+      return loaded;
+    }
+
+    // ── Fetch all missing squads progressively ───────────
+    async function fetchAllSquads() {
+      fetchStop = false;
+      const total = wcTeams.length;
+      const missing = wcTeams.filter(t => !localStorage.getItem(CACHE_PFX + t.id));
+
+      // If everything cached already, just update UI
+      if (missing.length === 0) {
+        setProgress(total, total);
+        setStatus(`✓ Connected — all ${total} squads ready`, 'ok');
+        renderTeams();
+        return;
+      }
+
+      const alreadyLoaded = total - missing.length;
+      setProgress(alreadyLoaded, total);
+
+      let done = alreadyLoaded;
+      for (let i = 0; i < missing.length; i++) {
+        if (fetchStop) break;
+        const apiTeam = missing[i];
+
+        try {
+          const data = await fetchFromAPI(`/teams/${apiTeam.id}`);
+          const squad = data.squad || [];
+          localStorage.setItem(CACHE_PFX + apiTeam.id, JSON.stringify(squad));
+          const name = matchName(apiTeam);
+          if (name) teamsData[name] = { squad, apiId: apiTeam.id };
+          done++;
+          setProgress(done, total);
+          setStatus(`✓ Connected · ${done}/${total} squads`, 'ok');
+          renderTeams();
+        } catch(e) {
+          if (e.message.includes('429')) {
+            setStatus('⏳ Rate limited — waiting 60s…', '');
+            await sleep(60000);
+            i--; // retry
+            continue;
+          }
+        }
+
+        if (i < missing.length - 1) await sleep(FETCH_DELAY);
+      }
+
+      if (!fetchStop) {
+        setStatus(`✓ Connected — all ${done} squads loaded`, 'ok');
+        setProgress(total, total);
+      }
+    }
+
+    // ── Connect / Disconnect ─────────────────────────────
+    async function connectAPI() {
+      const input = document.getElementById('apiKeyInput');
+      const key = (input.value || '').trim();
+      if (!key || key === '••••••••') {
+        // Use saved key
+        if (!apiKey) { setStatus('Please enter an API key.', 'err'); return; }
+      } else {
+        apiKey = key;
+        localStorage.setItem('wc2026_api_key', apiKey);
+        input.value = '';
+      }
+
+      setStatus('Connecting…', '');
+      try {
+        const data = await fetchFromAPI('/competitions/WC/teams?season=2026');
+        wcTeams = data.teams || [];
+        document.getElementById('disconnectBtn').style.display = 'inline-flex';
+
+        // Load whatever is already cached (instant)
+        const cached = loadCachedSquads();
+        setStatus(`✓ Connected — ${cached} squads from cache, fetching rest…`, 'ok');
+        renderTeams();
+
+        // Fetch remaining in background
+        fetchAllSquads();
+      } catch(e) {
+        setStatus(`✗ ${e.message}`, 'err');
+      }
+    }
+
+    function disconnectAPI() {
+      fetchStop = true;
+      apiKey = ''; wcTeams = []; teamsData = {};
+      // Clear squad cache
+      Object.keys(localStorage)
+        .filter(k => k.startsWith(CACHE_PFX))
+        .forEach(k => localStorage.removeItem(k));
+      localStorage.removeItem('wc2026_api_key');
+      document.getElementById('apiKeyInput').value = '';
+      document.getElementById('disconnectBtn').style.display = 'none';
+      document.getElementById('progressWrap').style.display = 'none';
+      setStatus('Disconnected — cache cleared.', '');
+      renderTeams();
+    }
+
+    // ── Render Teams Grid ────────────────────────────────
+    function renderTeams() {
+      const search    = document.getElementById('searchTeam').value.toLowerCase();
+      const grpFilter = document.getElementById('groupFilter').value;
+      const filtered  = ALL_TEAMS.filter(t =>
+        (!search    || t.name.toLowerCase().includes(search)) &&
+        (!grpFilter || t.group === grpFilter)
+      );
+
+      document.getElementById('teamsGrid').innerHTML = filtered.map(team => {
+        const cached    = teamsData[team.name];
+        const positions = cached ? countPositions(cached.squad) : null;
+        const loading   = apiKey && wcTeams.length && !cached;
+
+        return `<div class="team-card" onclick="openTeam('${team.name.replace(/'/g,"\\'")}')">
+          <div class="team-card-flag">${getFlag(team.name)}</div>
+          <div class="team-card-name">${team.name}</div>
+          <div class="team-card-group">Group ${team.group}</div>
+          ${positions ? `
+            <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.75rem;flex-wrap:wrap;">
+              <span title="Goalkeepers" style="font-size:0.75rem;color:var(--gold);">🧤 ${positions.gk}</span>
+              <span title="Defenders"   style="font-size:0.75rem;color:#22c55e;">🛡️ ${positions.def}</span>
+              <span title="Midfielders" style="font-size:0.75rem;color:#60a5fa;">⚙️ ${positions.mid}</span>
+              <span title="Forwards"    style="font-size:0.75rem;color:var(--red);">⚡ ${positions.fwd}</span>
+            </div>`
+          : loading ? `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.6rem;">⏳ loading…</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    // ── Squad Modal ──────────────────────────────────────
+    async function openTeam(teamName) {
+      const info = ALL_TEAMS.find(t => t.name === teamName);
+      document.getElementById('modalTitle').innerHTML =
+        `${getFlag(teamName)} ${teamName} <span style="font-size:0.7em;color:var(--text-muted);font-weight:500;">Group ${info?.group}</span>`;
+      document.getElementById('modalBackdrop').classList.add('open');
+
+      const body = document.getElementById('modalBody');
+      const teamGames = GAMES.filter(g => g.team1 === teamName || g.team2 === teamName);
+      const gamesHtml = `
+        <div class="team-games-section">
+          <div class="team-games-title">Matches</div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            ${teamGames.map(g => {
+              const opp = g.team1 === teamName ? g.team2 : g.team1;
+              return `<div style="background:var(--input-bg);border-radius:8px;padding:0.6rem 0.85rem;font-size:0.82rem;border:1px solid var(--border);">
+                <span style="color:var(--gold);font-weight:600;font-size:0.72rem;">${formatDate(g.date)} · ${g.time} ET</span>
+                <div style="margin-top:0.2rem;font-weight:500;">vs ${getFlag(opp)} ${opp} &nbsp;·&nbsp; <span style="color:var(--text-muted);">${g.stadium}</span></div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+
+      // Already cached?
+      if (teamsData[teamName]) {
+        body.innerHTML = renderSquadTable(teamsData[teamName].squad) + gamesHtml;
+        return;
+      }
+
+      if (apiKey && wcTeams.length) {
+        const apiTeam = wcTeams.find(at => matchName(at) === teamName);
+        if (apiTeam) {
+          body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">Loading squad…</div>';
+          try {
+            const data = await fetchFromAPI(`/teams/${apiTeam.id}`);
+            const squad = data.squad || [];
+            localStorage.setItem(CACHE_PFX + apiTeam.id, JSON.stringify(squad));
+            teamsData[teamName] = { squad, apiId: apiTeam.id };
+            body.innerHTML = renderSquadTable(squad) + gamesHtml;
+            renderTeams();
+          } catch(e) {
+            body.innerHTML = `<div style="color:var(--red);font-size:0.85rem;padding:1rem 0;">Failed: ${e.message}</div>` + gamesHtml;
+          }
+          return;
+        }
+      }
+
+      // No API key
+      body.innerHTML = `
+        <div style="background:var(--gold-dim);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+          <div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem;">Connect for player data</div>
+          <div style="font-size:0.8rem;color:var(--text-secondary);">Get a free key at <a href="https://www.football-data.org" target="_blank" rel="noopener" style="color:var(--gold);">football-data.org</a> and enter it above.</div>
+        </div>` + gamesHtml;
+    }
+
+    function renderSquadTable(squad) {
+      if (!squad?.length) return '<p style="color:var(--text-muted);font-size:0.85rem;">No squad data available.</p>';
+      const sorted = [...squad].sort((a,b) => {
+        const order = ['Goalkeeper','Defence','Midfield','Offence'];
+        return order.findIndex(o=>(a.position||'').includes(o)) - order.findIndex(o=>(b.position||'').includes(o));
+      });
+      const pos = countPositions(squad);
+      return `
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+          ${[['Total',squad.length,'var(--gold)'],['GK',pos.gk,'var(--gold)'],['DEF',pos.def,'#22c55e'],['MID',pos.mid,'#60a5fa'],['FWD',pos.fwd,'var(--red)']].map(([label,val,col])=>`
+            <div style="background:var(--input-bg);border-radius:8px;padding:0.55rem 0.9rem;text-align:center;border:1px solid var(--border);">
+              <div style="font-size:1.2rem;font-weight:800;color:${col};">${val}</div>
+              <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);">${label}</div>
+            </div>`).join('')}
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="player-table">
+            <thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Age</th><th>Nationality</th></tr></thead>
+            <tbody>
+              ${sorted.map(p=>`
+                <tr>
+                  <td style="color:var(--text-muted);">${p.shirtNumber??'—'}</td>
+                  <td style="font-weight:600;">${p.name}</td>
+                  <td>${posBadge(p.position)}</td>
+                  <td>${calcAge(p.dateOfBirth)}</td>
+                  <td style="color:var(--text-secondary);">${p.nationality||'—'}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function closeModal() { document.getElementById('modalBackdrop').classList.remove('open'); }
+    function handleModalClick(e) { if (e.target===document.getElementById('modalBackdrop')) closeModal(); }
+    document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+    // ── Init ─────────────────────────────────────────────
+    document.getElementById('searchTeam').addEventListener('input', renderTeams);
+    document.getElementById('groupFilter').addEventListener('change', renderTeams);
+
+    if (apiKey) connectAPI();  // auto-reconnect and load from cache
+    renderTeams();
+  </script>
+</body>
+</html>

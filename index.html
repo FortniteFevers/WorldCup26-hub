@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 FIFA World Cup</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="theme.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">⚽ <span>WC</span> 2026</a>
+    <ul id="navMenu">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="locations.html">Locations</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right">
+      <button id="themeToggle" class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+      <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-eyebrow">⚽ June 11 – July 19, 2026</div>
+      <h1>FIFA World Cup<br><em>2026</em></h1>
+      <div class="hero-flags">🇺🇸 🇲🇽 🇨🇦</div>
+      <p class="hero-sub">104 matches across 16 world-class stadiums in the United States, Mexico, and Canada.</p>
+      <div class="hero-actions">
+        <a href="games.html" class="btn">View All Matches →</a>
+        <a href="locations.html" class="btn btn-outline">Stadium Map</a>
+        <a href="calendar.html" class="btn btn-outline">Make Calendar</a>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown" id="countdownSection">
+      <div class="countdown-eyebrow">⚽ Time until kickoff — Mexico vs South Africa, June 11</div>
+      <div class="countdown-units" id="countdownUnits">
+        <div class="countdown-unit"><div class="countdown-num" id="cdDays">--</div><div class="countdown-unit-label">Days</div></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><div class="countdown-num" id="cdHours">--</div><div class="countdown-unit-label">Hours</div></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><div class="countdown-num" id="cdMinutes">--</div><div class="countdown-unit-label">Minutes</div></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit"><div class="countdown-num" id="cdSeconds">--</div><div class="countdown-unit-label">Seconds</div></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card"><div class="stat-number">104</div><div class="stat-label">Total Matches</div></div>
+      <div class="stat-card"><div class="stat-number">48</div><div class="stat-label">Teams</div></div>
+      <div class="stat-card"><div class="stat-number">16</div><div class="stat-label">Stadiums</div></div>
+      <div class="stat-card"><div class="stat-number">39</div><div class="stat-label">Days</div></div>
+    </div>
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">Opening Matches</div>
+        <div class="section-sub">June 11–12 · All times Eastern</div>
+      </div>
+      <a href="games.html" class="btn btn-outline btn-sm">See all 104 →</a>
+    </div>
+
+    <div class="games-container" id="featuredGames"></div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">🏟️</div>
+        <div class="info-title">Group Stage</div>
+        <div class="info-desc">12 groups of 4 teams · 72 matches · June 11 – June 27</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">⚔️</div>
+        <div class="info-title">Knockout Stage</div>
+        <div class="info-desc">Round of 32 through Quarterfinals · June 28 – July 11</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🏆</div>
+        <div class="info-title">Finals Week</div>
+        <div class="info-desc">Semifinals, Third Place &amp; Final · July 14 – July 19</div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🌎</div>
+        <div class="info-title">3 Host Nations</div>
+        <div class="info-desc">USA (11), Mexico (3), Canada (2) — first 3-nation World Cup</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>© 2026 FIFA World Cup Fan Site &nbsp;·&nbsp; Created by <a href="https://linktr.ee/zachspam06" target="_blank" rel="noopener noreferrer">Zach Andelman</a></p>
+      <p>Not affiliated with FIFA or any official organization.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+    function createGameCard(game) {
+      const ko = game.type !== 'Group';
+      return `<div class="game-card">
+        <div class="game-header">
+          <span class="game-date">${formatDate(game.date)}</span>
+          <span class="game-type ${ko ? 'knockout' : ''}">${game.type}</span>
+        </div>
+        <div class="game-match">
+          <div class="team"><span class="team-flag">${getFlag(game.team1)}</span><span class="team-name">${game.team1}</span></div>
+          <span class="vs">VS</span>
+          <div class="team"><span class="team-name">${game.team2}</span><span class="team-flag">${getFlag(game.team2)}</span></div>
+        </div>
+        <div class="game-footer">
+          <div class="detail"><span>🕐</span>${game.time} ET</div>
+          <div class="detail"><span>📍</span>${game.stadium}</div>
+        </div>
+      </div>`;
+    }
+    const container = document.getElementById('featuredGames');
+    GAMES.slice(0, 4).forEach(g => container.innerHTML += createGameCard(g));
+
+    // Countdown — target: June 11 2026 3:00 PM ET = 19:00 UTC
+    const TARGET = new Date('2026-06-11T19:00:00Z');
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      const diff = TARGET - Date.now();
+      if (diff <= 0) {
+        document.getElementById('countdownUnits').innerHTML =
+          '<div class="countdown-started">🎉 The World Cup has kicked off!</div>';
+        return;
+      }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      document.getElementById('cdDays').textContent    = pad(d);
+      document.getElementById('cdHours').textContent   = pad(h);
+      document.getElementById('cdMinutes').textContent = pad(m);
+      document.getElementById('cdSeconds').textContent = pad(s);
+    }
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>

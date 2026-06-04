@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make Calendar – 2026 FIFA World Cup</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="theme.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">⚽ <span>WC</span> 2026</a>
+    <ul id="navMenu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="locations.html">Locations</a></li>
+      <li><a href="calendar.html" class="active">Calendar</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right">
+      <button id="themeToggle" class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+      <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="hero" style="padding:3rem 1.5rem 2.5rem;">
+      <div class="hero-eyebrow">📆 Calendar Export</div>
+      <h1 style="font-size:clamp(2rem,5vw,3rem);"><em>Make</em> Calendar</h1>
+      <p class="hero-sub" style="margin-bottom:0;">Select matches and add them to your calendar app or download an .ics file</p>
+    </div>
+
+    <!-- ── Demo Calendar ────────────────────────── -->
+    <div class="section-header" style="margin-bottom:1rem;">
+      <div>
+        <div class="section-title">📅 Visual Schedule</div>
+        <div class="section-sub">Full tournament at a glance — all 104 matches</div>
+      </div>
+      <div style="display:flex;gap:0.4rem;align-items:center;">
+        <button class="demo-cal-nav" onclick="changeViewMonth(-1)" id="prevMonthBtn">◀</button>
+        <span id="viewMonthLabel" style="font-size:0.9rem;font-weight:700;min-width:100px;text-align:center;"></span>
+        <button class="demo-cal-nav" onclick="changeViewMonth(1)" id="nextMonthBtn">▶</button>
+      </div>
+    </div>
+    <div class="demo-cal-wrap" style="padding:1.25rem 1rem;">
+      <div class="demo-cal-weekdays">
+        <div class="demo-cal-weekday">Sun</div><div class="demo-cal-weekday">Mon</div>
+        <div class="demo-cal-weekday">Tue</div><div class="demo-cal-weekday">Wed</div>
+        <div class="demo-cal-weekday">Thu</div><div class="demo-cal-weekday">Fri</div>
+        <div class="demo-cal-weekday">Sat</div>
+      </div>
+      <div class="demo-cal-grid" id="demoCal"></div>
+    </div>
+
+    <div style="display:flex;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap;font-size:0.75rem;">
+      <div style="display:flex;align-items:center;gap:0.4rem;"><div style="width:10px;height:10px;border-radius:2px;border-left:3px solid var(--text-muted);background:var(--input-bg);"></div> Group Stage</div>
+      <div style="display:flex;align-items:center;gap:0.4rem;"><div style="width:10px;height:10px;border-radius:2px;border-left:3px solid var(--gold);background:var(--gold-dim);"></div> Knockout</div>
+      <div style="display:flex;align-items:center;gap:0.4rem;"><div style="width:10px;height:10px;border-radius:2px;border-left:3px solid var(--red);background:var(--red-dim);"></div> Final</div>
+    </div>
+
+    <!-- ── Select & Export ────────────────────────── -->
+    <div class="section-header" style="margin-bottom:1rem;">
+      <div>
+        <div class="section-title">📤 Select & Export</div>
+        <div class="section-sub">Choose matches to add to your calendar</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="cal-page-filters">
+      <input type="text" id="searchInput" class="filter-input" placeholder="🔍  Search by team…" style="flex:1;min-width:160px;">
+      <select id="typeFilter" class="filter-select">
+        <option value="">All Stages</option>
+        <option value="Group">Group Stage</option>
+        <option value="Round of 32">Round of 32</option>
+        <option value="Round of 16">Round of 16</option>
+        <option value="Quarter-final">Quarter-final</option>
+        <option value="Semi-final">Semi-final</option>
+        <option value="Final">Final</option>
+      </select>
+      <button class="btn btn-outline btn-sm" onclick="selectAll()">Select All</button>
+      <button class="btn btn-outline btn-sm" onclick="selectNone()">Clear All</button>
+    </div>
+
+    <div class="cal-page-grid">
+      <!-- Games list -->
+      <div>
+        <div id="gamesList" style="display:flex;flex-direction:column;gap:0.65rem;"></div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="cal-sidebar">
+        <div class="cal-summary-box">
+          <div class="cal-summary-title">📆 Your Calendar</div>
+          <div class="cal-count" id="selCount">0</div>
+          <div class="cal-count-label">matches selected</div>
+          <div class="cal-actions">
+            <button class="btn btn-full" onclick="downloadICS()">⬇ Download .ics file</button>
+            <p style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin-top:0.25rem;">Works with Apple Calendar, Google, Outlook</p>
+          </div>
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+            <div style="font-size:0.8rem;font-weight:600;margin-bottom:0.75rem;color:var(--text-secondary);">Or add individually:</div>
+            <div id="googleLinks" style="display:flex;flex-direction:column;gap:0.5rem;max-height:300px;overflow-y:auto;"></div>
+            <div id="noSelMsg" style="font-size:0.78rem;color:var(--text-muted);">Select matches to see Google Calendar links.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>© 2026 FIFA World Cup Fan Site &nbsp;·&nbsp; Created by <a href="https://linktr.ee/zachspam06" target="_blank" rel="noopener noreferrer">Zach Andelman</a></p>
+      <p>Not affiliated with FIFA or any official organization.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+    let selected = new Set();
+    let filteredIds = GAMES.map(g => g.id);
+
+    function renderList() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const type = document.getElementById('typeFilter').value;
+
+      const filtered = GAMES.filter(g =>
+        (!search || g.team1.toLowerCase().includes(search) || g.team2.toLowerCase().includes(search)) &&
+        (!type || g.type === type)
+      );
+      filteredIds = filtered.map(g => g.id);
+
+      const list = document.getElementById('gamesList');
+      list.innerHTML = filtered.map(game => {
+        const isSel = selected.has(game.id);
+        return `<div class="game-select-card ${isSel ? 'selected' : ''}" onclick="toggleGame(${game.id})">
+          <div class="game-checkbox">${isSel ? '✓' : ''}</div>
+          <div class="game-select-info">
+            <div class="game-select-teams">${getFlag(game.team1)} ${game.team1} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${game.team2} ${getFlag(game.team2)}</div>
+            <div class="game-select-meta">${formatDate(game.date)} · ${game.time} ET · ${game.stadium}</div>
+          </div>
+          <a href="${toGoogleCalURL(game)}" target="_blank" rel="noopener" onclick="e=>e.stopPropagation()"
+            style="font-size:0.72rem;color:var(--gold);text-decoration:none;font-weight:600;white-space:nowrap;flex-shrink:0;padding:0.3rem 0.5rem;border-radius:6px;border:1px solid var(--gold-dim);">
+            Google Cal
+          </a>
+        </div>`;
+      }).join('');
+      updateSidebar();
+    }
+
+    function toggleGame(id) {
+      if (selected.has(id)) selected.delete(id);
+      else selected.add(id);
+      renderList();
+    }
+
+    function selectAll() {
+      filteredIds.forEach(id => selected.add(id));
+      renderList();
+    }
+
+    function selectNone() {
+      filteredIds.forEach(id => selected.delete(id));
+      renderList();
+    }
+
+    function updateSidebar() {
+      const selGames = GAMES.filter(g => selected.has(g.id));
+      document.getElementById('selCount').textContent = selGames.length;
+
+      const linksEl = document.getElementById('googleLinks');
+      const noMsg = document.getElementById('noSelMsg');
+
+      if (selGames.length === 0) {
+        linksEl.innerHTML = '';
+        noMsg.style.display = 'block';
+      } else {
+        noMsg.style.display = 'none';
+        linksEl.innerHTML = selGames.slice(0, 20).map(g => `
+          <a href="${toGoogleCalURL(g)}" target="_blank" rel="noopener"
+            style="font-size:0.75rem;color:var(--gold);text-decoration:none;font-weight:500;
+                   padding:0.35rem 0.6rem;background:var(--gold-dim);border-radius:6px;
+                   border:1px solid rgba(245,200,66,0.2);display:block;line-height:1.3;">
+            📅 ${g.team1} vs ${g.team2} <span style="color:var(--text-muted);font-weight:400;">${formatDate(g.date)}</span>
+          </a>`).join('');
+        if (selGames.length > 20) {
+          linksEl.innerHTML += `<div style="font-size:0.72rem;color:var(--text-muted);text-align:center;">+${selGames.length - 20} more — use .ics download</div>`;
+        }
+      }
+    }
+
+    function downloadICS() {
+      const selGames = GAMES.filter(g => selected.has(g.id));
+      if (selGames.length === 0) {
+        alert('Please select at least one match first.');
+        return;
+      }
+
+      let ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//World Cup 2026//EN\r\nCALSCALE:GREGORIAN\r\nX-WR-CALNAME:FIFA World Cup 2026\r\n`;
+
+      selGames.forEach(game => {
+        const start = toUTCICS(game.date, game.time);
+        if (!start) return;
+        const endD = new Date(start.replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z'));
+        endD.setHours(endD.getHours() + 2);
+        const end = endD.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+        const summary = `${game.team1} vs ${game.team2} – FIFA World Cup 2026`;
+        ics += `BEGIN:VEVENT\r\n`;
+        ics += `UID:wc2026-match-${game.id}@worldcup2026\r\n`;
+        ics += `DTSTAMP:20260604T000000Z\r\n`;
+        ics += `DTSTART:${start}\r\n`;
+        ics += `DTEND:${end}\r\n`;
+        ics += `SUMMARY:${summary}\r\n`;
+        ics += `LOCATION:${game.stadium}\r\n`;
+        ics += `DESCRIPTION:${game.type} Match · ${game.time} ET\r\n`;
+        ics += `END:VEVENT\r\n`;
+      });
+
+      ics += `END:VCALENDAR`;
+
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `WorldCup2026_${selGames.length}matches.ics`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderList);
+    document.getElementById('typeFilter').addEventListener('change', renderList);
+
+    renderList();
+
+    // ── Demo Calendar ──────────────────────────────
+    // Group games by date
+    const gamesByDate = {};
+    GAMES.forEach(g => {
+      if (!gamesByDate[g.date]) gamesByDate[g.date] = [];
+      gamesByDate[g.date].push(g);
+    });
+
+    let viewYear = 2026, viewMonth = 5; // start at June
+
+    function chipClass(type) {
+      if (type === 'Final' || type === 'Third Place') return 'chip-final';
+      if (type === 'Group') return 'chip-group';
+      return 'chip-knockout'; // R32, R16, QF, SF all get gold
+    }
+
+    function renderDemoCal() {
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('viewMonthLabel').textContent = `${monthNames[viewMonth]} ${viewYear}`;
+
+      // Disable nav outside Jun–Jul 2026
+      document.getElementById('prevMonthBtn').disabled = (viewYear === 2026 && viewMonth <= 5);
+      document.getElementById('nextMonthBtn').disabled = (viewYear === 2026 && viewMonth >= 6);
+
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const firstDay   = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
+
+      const today = new Date();
+      let html = '';
+
+      // Empty leading cells
+      for (let i = 0; i < firstDay; i++) {
+        html += '<div class="demo-cal-cell empty"></div>';
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dayGames = gamesByDate[dateStr] || [];
+        const isToday = today.getFullYear() === viewYear && today.getMonth() === viewMonth && today.getDate() === d;
+        const hasGames = dayGames.length > 0;
+        const MAX_CHIPS = 3;
+
+        let chipsHtml = '';
+        if (hasGames) {
+          const visible = dayGames.slice(0, MAX_CHIPS);
+          const extra   = dayGames.length - MAX_CHIPS;
+          visible.forEach(g => {
+            const isTBD = g.team1 === 'TBD';
+            const label = isTBD
+              ? `${g.type} · ${g.time}`
+              : `${getFlag(g.team1)}${getFlag(g.team2)} ${g.time}`;
+            chipsHtml += `<div class="game-chip ${chipClass(g.type)}" title="${g.team1} vs ${g.team2} · ${g.time} ET · ${g.stadium}">${label}</div>`;
+          });
+          if (extra > 0) {
+            chipsHtml += `<div class="chip-more" onclick="showDayGames('${dateStr}')">+${extra} more</div>`;
+          }
+        }
+
+        html += `<div class="demo-cal-cell ${hasGames ? 'has-games' : ''} ${isToday ? 'today' : ''}">
+          <div class="demo-cal-day-num">${d}</div>
+          ${chipsHtml}
+        </div>`;
+      }
+
+      document.getElementById('demoCal').innerHTML = html;
+    }
+
+    function changeViewMonth(dir) {
+      viewMonth += dir;
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      renderDemoCal();
+    }
+
+    function showDayGames(dateStr) {
+      const dayGames = gamesByDate[dateStr] || [];
+      const info = dayGames.map(g =>
+        `• ${getFlag(g.team1)} ${g.team1} vs ${g.team2} ${getFlag(g.team2)}  —  ${g.time} ET  |  ${g.stadium}`
+      ).join('\n');
+      alert(`Games on ${formatDateLong(dateStr)}:\n\n${info}`);
+    }
+
+    renderDemoCal();
+  </script>
+</body>
+</html>
