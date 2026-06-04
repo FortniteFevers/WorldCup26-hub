@@ -2,7 +2,7 @@
 
 Your interactive companion for the 2026 FIFA World Cup — track all 104 matches across 16 stadiums, explore live team rosters, and sync games to your calendar.
 
-**Live Demo:** [world-cup-2026.github.io](https://your-username.github.io/world-cup-2026)
+**Live Demo:** [WorldCup26-hub.github.io]([https://your-username.github.io/world-cup-2026](https://fortnitefevers.github.io/WorldCup26-hub/))
 
 ---
 
@@ -56,45 +56,6 @@ Your interactive companion for the 2026 FIFA World Cup — track all 104 matches
 - Select individual games or "Select All"
 - Download as `.ics` file (works with Apple Calendar, Google Calendar, Outlook)
 - Or add each game individually to Google Calendar
-
----
-
-## 🚀 Local Development
-
-### Prerequisites
-- Python 3.7+ (for CORS proxy)
-- A modern web browser
-
-### Installation
-
-```bash
-git clone https://github.com/yourusername/world-cup-2026.git
-cd world-cup-2026
-```
-
-### Running Locally
-
-```bash
-# Terminal 1: Start the web server (port 8002)
-cd world-cup-2026
-python3 -m http.server 8002 --directory .
-
-# Terminal 2: Start the API proxy (port 8003)
-python3 proxy.py
-```
-
-Then open **http://localhost:8002** in your browser.
-
-### API Integration (Optional)
-
-To fetch live team rosters:
-
-1. Register for a free API key at [football-data.org](https://www.football-data.org/register)
-2. Navigate to the **Teams** page
-3. Paste your API key and click "Connect"
-4. All 48 team rosters will auto-fetch and cache
-
-**Note:** The CORS proxy (`proxy.py`) is required because the API doesn't allow direct browser requests from localhost. On GitHub Pages, you can replace this with a serverless function or use the proxy URL as-is.
 
 ---
 
