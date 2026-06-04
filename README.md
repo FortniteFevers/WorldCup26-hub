@@ -2,7 +2,7 @@
 
 Your interactive companion for the 2026 FIFA World Cup — track all 104 matches across 16 stadiums, explore live team rosters, and sync games to your calendar.
 
-**Live Demo:** [WorldCup26-hub.github.io]([https://your-username.github.io/world-cup-2026](https://fortnitefevers.github.io/WorldCup26-hub/))
+**Live Demo:** [WorldCup26-hub.github.io](https://fortnitefevers.github.io/WorldCup26-hub/)
 
 ---
 
