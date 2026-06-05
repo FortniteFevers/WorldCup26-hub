@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Team – 2026 FIFA World Cup</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
   <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
   <style>
@@ -237,17 +237,17 @@
           </div>
           <button class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="enterMode('squad');event.stopPropagation()">Start Building →</button>
         </div>
-        <div class="mode-card" onclick="enterMode('bracket')">
+        <div class="mode-card" onclick="window.location.href='bracket.html'">
           <div class="mode-card-icon">🏆</div>
           <div class="mode-card-title">Bracket Simulator</div>
-          <div class="mode-card-desc">Simulate the complete 2026 World Cup — group stage through the Final. Predict or auto-simulate every match.</div>
+          <div class="mode-card-desc">Simulate the complete 2026 World Cup — all 12 groups, standings, 8 best 3rd-place teams, and the full knockout bracket.</div>
           <div class="mode-card-features">
-            <div class="mode-card-feat">Full group stage (all 12 groups)</div>
-            <div class="mode-card-feat">Round of 32 → Round of 16 → QF → SF</div>
-            <div class="mode-card-feat">Click to pick winners or auto-simulate</div>
-            <div class="mode-card-feat">Champion reveal</div>
+            <div class="mode-card-feat">Full group stage with real standings</div>
+            <div class="mode-card-feat">8 best 3rd-place teams advance</div>
+            <div class="mode-card-feat">R32 → R16 → QF → SF → Final</div>
+            <div class="mode-card-feat">Click to pick or auto-simulate any match</div>
           </div>
-          <button class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="enterMode('bracket');event.stopPropagation()">Simulate Bracket →</button>
+          <a href="bracket.html" class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="event.stopPropagation()">Open Bracket →</a>
         </div>
       </div>
     </div>
@@ -452,7 +452,7 @@
     requestAnimationFrame(raf);
 
     // ── Shared state ─────────────────────────────────
-    const API_BASE  = 'http://localhost:8003';
+    const _isLocal = ['localhost','127.0.0.1'].includes(window.location.hostname);
     const CACHE_KEY = 'wc2026_all_squads';
     let apiKey    = localStorage.getItem('wc2026_api_key') || '';
     let teamsData = {};
@@ -507,7 +507,10 @@
 
     // ── API ──────────────────────────────────────────
     async function fetchFromAPI(path) {
-      const res = await fetch(`${API_BASE}${path}`, { headers: { 'X-Auth-Token': apiKey } });
+      const url = _isLocal
+        ? `http://localhost:8003${path}`
+        : `https://corsproxy.io/?${encodeURIComponent('https://api.football-data.org/v4' + path)}`;
+      const res = await fetch(url, { headers: { 'X-Auth-Token': apiKey } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
     }

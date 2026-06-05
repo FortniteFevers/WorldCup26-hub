@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teams – 2026 FIFA World Cup</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
   <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
 </head>
@@ -118,7 +118,8 @@
     requestAnimationFrame(raf);
 
     // Requests go through local proxy (proxy.py on :8003) to avoid CORS issues
-    const API_BASE   = 'http://localhost:8003';
+    // Auto-detect: use local proxy when developing, corsproxy.io when on GitHub Pages
+    const _isLocal = ['localhost','127.0.0.1'].includes(window.location.hostname);
     const CACHE_KEY  = 'wc2026_all_squads';    // Single cache for all 48 teams
 
     let apiKey    = localStorage.getItem('wc2026_api_key') || '';
@@ -192,11 +193,12 @@
       wrap.style.display = show ? 'block' : 'none';
     }
 
-    // ── API fetch (single call gets all 48 teams + squads!) ────────────────
+    // ── API fetch (local proxy or corsproxy.io on GitHub Pages) ───────────
     async function fetchFromAPI(path) {
-      const res = await fetch(`${API_BASE}${path}`, {
-        headers: { 'X-Auth-Token': apiKey }
-      });
+      const url = _isLocal
+        ? `http://localhost:8003${path}`
+        : `https://corsproxy.io/?${encodeURIComponent('https://api.football-data.org/v4' + path)}`;
+      const res = await fetch(url, { headers: { 'X-Auth-Token': apiKey } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
     }
