@@ -269,7 +269,7 @@
       <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;">
         <div style="flex:1;min-width:220px;">
           <div style="font-size:0.88rem;font-weight:700;margin-bottom:0.2rem;">🔗 Connect football-data.org</div>
-          <div style="font-size:0.78rem;color:var(--text-secondary);">Need player names. Run <code style="background:var(--input-bg);padding:0.1rem 0.4rem;border-radius:4px;">python3 proxy.py</code> first, then enter your API key.</div>
+          <div style="font-size:0.78rem;color:var(--text-secondary);">Enter your football-data.org API key to load live player names, positions, ages, and shirt numbers.</div>
         </div>
         <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
           <input type="password" id="apiKeyInput" class="api-key-input" placeholder="Paste API key…" style="width:200px;">
@@ -543,7 +543,7 @@
         document.getElementById('disconnectBtn').style.display = 'inline-flex';
         setStatus(`✓ Connected — ${Object.keys(teamsData).length} squads loaded`, 'ok');
         if (currentTeam && teamsData[currentTeam]) renderPlayerList();
-      } catch(e) { setStatus(`✗ ${e.message} — Is proxy.py running on :8003?`, 'err'); }
+      } catch(e) { setStatus(`✗ ${e.message} — Could not load squad data. Check your API key and try again.`, 'err'); }
     }
     function disconnectAPI() {
       apiKey=''; wcTeams=[]; teamsData={};
