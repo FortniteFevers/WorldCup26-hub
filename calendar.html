@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Make Calendar – 2026 FIFA World Cup</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
   <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
 </head>
@@ -19,6 +19,7 @@
       <li><a href="locations.html">Locations</a></li>
       <li><a href="calendar.html" class="active">Calendar</a></li>
       <li><a href="teams.html">Teams</a></li>
+      <li><a href="myteam.html">My Team</a></li>
       <li><a href="guide.html">Guide</a></li>
     </ul>
     <div class="nav-right">
@@ -36,6 +37,7 @@
     <a href="locations.html" onclick="closeMobileMenu()">Locations</a>
     <a href="calendar.html" class="active" onclick="closeMobileMenu()">Calendar</a>
     <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
+    <a href="myteam.html" onclick="closeMobileMenu()">My Team</a>
     <a href="guide.html" onclick="closeMobileMenu()">Guide</a>
   </div>
 
@@ -119,6 +121,40 @@
             <div id="googleLinks" style="display:flex;flex-direction:column;gap:0.5rem;max-height:300px;overflow-y:auto;"></div>
             <div id="noSelMsg" style="font-size:0.78rem;color:var(--text-muted);">Select matches to see Google Calendar links.</div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Games Modal -->
+  <div class="modal-backdrop" id="dayGamesBackdrop" onclick="handleDayModalBackdrop(event)">
+    <div class="modal" id="dayGamesModal" data-lenis-prevent style="max-width:520px;">
+      <div class="modal-header">
+        <div class="modal-title" id="dayModalTitle"></div>
+        <button class="modal-close" onclick="closeDayModal()">✕</button>
+      </div>
+      <div class="modal-body" id="dayModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Game Detail Modal -->
+  <div class="modal-backdrop" id="gameDetailBackdrop" onclick="handleGameModalBackdrop(event)">
+    <div class="modal" id="gameDetailModal" data-lenis-prevent>
+      <div class="modal-header">
+        <div class="modal-title" id="gdStage"></div>
+        <button class="modal-close" onclick="closeGameDetail()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Teams -->
+        <div id="gdMatchup" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;text-align:center;padding:1.5rem 0 1.75rem;"></div>
+
+        <!-- Meta -->
+        <div id="gdMeta" style="display:flex;flex-direction:column;gap:0.6rem;padding:1.25rem;background:var(--bg-base);border-radius:12px;border:1px solid var(--border);margin-bottom:1.5rem;"></div>
+
+        <!-- Actions -->
+        <div style="display:flex;flex-direction:column;gap:0.65rem;">
+          <button class="btn btn-full" id="gdSelectBtn" onclick="toggleGameDetailSelect()"></button>
+          <a class="btn btn-outline btn-full" id="gdGoogleBtn" href="#" target="_blank" rel="noopener" style="justify-content:center;text-decoration:none;">📅 Add to Google Calendar</a>
         </div>
       </div>
     </div>
@@ -305,7 +341,7 @@
             const label = isTBD
               ? `${g.type} · ${g.time}`
               : `${getFlag(g.team1)}${getFlag(g.team2)} ${g.time}`;
-            chipsHtml += `<div class="game-chip ${chipClass(g.type)}" title="${g.team1} vs ${g.team2} · ${g.time} ET · ${g.stadium}">${label}</div>`;
+            chipsHtml += `<div class="game-chip ${chipClass(g.type)}" onclick="openGameDetail(${g.id})" style="cursor:pointer;" title="${g.team1} vs ${g.team2}">${label}</div>`;
           });
           if (extra > 0) {
             chipsHtml += `<div class="chip-more" onclick="showDayGames('${dateStr}')">+${extra} more</div>`;
@@ -330,13 +366,160 @@
 
     function showDayGames(dateStr) {
       const dayGames = gamesByDate[dateStr] || [];
-      const info = dayGames.map(g =>
-        `• ${getFlag(g.team1)} ${g.team1} vs ${g.team2} ${getFlag(g.team2)}  —  ${g.time} ET  |  ${g.stadium}`
-      ).join('\n');
-      alert(`Games on ${formatDateLong(dateStr)}:\n\n${info}`);
+
+      document.getElementById('dayModalTitle').innerHTML =
+        `<span style="font-size:0.95rem;">📅</span> ${formatDateLong(dateStr)}`;
+
+      document.getElementById('dayModalBody').innerHTML = dayGames.map(g => {
+        const ko = g.type !== 'Group';
+        const isFinal = g.type === 'Final';
+        const stageColor  = isFinal ? 'var(--red)'  : ko ? 'var(--gold)' : 'var(--text-muted)';
+        const stageBg     = isFinal ? 'var(--red-dim)' : ko ? 'var(--gold-dim)' : 'var(--input-bg)';
+        const stageBorder = isFinal ? 'rgba(232,64,64,0.2)' : ko ? 'rgba(245,200,66,0.2)' : 'var(--border)';
+        return `
+          <div onclick="openGameFromDay(${g.id})" style="
+            display:flex;align-items:center;gap:1rem;
+            padding:0.9rem 1rem;border-radius:12px;
+            border:1px solid var(--border);background:var(--bg-base);
+            cursor:pointer;transition:all 0.18s;margin-bottom:0.6rem;"
+            onmouseenter="this.style.borderColor='var(--border-bright)';this.style.background='var(--bg-card-hover)'"
+            onmouseleave="this.style.borderColor='var(--border)';this.style.background='var(--bg-base)'">
+            <div style="display:flex;align-items:center;gap:0.4rem;flex:1;min-width:0;">
+              <span style="font-size:1.5rem;line-height:1;">${getFlag(g.team1)}</span>
+              <span style="font-size:0.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.team1}</span>
+              <span style="font-size:0.7rem;color:var(--text-muted);font-weight:600;margin:0 0.15rem;">vs</span>
+              <span style="font-size:0.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.team2}</span>
+              <span style="font-size:1.5rem;line-height:1;">${getFlag(g.team2)}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.25rem;flex-shrink:0;">
+              <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+                padding:0.15rem 0.55rem;border-radius:100px;
+                background:${stageBg};color:${stageColor};border:1px solid ${stageBorder};">${g.type}</span>
+              <span style="font-size:0.72rem;color:var(--text-muted);">${g.time} ET</span>
+            </div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('dayGamesBackdrop').classList.add('open');
+      lenis.stop();
+    }
+
+    function closeDayModal() {
+      document.getElementById('dayGamesBackdrop').classList.remove('open');
+      lenis.start();
+    }
+
+    function handleDayModalBackdrop(e) {
+      if (e.target === document.getElementById('dayGamesBackdrop')) closeDayModal();
+    }
+
+    function openGameFromDay(id) {
+      // Close day modal silently, then open game detail (lenis stays stopped)
+      document.getElementById('dayGamesBackdrop').classList.remove('open');
+      openGameDetail(id);
     }
 
     renderDemoCal();
+
+    // ── Game Detail Modal ──────────────────────────
+    let _detailGameId = null;
+
+    function openGameDetail(id) {
+      const game = GAMES.find(g => g.id === id);
+      if (!game) return;
+      _detailGameId = id;
+
+      const ko = game.type !== 'Group';
+      const isFinal = game.type === 'Final';
+      const stageColor = isFinal ? 'var(--red)' : ko ? 'var(--gold)' : 'var(--text-muted)';
+      const stageBg    = isFinal ? 'var(--red-dim)' : ko ? 'var(--gold-dim)' : 'var(--input-bg)';
+      const stageBorder= isFinal ? 'rgba(232,64,64,0.25)' : ko ? 'rgba(245,200,66,0.25)' : 'var(--border)';
+
+      // Stage badge
+      document.getElementById('gdStage').innerHTML =
+        `<span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+          padding:0.3rem 0.8rem;border-radius:100px;background:${stageBg};color:${stageColor};
+          border:1px solid ${stageBorder};">${game.type}</span>`;
+
+      // Matchup
+      const isTBD = game.team1 === 'TBD';
+      document.getElementById('gdMatchup').innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
+          <div style="font-size:3rem;line-height:1;">${getFlag(game.team1)}</div>
+          <div style="font-size:1rem;font-weight:800;letter-spacing:-0.02em;">${game.team1}</div>
+        </div>
+        <div style="font-size:0.72rem;font-weight:800;color:var(--text-muted);letter-spacing:0.1em;
+          background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:0.4rem 0.7rem;">VS</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
+          <div style="font-size:3rem;line-height:1;">${getFlag(game.team2)}</div>
+          <div style="font-size:1rem;font-weight:800;letter-spacing:-0.02em;">${game.team2}</div>
+        </div>`;
+
+      // Meta rows
+      const stadium = STADIUMS[game.stadium];
+      const countryFlag = stadium ? stadium.country : '';
+      const city = stadium ? stadium.city : '';
+      document.getElementById('gdMeta').innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;">
+          <span style="font-size:1rem;">📅</span>
+          <span style="color:var(--text-secondary);">${formatDateLong(game.date)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;">
+          <span style="font-size:1rem;">🕐</span>
+          <span style="color:var(--text-secondary);">${game.time} Eastern Time</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;">
+          <span style="font-size:1rem;">📍</span>
+          <span style="color:var(--text-secondary);">${game.stadium}${city ? ' · ' + city : ''} ${countryFlag}</span>
+        </div>`;
+
+      // Select button
+      updateGdSelectBtn();
+
+      // Google Cal link
+      document.getElementById('gdGoogleBtn').href = toGoogleCalURL(game);
+
+      // Show modal
+      document.getElementById('gameDetailBackdrop').classList.add('open');
+      lenis.stop();
+    }
+
+    function closeGameDetail() {
+      document.getElementById('gameDetailBackdrop').classList.remove('open');
+      lenis.start();
+      _detailGameId = null;
+    }
+
+    function handleGameModalBackdrop(e) {
+      if (e.target === document.getElementById('gameDetailBackdrop')) closeGameDetail();
+    }
+
+    function updateGdSelectBtn() {
+      const btn = document.getElementById('gdSelectBtn');
+      if (selected.has(_detailGameId)) {
+        btn.textContent = '✓ Added to Export Selection';
+        btn.style.background = '#22c55e';
+        btn.style.color = '#fff';
+      } else {
+        btn.textContent = '+ Add to Export Selection';
+        btn.style.background = '';
+        btn.style.color = '';
+      }
+    }
+
+    function toggleGameDetailSelect() {
+      if (selected.has(_detailGameId)) selected.delete(_detailGameId);
+      else selected.add(_detailGameId);
+      updateGdSelectBtn();
+      renderList(); // keep the list in sync
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (document.getElementById('gameDetailBackdrop').classList.contains('open')) closeGameDetail();
+      else if (document.getElementById('dayGamesBackdrop').classList.contains('open')) closeDayModal();
+    });
   </script>
 </body>
 </html>
