@@ -401,17 +401,17 @@
 
     /* Landing footer */
     .lp-footer {
+      background: var(--bg-surface);
       border-top: 1px solid var(--border);
-      padding: 2rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
+      padding: 1.75rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
     }
-    .lp-footer-copy { font-size: 0.75rem; color: var(--text-muted); line-height: 1.7; }
-    .lp-footer-copy a { color: var(--text-secondary); text-decoration: none; }
-    .lp-footer-copy a:hover { color: var(--text-primary); }
+    .lp-footer-copy { max-width: 1300px; margin: 0 auto; }
+    .lp-footer-copy div { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+    .lp-footer-copy a { color: var(--gold); text-decoration: none; font-weight: 600; }
+    .lp-footer-copy a:hover { text-decoration: underline; }
     .lp-footer-links { display: flex; gap: 1.25rem; flex-wrap: wrap; }
     .lp-footer-links a {
       font-size: 0.75rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s;
@@ -497,7 +497,7 @@
 <body>
   <!-- Navigation -->
   <nav>
-    <a href="index.html" class="logo">⚽ <span>WC</span> 2026</a>
+    <a href="index.html" class="logo">⚽ <span>World Cup</span> Field Guide</a>
     <ul id="navMenu">
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="games.html">Games</a></li>
@@ -664,14 +664,12 @@
   </div>
 
   <!-- ═══════════ FOOTER ═══════════ -->
-  <div class="lp-wrap">
-    <footer class="lp-footer">
-      <div class="lp-footer-copy">
-        <div>© 2026 FIFA World Cup Fan Site · Created by <a href="https://linktr.ee/zachspam06" target="_blank" rel="noopener noreferrer">Zach Andelman</a></div>
-        <div>Not affiliated with FIFA or any official organization.</div>
-      </div>
-    </footer>
-  </div>
+  <footer class="lp-footer">
+    <div class="lp-footer-copy">
+      <div>© 2026 FIFA World Cup Fan Site · Created by <a href="https://linktr.ee/zachspam06" target="_blank" rel="noopener noreferrer">Zach Andelman</a></div>
+      <div>Not affiliated with FIFA or any official organization.</div>
+    </div>
+  </footer>
 
   <script src="data.js"></script>
   <script>
