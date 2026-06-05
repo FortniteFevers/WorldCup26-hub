@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>World Cup Guide – 2026 FIFA World Cup</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2">
   <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
   <style>
@@ -75,11 +75,10 @@
       margin-bottom: 1rem;
     }
 
-    /* Callout box */
+    /* Callout box — clean, no colored border */
     .callout {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-left: 4px solid var(--gold);
       border-radius: 12px;
       padding: 1.25rem 1.5rem;
       margin: 1.5rem 0;
@@ -88,15 +87,15 @@
       line-height: 1.7;
     }
     .callout strong { color: var(--text-primary); }
-    .callout.red  { border-left-color: var(--red); }
-    .callout.blue { border-left-color: #60a5fa; }
-    .callout.green { border-left-color: #22c55e; }
+    .callout.red   { }
+    .callout.blue  { }
+    .callout.green { }
 
     /* Two-column layout */
     .guide-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+      gap: 1rem;
       margin: 1.5rem 0;
     }
     @media (max-width: 700px) { .guide-grid { grid-template-columns: 1fr; } }
@@ -104,8 +103,8 @@
     /* Regions table */
     .region-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
       margin: 1.5rem 0;
     }
     .region-card {
@@ -143,6 +142,11 @@
       padding: 0.15rem 0.6rem;
     }
 
+    /* Table scroll wrapper for mobile */
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1.25rem 0; border-radius: 12px; border: 1px solid var(--border); }
+    .table-scroll .standings-table,
+    .table-scroll .compare-table { margin: 0; border: none; border-radius: 0; }
+
     /* Points / standings table */
     .standings-table {
       width: 100%;
@@ -161,13 +165,15 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      padding: 0.65rem 1rem;
+      padding: 0.65rem 0.85rem;
       text-align: left;
+      white-space: nowrap;
     }
     .standings-table td {
-      padding: 0.75rem 1rem;
+      padding: 0.7rem 0.85rem;
       border-top: 1px solid var(--border);
       color: var(--text-secondary);
+      white-space: nowrap;
     }
     .standings-table td:first-child { color: var(--text-primary); font-weight: 600; }
     .standings-table .pts { color: var(--gold); font-weight: 800; }
@@ -180,7 +186,7 @@
       flex-direction: column;
       gap: 0;
       margin: 1.5rem 0;
-      max-width: 420px;
+      max-width: 100%;
     }
     .bracket-step {
       display: flex;
@@ -216,19 +222,21 @@
       border: 1px solid var(--border);
     }
     .compare-table th {
-      padding: 0.75rem 1.25rem;
-      font-size: 0.72rem;
+      padding: 0.7rem 1rem;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      white-space: nowrap;
     }
     .compare-table th:first-child { background: var(--bg-surface); color: var(--text-muted); text-align: left; }
     .compare-table th.old  { background: rgba(148,163,184,0.08); color: var(--text-muted); }
     .compare-table th.new2026 { background: var(--gold-dim); color: var(--gold); }
     .compare-table td {
-      padding: 0.7rem 1.25rem;
+      padding: 0.65rem 1rem;
       border-top: 1px solid var(--border);
       color: var(--text-secondary);
+      white-space: nowrap;
     }
     .compare-table td:first-child { color: var(--text-primary); font-weight: 600; background: var(--bg-card); }
     .compare-table td.old  { background: var(--bg-card); text-align: center; }
@@ -257,8 +265,8 @@
     /* Teams to know */
     .teams-know-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 0.85rem;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
       margin: 1.5rem 0;
     }
     .team-know-card {
@@ -353,13 +361,33 @@
     }
     .guide-toc a:hover { color: var(--text-primary); background: var(--input-bg); }
     @media (max-width: 900px) {
-      .guide-layout { grid-template-columns: 1fr; }
+      .guide-layout {
+        display: block; /* drop grid entirely on mobile/tablet */
+      }
       .guide-toc { display: none; }
     }
     .divider {
       border: none;
       border-top: 1px solid var(--border);
-      margin: 3.5rem 0;
+      margin: 3rem 0;
+    }
+
+    /* ── Mobile overrides ── */
+    @media (max-width: 700px) {
+      .guide-section { margin-bottom: 2.5rem; }
+      .guide-lead { font-size: 0.95rem; max-width: 100%; }
+      .guide-text { font-size: 0.88rem; max-width: 100%; }
+      .callout { padding: 1rem 1.1rem; font-size: 0.85rem; }
+      .points-grid { gap: 0.6rem; }
+      .points-card { padding: 0.75rem 0.9rem; min-width: 90px; }
+      .points-num { font-size: 1.6rem; }
+      .follow-step { padding: 0.85rem 1rem; gap: 0.75rem; }
+      .bracket-num { min-width: 44px; font-size: 1.1rem; }
+      .bracket-step { padding: 0.75rem 1rem; }
+      .divider { margin: 2rem 0; }
+      .region-grid { grid-template-columns: 1fr 1fr; }
+      .guide-section h2 { font-size: 1.5rem; }
+      .teams-know-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -511,6 +539,7 @@
           </div>
 
           <p class="guide-text">Here's an example of how a group table might look after all three games:</p>
+          <div class="table-scroll">
           <table class="standings-table">
             <thead>
               <tr>
@@ -526,6 +555,7 @@
               <tr><td>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</td><td>0</td><td>2</td><td>1</td><td>-4</td><td class="pts">2</td></tr>
             </tbody>
           </table>
+          </div>
           <div style="display:flex;gap:1.25rem;flex-wrap:wrap;font-size:0.75rem;margin-bottom:1.25rem;">
             <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.3);display:inline-block;"></span> Auto-advance (top 2)</span>
             <span style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.3);display:inline-block;"></span> Possible advance (best 3rd-place)</span>
@@ -589,6 +619,7 @@
           <h2>Why 2026 is <em>Different</em></h2>
           <p class="guide-text">This is not just "another World Cup." It is <strong>the biggest one ever held</strong>. Here's how it compares to the old format:</p>
 
+          <div class="table-scroll">
           <table class="compare-table">
             <thead>
               <tr>
@@ -607,6 +638,7 @@
               <tr><td>Tournament Duration</td><td class="old">~32 days</td><td class="new2026">39 days</td></tr>
             </tbody>
           </table>
+          </div>
 
           <div class="guide-grid">
             <div class="callout green" style="margin:0;">
@@ -682,6 +714,7 @@
           <h2>How Soccer <em>Standings Work</em></h2>
           <p class="guide-text">In American sports, you're used to wins and losses. Soccer uses <strong>points</strong> because ties (draws) are completely normal — and they happen a lot. That's why standings look different.</p>
           <p class="guide-text">Here's an example of a full group table with explanations:</p>
+          <div class="table-scroll">
           <table class="standings-table">
             <thead>
               <tr>
@@ -703,6 +736,7 @@
               <tr><td>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</td><td>3</td><td>0</td><td>2</td><td>1</td><td>1</td><td>5</td><td>-4</td><td class="pts">2</td></tr>
             </tbody>
           </table>
+          </div>
 
           <div class="callout">
             <strong>Goal Difference (GD)</strong> is goals scored <em>minus</em> goals allowed. If you win 3–0, that's +3. If you lose 2–1, that's -1. It's the most common tiebreaker when teams are level on points — which is why teams don't coast when they're up big. Winning 4–0 instead of 1–0 can literally be the difference between advancing and going home.
