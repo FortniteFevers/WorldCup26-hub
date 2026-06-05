@@ -1,134 +1,160 @@
-# 🌍⚽ World Cup 2026
+# World Cup Field Guide
 
-Your interactive companion for the 2026 FIFA World Cup — track all 104 matches across 16 stadiums, explore live team rosters, and sync games to your calendar.
+An interactive public field guide for following the 2026 FIFA World Cup. It brings the schedule, groups, stadiums, teams, calendar tools, roster data, and bracket simulations into one place for both casual fans and people who already follow the sport closely.
 
-**Live Demo:** [WorldCup26-hub.github.io](https://fortnitefevers.github.io/WorldCup26-hub/)
+**Live Site:** [worldcupfieldguide.com](https://worldcupfieldguide.com)
 
----
+## Features
 
-## ✨ Features
+- **Full Match Schedule** - Browse all 104 matches from the group stage through the final, with kickoff times shown in Eastern Time.
+- **Search & Filters** - Find matches by team, stadium, date, or tournament stage.
+- **Groups View** - See all 12 groups, standings structure, matchday schedules, and advancement rules.
+- **Stadium Map** - Explore all 16 host venues on an interactive Leaflet map with venue cards and match counts.
+- **Calendar Export** - Select games and download an `.ics` file or add individual matches to Google Calendar.
+- **Teams Hub** - Browse all 48 qualified teams and optionally connect a football-data.org API key for live squad data.
+- **My Team** - Pick a country, build a starting XI on a tactical pitch, choose formations, and simulate a match.
+- **Bracket Simulator** - Simulate the full tournament from groups through the final, including best third-place advancement.
+- **World Cup Guide** - Beginner-friendly explanations for how the tournament format works.
+- **Optional Accounts** - Clerk sign-in/sign-up is available for future saved data and paid features, but the site remains publicly browsable without an account.
+- **Dark/Light Mode** - Persistent theme toggle across pages.
+- **Mobile Responsive** - Compact navigation and responsive layouts for smaller screens.
+- **Vercel Analytics** - Basic traffic analytics through Vercel.
 
-- **📅 Full Schedule** — All 104 group, knockout, and final matches with kickoff times (Eastern Time)
-- **🗺️ Stadium Map** — Interactive Leaflet.js map with all 16 venues color-coded by country (USA, Mexico, Canada)
-- **👥 Live Team Rosters** — Integrate with [football-data.org](https://www.football-data.org) API to fetch squad data for all 48 teams
-  - Player names, positions (GK/DEF/MID/FWD), ages, nationality
-  - Position breakdown badges (🧤🛡️⚙️⚡) on team cards
-  - Data cached in localStorage for instant loading after first sync
-- **📆 Calendar Export** — Select matches and download as `.ics` file or add individually to Google Calendar
-- **🔍 Search & Filter** — Find games by team, date, stadium, or tournament stage
-- **🌙 Dark/Light Mode** — Toggle theme with persistent storage
-- **📱 Mobile-Responsive** — Optimized for all screen sizes
-- **⏳ Live Countdown** — Hours/minutes/seconds until first match
+## Tech Stack
 
----
+- **Core App:** HTML5, CSS3, vanilla JavaScript
+- **Deployment Wrapper:** Next.js App Router on Vercel
+- **Auth:** Clerk
+- **Analytics:** Vercel Analytics
+- **Maps:** Leaflet.js with CartoDB tiles
+- **Animations:** Lenis smooth scrolling
+- **Image Export:** html2canvas for bracket sharing
+- **API Data:** football-data.org for optional squad/player data
+- **Storage:** localStorage for theme, API key state, cached squads, and simulator data
 
-## 🛠️ Tech Stack
+## Project Structure
 
-- **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3
-- **Maps:** [Leaflet.js](https://leafletjs.com/) + CartoDB tiles
-- **API:** [football-data.org](https://www.football-data.org) (free tier)
-- **Backend Proxy:** Python CORS proxy for API requests
-- **Storage:** localStorage for squad caching
-- **Deployment:** GitHub Pages (static site)
-
----
-
-## 📖 Usage
-
-### 1. View the Schedule
-- **Home** → See opening matches and tournament stats
-- **Games** → Browse all 104 matches with search, filter by date/stadium/stage
-- **Calendar** → Visual grid view of the full schedule
-
-### 2. Explore Stadiums
-- **Locations** → Interactive map of all 16 venues
-- Click a marker to see games at that stadium
-- Click a card below the map to zoom to that location
-
-### 3. View Team Rosters (Requires API Key)
-- **Teams** → All 48 teams in a grid
-- Get a free API key at [football-data.org](https://www.football-data.org/register)
-- Paste your key on the Teams page → Auto-fetches all rosters (~8 minutes, then cached)
-- Click any team to see full player roster with stats
-
-### 4. Export to Calendar
-- **Calendar** → Visual month grid of all matches
-- Select individual games or "Select All"
-- Download as `.ics` file (works with Apple Calendar, Google Calendar, Outlook)
-- Or add each game individually to Google Calendar
-
----
-
-## 📁 Project Structure
-
-```
+```text
 world-cup-2026/
-├── index.html           # Home page with countdown & stats
-├── games.html           # Full match schedule with filters
-├── locations.html       # Interactive stadium map
-├── calendar.html        # Visual calendar view & export
-├── teams.html           # Team rosters & squad data
-├── data.js              # All 104 matches & stadium data
-├── styles.css           # Responsive dark/light mode styles
-├── theme.js             # Theme toggle & mobile nav
-├── proxy.py             # Python CORS proxy (local only)
-└── README.md            # This file
+├── app/
+│   ├── layout.tsx        # ClerkProvider, Vercel Analytics, global app shell
+│   └── page.tsx          # Redirects / to the static landing page
+├── public/               # Static files served by the Next/Vercel app
+├── index.html            # Landing page with countdown, stats, and feature links
+├── games.html            # Full 104-match schedule with filters and modals
+├── groups.html           # Group standings and matchday overview
+├── locations.html        # Interactive stadium map
+├── calendar.html         # Calendar grid, .ics export, Google Calendar links
+├── teams.html            # Team cards and optional roster API integration
+├── myteam.html           # Squad builder and match simulator
+├── bracket.html          # Full World Cup bracket simulator
+├── guide.html            # Beginner-friendly World Cup guide
+├── data.js               # Matches, groups, stadiums, flags, helper data
+├── script.js             # Shared landing/schedule behavior
+├── auth.js               # Clerk JS integration for static pages
+├── theme.js              # Theme toggle and mobile nav behavior
+├── styles.css            # Global responsive styles and themes
+├── proxy.ts              # Clerk middleware for Next/Vercel
+├── proxy.py              # Optional local-only CORS helper for API testing
+├── package.json          # Next, React, Clerk, and Vercel dependencies
+└── README.md
 ```
 
----
+When editing the static pages, keep the root files and matching files in `public/` in sync because Vercel serves the static experience from `public/`.
 
-## 📝 Data
+## Data
 
-All 104 matches are hardcoded in `data.js` with:
-- **Group Stage** (72 matches): June 11–27, 2026
-- **Knockout Rounds** (32 matches): June 28–July 19, 2026
-- Teams, times, stadiums, and group assignments
+All tournament schedule and venue data lives in `data.js`.
 
-Stadium coordinates and capacities are included for the interactive map.
+- **Total matches:** 104
+- **Group stage:** 72 matches from June 11-27, 2026
+- **Knockout rounds:** 32 matches from June 28-July 19, 2026
+- **Teams:** 48 teams across 12 groups
+- **Stadiums:** 16 venues across the United States, Mexico, and Canada
 
----
+The schedule, stadium coordinates, capacities, groups, flags, and helper mappings are currently stored client-side.
 
-## 🔌 API Credits
+## Local Development
 
-- **Match Schedule & Stadium Data:** Manual compilation from official FIFA sources
-- **Team Rosters & Player Data:** [football-data.org](https://www.football-data.org)
-  - Free tier: 10 requests/minute
-  - Requires free API key (no credit card)
+Install dependencies:
 
----
+```bash
+npm install
+```
 
-## 🎨 Design Features
+Create `.env.local` for Clerk if you want to test sign-in locally:
 
-- **Dark Mode (Default):** Deep navy background with gold accents
-- **Light Mode:** Clean white with amber gold, optimized for readability
-- **Glassmorphism:** Frosted glass nav bar with blur effects
-- **Responsive Grid:** Auto-adjusts from mobile (1 col) to desktop (3+ cols)
-- **Accessible Colors:** High contrast, colorblind-friendly position badges
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key_here
+CLERK_SECRET_KEY=your_secret_key_here
+```
 
----
+Start the development server:
 
-## 🤝 Contributing
+```bash
+npm run dev
+```
 
-Found a bug or want to add a feature? Pull requests welcome!
+Then open:
 
-**Ideas for contributions:**
-- Add more tournament stats (win probabilities, historical comparisons)
-- Player highlight videos or bio links
-- Betting odds integration
-- Multi-language support
-- Progressive Web App (offline support)
+```text
+http://localhost:3000
+```
 
----
+The site should remain accessible without signing in. Sign-in is only for optional account-based features.
 
-## 📄 License
+## Optional API Integration
 
-MIT License — See [LICENSE](LICENSE) file for details.
+Roster and player data use [football-data.org](https://www.football-data.org). Users can paste their own API key on the Teams or My Team pages to fetch squad data.
 
----
+- The API key is stored locally in the browser.
+- Squad data is cached in localStorage after it loads.
+- The deployed site routes browser requests through a CORS proxy URL.
+- `proxy.py` exists only as a local development helper if direct local API testing needs it.
 
-## 👨‍💻 Created by
+Future monetization can use the existing account system to unlock an API connection as a one-time paid feature while keeping the rest of the guide free.
 
-Myself, Fevers.
-*Built and documented with assistance from [Claude Code](https://code.claude.com/docs/en/best-practices) by Anthropic.*
+## Deployment
 
-*Not affiliated with FIFA or any official organization.*
+The project is set up for Vercel with GitHub integration.
+
+Required Vercel environment variables:
+
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key_here
+CLERK_SECRET_KEY=your_secret_key_here
+```
+
+Do not commit secrets. Keep `.env.local`, `node_modules`, `.next`, and other generated files out of Git.
+
+After changing Vercel environment variables, redeploy the project so the new values are included in the build.
+
+## Design
+
+- Dark mode is the default visual identity, with gold World Cup-inspired accents.
+- Light mode is supported across the main pages.
+- Navigation uses a compact mobile layout with auth controls, theme toggle, and menu access.
+- Cards, tables, filters, and modals are designed for quick scanning during the tournament.
+
+## Contributing Ideas
+
+- Saved user picks and bracket history
+- Account-based dashboard for saved teams and favorite matches
+- Stripe one-time payment for premium API-powered features
+- More tournament explainers for new fans
+- Historical World Cup stats and comparisons
+- Progressive Web App support for offline schedule access
+
+## Credits
+
+Created by [Zach Andelman](https://linktr.ee/zachspam06).
+
+Schedule and venue information is manually compiled from public World Cup sources. Live squad/player data is provided through [football-data.org](https://www.football-data.org).
+
+This project is not affiliated with FIFA or any official organization.
+
+## License
+
+MIT License
+
+Copyright (c) 2026 Zach Andelman
