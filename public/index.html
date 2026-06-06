@@ -493,20 +493,20 @@
       background: linear-gradient(to top, var(--bg-base), transparent);
     }
   </style>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
 </head>
 <body>
   <!-- Navigation -->
   <nav>
-    <a href="index.html" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
+    <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
-      <li><a href="index.html" class="active">Home</a></li>
-      <li><a href="games.html">Games</a></li>
-      <li><a href="groups.html">Groups</a></li>
-      <li><a href="locations.html">Locations</a></li>
-      <li><a href="calendar.html">Calendar</a></li>
-      <li><a href="teams.html">Teams</a></li>
-      <li><a href="myteam.html">My Team</a></li>
-      <li><a href="guide.html">Guide</a></li>
+      <li><a href="/" class="active">Home</a></li>
+      <li><a href="/games">Browse Matches</a></li>
+      <li><a href="/groups">Groups</a></li>
+      <li><a href="/teams">Teams</a></li>
+      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
       <div class="clerk-auth signed-out" id="authControls">
@@ -521,14 +521,12 @@
 
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
-    <a href="index.html" class="active" onclick="closeMobileMenu()">Home</a>
-    <a href="games.html" onclick="closeMobileMenu()">Games</a>
-    <a href="groups.html" onclick="closeMobileMenu()">Groups</a>
-    <a href="locations.html" onclick="closeMobileMenu()">Locations</a>
-    <a href="calendar.html" onclick="closeMobileMenu()">Calendar</a>
-    <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
-    <a href="myteam.html" onclick="closeMobileMenu()">My Team</a>
-    <a href="guide.html" onclick="closeMobileMenu()">Guide</a>
+    <a href="/" class="active" onclick="closeMobileMenu()">Home</a>
+    <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
+    <a href="/groups" onclick="closeMobileMenu()">Groups</a>
+    <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
+    <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
 
   <!-- ═══════════ HERO ═══════════ -->
@@ -558,9 +556,9 @@
       <p class="lp-sub">104 matches &nbsp;·&nbsp; 48 teams &nbsp;·&nbsp; 16 stadiums &nbsp;·&nbsp; 1 champion</p>
 
       <div class="lp-ctas">
-        <a href="games.html" class="lp-cta-primary">View All Matches →</a>
-        <a href="locations.html" class="lp-cta-secondary">Stadium Map</a>
-        <a href="calendar.html" class="lp-cta-secondary">Make Calendar</a>
+        <a href="/games" class="lp-cta-primary">Browse Games →</a>
+        <a href="/teams" class="lp-cta-secondary">View Teams</a>
+        <a href="/my-team" class="lp-cta-secondary">My Team</a>
       </div>
 
       <div class="lp-hosts">
@@ -608,7 +606,7 @@
         <div class="lp-title">Opening Matches</div>
         <div class="lp-subtitle">June 11–12 · All times Eastern</div>
       </div>
-      <a href="games.html" class="btn btn-outline btn-sm">All 104 Matches →</a>
+      <a href="/games" class="btn btn-outline btn-sm">Browse Matches →</a>
     </div>
     <div class="lp-match-list" id="featuredGames"></div>
   </div>
@@ -621,7 +619,7 @@
         <div class="lp-title">The Tournament</div>
         <div class="lp-subtitle">First 48-team World Cup in history</div>
       </div>
-      <a href="groups.html" class="btn btn-outline btn-sm">Groups & Standings →</a>
+      <a href="/groups" class="btn btn-outline btn-sm">Groups & Standings →</a>
     </div>
     <div class="lp-stages">
       <div class="lp-stage">

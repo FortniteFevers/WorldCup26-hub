@@ -185,19 +185,19 @@
     .pop-in { animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     .spin { display: inline-block; animation: spin 0.7s linear infinite; }
   </style>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
 </head>
 <body>
   <nav>
-    <a href="index.html" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
+    <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="games.html">Games</a></li>
-      <li><a href="groups.html">Groups</a></li>
-      <li><a href="locations.html">Locations</a></li>
-      <li><a href="calendar.html">Calendar</a></li>
-      <li><a href="teams.html">Teams</a></li>
-      <li><a href="myteam.html" class="active">My Team</a></li>
-      <li><a href="guide.html">Guide</a></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/games">Browse Matches</a></li>
+      <li><a href="/groups">Groups</a></li>
+      <li><a href="/teams">Teams</a></li>
+      <li><a href="/my-team" class="active">My Team</a></li>
+      <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
       <div class="clerk-auth signed-out" id="authControls">
@@ -212,21 +212,19 @@
 
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
-    <a href="index.html" onclick="closeMobileMenu()">Home</a>
-    <a href="games.html" onclick="closeMobileMenu()">Games</a>
-    <a href="groups.html" onclick="closeMobileMenu()">Groups</a>
-    <a href="locations.html" onclick="closeMobileMenu()">Locations</a>
-    <a href="calendar.html" onclick="closeMobileMenu()">Calendar</a>
-    <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
-    <a href="myteam.html" class="active" onclick="closeMobileMenu()">My Team</a>
-    <a href="guide.html" onclick="closeMobileMenu()">Guide</a>
+    <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
+    <a href="/groups" onclick="closeMobileMenu()">Groups</a>
+    <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/my-team" class="active" onclick="closeMobileMenu()">My Team</a>
+    <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
 
   <div class="container">
     <div class="hero" style="padding:3rem 1.5rem 2.5rem;">
       <div class="hero-eyebrow">⚽ Interactive Zone</div>
       <h1 style="font-size:clamp(2rem,5vw,3rem);">My <em>Team</em></h1>
-      <p class="hero-sub" style="margin-bottom:0;">Build your dream XI or simulate the entire 2026 World Cup bracket</p>
+      <p class="hero-sub" style="margin-bottom:0;">Build a squad. Predict the bracket. Draft your 104-0 team.</p>
     </div>
 
     <!-- ── Mode Picker ──────────────────────────────── -->
@@ -244,7 +242,7 @@
           </div>
           <button class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="enterMode('squad');event.stopPropagation()">Start Building →</button>
         </div>
-        <div class="mode-card" onclick="window.location.href='bracket.html'">
+        <div class="mode-card" onclick="window.location.href='/bracket'">
           <div class="mode-card-icon">🏆</div>
           <div class="mode-card-title">Bracket Simulator</div>
           <div class="mode-card-desc">Simulate the complete 2026 World Cup — all 12 groups, standings, 8 best 3rd-place teams, and the full knockout bracket.</div>
@@ -254,9 +252,9 @@
             <div class="mode-card-feat">R32 → R16 → QF → SF → Final</div>
             <div class="mode-card-feat">Click to pick or auto-simulate any match</div>
           </div>
-          <a href="bracket.html" class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="event.stopPropagation()">Open Bracket →</a>
+          <a href="/bracket" class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="event.stopPropagation()">Open Bracket →</a>
         </div>
-        <div class="mode-card" onclick="window.location.href='draft.html'" style="position:relative;overflow:hidden;">
+        <div class="mode-card" onclick="window.location.href='/104-0'" style="position:relative;overflow:hidden;">
           <div style="position:absolute;top:1rem;right:1rem;font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.55rem;border-radius:100px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,200,66,0.3);">NEW</div>
           <div class="mode-card-icon">🎰</div>
           <div class="mode-card-title" style="background:linear-gradient(135deg,var(--gold) 0%,#ff8c00 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">104-0</div>
@@ -267,7 +265,7 @@
             <div class="mode-card-feat">Classic mode + Scout mode (names hidden)</div>
             <div class="mode-card-feat">Simulate 8 games from group to Final</div>
           </div>
-          <a href="draft.html" class="btn" style="margin-top:0.5rem;width:fit-content;background:linear-gradient(135deg,var(--gold),#e8a000);color:#0a0a0a;" onclick="event.stopPropagation()">Play 104-0 →</a>
+          <a href="/104-0" class="btn" style="margin-top:0.5rem;width:fit-content;background:linear-gradient(135deg,var(--gold),#e8a000);color:#0a0a0a;" onclick="event.stopPropagation()">Play 104-0 →</a>
         </div>
       </div>
     </div>

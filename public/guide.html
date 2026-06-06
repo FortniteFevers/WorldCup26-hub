@@ -769,19 +769,19 @@
       .teams-know-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
 </head>
 <body>
   <nav>
-    <a href="index.html" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
+    <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="games.html">Games</a></li>
-      <li><a href="groups.html">Groups</a></li>
-      <li><a href="locations.html">Locations</a></li>
-      <li><a href="calendar.html">Calendar</a></li>
-      <li><a href="teams.html">Teams</a></li>
-      <li><a href="myteam.html">My Team</a></li>
-      <li><a href="guide.html" class="active">Guide</a></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/games">Browse Matches</a></li>
+      <li><a href="/groups">Groups</a></li>
+      <li><a href="/teams">Teams</a></li>
+      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/guide" class="active">Guide</a></li>
     </ul>
     <div class="nav-right">
       <div class="clerk-auth signed-out" id="authControls">
@@ -797,14 +797,12 @@
   <!-- Mobile Menu Modal -->
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
-    <a href="index.html" onclick="closeMobileMenu()">Home</a>
-    <a href="games.html" onclick="closeMobileMenu()">Games</a>
-    <a href="groups.html" onclick="closeMobileMenu()">Groups</a>
-    <a href="locations.html" onclick="closeMobileMenu()">Locations</a>
-    <a href="calendar.html" onclick="closeMobileMenu()">Calendar</a>
-    <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
-    <a href="myteam.html" onclick="closeMobileMenu()">My Team</a>
-    <a href="guide.html" class="active" onclick="closeMobileMenu()">Guide</a>
+    <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
+    <a href="/groups" onclick="closeMobileMenu()">Groups</a>
+    <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
+    <a href="/guide" class="active" onclick="closeMobileMenu()">Guide</a>
   </div>
 
   <div class="container">
@@ -1113,7 +1111,7 @@
           </div>
           <p class="guide-text">For fans in the US, this is a rare opportunity. The World Cup is usually held in one faraway country, but this time the biggest games — quarterfinals, semifinals, and the final — are happening in American NFL stadiums across cities like Dallas, Los Angeles, Miami, Atlanta, Seattle, and New York.</p>
           <div style="margin-top:1.25rem;">
-            <a href="locations.html" class="btn btn-outline" style="font-size:0.85rem;">View all 16 stadiums on the map →</a>
+            <a href="/games?tab=venues" class="btn btn-outline" style="font-size:0.85rem;">View all 16 stadiums on the map →</a>
           </div>
         </div>
 
@@ -1407,9 +1405,9 @@
           </div>
 
           <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;">
-            <a href="games.html" class="btn">View All 104 Matches →</a>
-            <a href="teams.html" class="btn btn-outline">Explore All 48 Teams</a>
-            <a href="calendar.html" class="btn btn-outline">Build Your Calendar</a>
+            <a href="/games" class="btn">View All 104 Matches →</a>
+            <a href="/teams" class="btn btn-outline">Explore All 48 Teams</a>
+            <a href="/games?tab=calendar" class="btn btn-outline">Build Your Calendar</a>
           </div>
         </div>
 

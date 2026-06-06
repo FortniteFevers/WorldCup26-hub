@@ -96,10 +96,10 @@
     /* ── Draft Screen ────────────────────────────── */
     .d-round-bar {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      gap: 0.6rem;
       margin-bottom: 1.5rem;
-      gap: 1rem;
     }
     .d-round-label {
       font-size: 0.72rem;
@@ -107,6 +107,7 @@
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--text-muted);
+      text-align: center;
     }
 
     /* Country switch button */
@@ -189,11 +190,12 @@
     .d-pending-banner.show { display: block; }
     .d-slots-bar {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.35rem;
+      width: 100%;
     }
     .d-slot-pip {
-      width: 32px;
-      height: 7px;
+      flex: 1;
+      height: 6px;
       border-radius: 4px;
       background: var(--border);
       transition: background 0.3s;
@@ -637,19 +639,19 @@
       .d-form-def .d-lineup-slot { max-width: 72px; }
     }
   </style>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
 </head>
 <body>
   <nav>
-    <a href="index.html" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
+    <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="games.html">Games</a></li>
-      <li><a href="groups.html">Groups</a></li>
-      <li><a href="locations.html">Locations</a></li>
-      <li><a href="calendar.html">Calendar</a></li>
-      <li><a href="teams.html">Teams</a></li>
-      <li><a href="myteam.html" class="active">My Team</a></li>
-      <li><a href="guide.html">Guide</a></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/games">Browse Matches</a></li>
+      <li><a href="/groups">Groups</a></li>
+      <li><a href="/teams">Teams</a></li>
+      <li><a href="/my-team" class="active">My Team</a></li>
+      <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
       <div class="clerk-auth signed-out" id="authControls">
@@ -664,14 +666,12 @@
 
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
-    <a href="index.html" onclick="closeMobileMenu()">Home</a>
-    <a href="games.html" onclick="closeMobileMenu()">Games</a>
-    <a href="groups.html" onclick="closeMobileMenu()">Groups</a>
-    <a href="locations.html" onclick="closeMobileMenu()">Locations</a>
-    <a href="calendar.html" onclick="closeMobileMenu()">Calendar</a>
-    <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
-    <a href="myteam.html" class="active" onclick="closeMobileMenu()">My Team</a>
-    <a href="guide.html" onclick="closeMobileMenu()">Guide</a>
+    <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
+    <a href="/groups" onclick="closeMobileMenu()">Groups</a>
+    <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/my-team" class="active" onclick="closeMobileMenu()">My Team</a>
+    <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
 
   <div class="draft-wrap">
@@ -705,17 +705,14 @@
         </div>
       </div>
       <div style="margin-top:1.5rem;text-align:center;">
-        <a href="myteam.html" style="font-size:0.8rem;color:var(--text-muted);text-decoration:none;">← Back to My Team</a>
+        <a href="/my-team" style="font-size:0.8rem;color:var(--text-muted);text-decoration:none;">← Back to My Team</a>
       </div>
     </div>
 
     <!-- ── Screen: Draft ─────────────────────────── -->
     <div id="screenDraft" class="d-screen">
       <div class="d-round-bar">
-        <div>
-          <div class="d-round-label">Pick <span id="dRoundNum">1</span> of 11</div>
-          <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600;margin-top:0.2rem;" id="dNeedLabel"></div>
-        </div>
+        <div class="d-round-label">Pick <span id="dRoundNum">1</span> of 11</div>
         <div class="d-slots-bar" id="dSlotBar">
           <div class="d-slot-pip active" id="pip0"></div>
           <div class="d-slot-pip" id="pip1"></div>
@@ -729,6 +726,7 @@
           <div class="d-slot-pip" id="pip9"></div>
           <div class="d-slot-pip" id="pip10"></div>
         </div>
+        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:600;" id="dNeedLabel"></div>
       </div>
 
       <div class="d-spin-area">
@@ -812,7 +810,7 @@
         </button>
         <div class="d-play-again">
           <button class="btn" onclick="startDraft(gameMode)">Play Again</button>
-          <a href="myteam.html" class="btn btn-outline">← My Team</a>
+          <a href="/my-team" class="btn btn-outline">← My Team</a>
         </div>
       </div>
     </div>
@@ -927,13 +925,36 @@
     function playerRating(player) {
       const groupsName = TEAM_GROUPS_NAME[player.teamName] || player.teamName;
       const base = RATINGS[groupsName] || 68;
-      const posBonus = { Goalkeeper: -1, Defence: 0, Midfield: 1, Offence: 3 }[player.position] || 0;
-      const jitter = (nameHash(player.name) % 21) - 10;
-      return Math.max(45, Math.min(95, base + posBonus + jitter));
+
+      // Jersey number as quality proxy within the team
+      // #10 is typically the best; #1-11 starters; #20+ squad fillers
+      const j = player.jerseyNumber;
+      let jerseyBonus = 0;
+      if      (j === 10)          jerseyBonus =  9;
+      else if (j === 7 || j === 9) jerseyBonus =  6;
+      else if (j >= 1 && j <= 11)  jerseyBonus =  3;
+      else if (j >= 12 && j <= 16) jerseyBonus =  0;
+      else if (j >= 17 && j <= 20) jerseyBonus = -4;
+      else if (j > 20)             jerseyBonus = -7;
+      else                         jerseyBonus = -2; // undefined jersey
+
+      // Age factor — peak is 26-30
+      const age = playerAge(player.dateOfBirth);
+      let ageBonus = 0;
+      if      (typeof age === 'number' && age >= 26 && age <= 30) ageBonus =  3;
+      else if (typeof age === 'number' && age >= 23 && age <= 33) ageBonus =  0;
+      else if (typeof age === 'number' && age < 23)               ageBonus = age - 24; // −1 to −5 for teens
+      else if (typeof age === 'number' && age > 33)               ageBonus = 33 - age; // −1 to −6 for veterans
+
+      // Small name-hash jitter for variety (±3 instead of ±10)
+      const jitter = (nameHash(player.name) % 7) - 3;
+
+      return Math.max(45, Math.min(94, base + jerseyBonus + ageBonus + jitter));
     }
 
     function starsEl(rating) {
-      const stars = Math.round(rating / 20); // 1-5
+      // Threshold-based so spread is meaningful across the 45–94 range
+      const stars = rating >= 85 ? 5 : rating >= 76 ? 4 : rating >= 67 ? 3 : rating >= 57 ? 2 : 1;
       return Array.from({length:5}, (_,i) =>
         `<div class="d-pc-star${i < stars ? ' on' : ''}"></div>`
       ).join('');
@@ -1336,11 +1357,16 @@
 
     function simMatch(myRating, oppTeam, isKO) {
       const r1 = myRating, r2 = RATINGS[oppTeam] || 68;
-      const noise = () => 0.55 + Math.random() * 0.9;
-      let g1 = poissonRand((0.3 + r1/200) * noise() * 0.8);
-      let g2 = poissonRand((0.3 + r2/200) * noise() * 0.8);
+      // Realistic WC scoring: ~1.2–2.2 goals per team per game
+      // Strength drives expected goals; noise adds variance
+      const noise = () => 0.65 + Math.random() * 0.7;
+      const λ1 = (0.5 + r1 / 100) * noise();
+      const λ2 = (0.5 + r2 / 100) * noise();
+      let g1 = poissonRand(λ1);
+      let g2 = poissonRand(λ2);
       if (isKO && g1 === g2) {
-        const pen = Math.random() < r1/(r1+r2);
+        // Penalty shootout weighted by team strength
+        const pen = Math.random() < r1 / (r1 + r2);
         return { g1, g2, win: pen, draw: false, pen: true };
       }
       return { g1, g2, win: g1 > g2, draw: g1 === g2, pen: false };
@@ -1362,15 +1388,18 @@
       const groupPool = sorted.slice(0, Math.ceil(sorted.length * 0.7));
       const groupOpps = groupPool.sort(() => Math.random() - 0.5).slice(0, 3);
 
-      // Knockout: progressively tougher
+      // Knockout: progressively tougher — R32 is easy, Final is the best
+      // Sort ascending so index 0 = weakest
       const koPool = [...pool].filter(t => !groupOpps.includes(t))
-        .sort((a,b) => (RATINGS[b]||68) - (RATINGS[a]||68));
+        .sort((a,b) => (RATINGS[a]||68) - (RATINGS[b]||68));
+      const n = koPool.length;
+      const pick = (lo, hi) => koPool[lo + Math.floor(Math.random() * (hi - lo + 1))] || koPool[n - 1];
       const koOpps = [
-        koPool[Math.floor(Math.random() * Math.min(10, koPool.length))],
-        koPool[Math.floor(Math.random() * Math.min(7, koPool.length))],
-        koPool[Math.floor(Math.random() * Math.min(5, koPool.length))],
-        koPool[Math.floor(Math.random() * Math.min(3, koPool.length))],
-        koPool[0] || koPool[Math.floor(Math.random() * koPool.length)],
+        pick(0,  Math.floor(n * 0.45)),  // R32:   bottom 45% — weak sides
+        pick(Math.floor(n * 0.2), Math.floor(n * 0.6)),  // R16:   lower-mid
+        pick(Math.floor(n * 0.4), Math.floor(n * 0.75)), // QF:    mid-tier
+        pick(Math.floor(n * 0.6), Math.floor(n * 0.9)),  // SF:    strong
+        pick(Math.floor(n * 0.8), n - 1),                // Final: elite
       ];
 
       return { groupOpps, koOpps };
@@ -1441,7 +1470,10 @@
         if (idx === 2) {
           const advRow   = document.createElement('div');
           advRow.className = 'd-group-result';
-          const advances = groupPts >= 4 || (groupPts === 3 && Math.random() < 0.6);
+          // 2026 format: top 2 + 8 best 3rd-place teams advance
+          // 6pts = certain, 4-5pts = very likely, 3pts = decent shot, 1-2pts = unlikely
+          const advChance = groupPts >= 6 ? 1.0 : groupPts >= 4 ? 0.92 : groupPts === 3 ? 0.72 : groupPts === 2 ? 0.25 : 0.05;
+          const advances = Math.random() < advChance;
           if (advances) {
             advRow.innerHTML = `<strong>📊 Qualified from group</strong> — ${groupPts} pts · Advancing to Round of 32`;
           } else {

@@ -1,0 +1,17 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async rewrites() {
+    return [
+      { source: '/',        destination: '/index.html'   },
+      { source: '/games',   destination: '/games.html'   },
+      { source: '/groups',  destination: '/groups.html'  },
+      { source: '/teams',   destination: '/teams.html'   },
+      { source: '/my-team', destination: '/myteam.html'  },
+      { source: '/guide',   destination: '/guide.html'   },
+      { source: '/bracket', destination: '/bracket.html' },
+      { source: '/104-0',   destination: '/draft.html'   },
+    ];
+  },
+};
+
+module.exports = nextConfig;
