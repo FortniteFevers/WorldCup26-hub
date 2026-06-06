@@ -54,30 +54,13 @@
       <p class="hero-sub" style="margin-bottom:0;">All 48 teams competing in the 2026 FIFA World Cup, across 12 groups</p>
     </div>
 
-    <!-- API Panel -->
+    <!-- Data Panel -->
     <div class="api-panel">
       <div class="api-panel-text">
-        <h3>🔗 Connect football-data.org for live squad data</h3>
-        <p>Get a free API key at <strong>football-data.org</strong> to unlock full player rosters, positions, and ages for every team. Squad data is cached so it only loads once.</p>
+        <h3>🔗 Squad data</h3>
+        <p>Roster data is bundled locally from football-data.org, so teams and players load without any setup.</p>
       </div>
-      <div style="min-width:260px;">
-        <div class="api-input-row">
-          <input type="password" id="apiKeyInput" class="api-key-input" placeholder="Paste your API key…">
-          <button class="btn btn-sm" onclick="connectAPI()">Connect</button>
-          <button class="btn btn-sm btn-outline" onclick="disconnectAPI()" id="disconnectBtn" style="display:none;">Disconnect</button>
-        </div>
-        <div class="api-status" id="apiStatus" style="margin-top:0.5rem;"></div>
-        <!-- Progress bar -->
-        <div id="progressWrap" style="display:none;margin-top:0.75rem;">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-bottom:0.3rem;">
-            <span id="progressLabel">Loading squads…</span>
-            <span id="progressPct">0%</span>
-          </div>
-          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
-            <div id="progressBar" style="height:100%;background:var(--gold);border-radius:2px;width:0%;transition:width 0.4s ease;"></div>
-          </div>
-        </div>
-      </div>
+      <div class="api-status ok" id="apiStatus" style="min-width:220px;text-align:right;"></div>
     </div>
 
     <!-- Filters -->
@@ -123,12 +106,8 @@
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
-    // Requests go through local proxy (proxy.py on :8003) to avoid CORS issues
-    // Auto-detect: use local proxy when developing, corsproxy.io when on GitHub Pages
-    const _isLocal = ['localhost','127.0.0.1'].includes(window.location.hostname);
-    const CACHE_KEY  = 'wc2026_all_squads';    // Single cache for all 48 teams
+    const BUNDLED_SQUADS_URL = 'football-data/wc-2026-teams.json';
 
-    let apiKey    = localStorage.getItem('wc2026_api_key') || '';
     let teamsData = {};   // teamName → { squad:[], apiId }
     let wcTeams   = [];   // raw API team objects
 
@@ -194,109 +173,28 @@
       el.className = 'api-status' + (type ? ` ${type}` : '');
     }
 
-    function setProgress(show) {
-      const wrap = document.getElementById('progressWrap');
-      wrap.style.display = show ? 'block' : 'none';
+    function applySquadsData(data) {
+      teamsData = {};
+      wcTeams = data.teams || [];
+      wcTeams.forEach(apiTeam => {
+        const name = matchName(apiTeam);
+        if (name && apiTeam.squad) {
+          teamsData[name] = { squad: apiTeam.squad, apiId: apiTeam.id };
+        }
+      });
+      return Object.keys(teamsData).length;
     }
 
-    // ── API fetch (local proxy or corsproxy.io on GitHub Pages) ───────────
-    async function fetchFromAPI(path) {
-      const url = _isLocal
-        ? `http://localhost:8003${path}`
-        : `https://corsproxy.io/?${encodeURIComponent('https://api.football-data.org/v4' + path)}`;
-      const res = await fetch(url, { headers: { 'X-Auth-Token': apiKey } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    }
-
-    // ── Load all squads from cache ────────────────────────
-    function loadCachedSquads() {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (!raw) return 0;
+    async function loadBundledSquads() {
       try {
-        const data = JSON.parse(raw);
-        wcTeams = data.teams || [];
-        wcTeams.forEach(apiTeam => {
-          const name = matchName(apiTeam);
-          if (name && apiTeam.squad) {
-            teamsData[name] = { squad: apiTeam.squad, apiId: apiTeam.id };
-          }
-        });
-        return wcTeams.length;
+        const res = await fetch(BUNDLED_SQUADS_URL, { cache: 'no-store' });
+        if (!res.ok) return 0;
+        const data = await res.json();
+        if (!data?.teams?.length) return 0;
+        return applySquadsData(data);
       } catch(e) {
         return 0;
       }
-    }
-
-    // ── Fetch all squads in ONE call ──────────────────────
-    async function fetchAllSquads() {
-      setProgress(true);
-      document.getElementById('progressLabel').textContent = 'Fetching all teams…';
-
-      try {
-        const data = await fetchFromAPI('/competitions/WC/teams?season=2026');
-        wcTeams = data.teams || [];
-
-        // Cache the entire response
-        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-
-        // Populate teamsData
-        wcTeams.forEach(apiTeam => {
-          const name = matchName(apiTeam);
-          if (name && apiTeam.squad) {
-            teamsData[name] = { squad: apiTeam.squad, apiId: apiTeam.id };
-          }
-        });
-
-        setProgress(false);
-        setStatus(`✓ Connected — all ${wcTeams.length} squads loaded`, 'ok');
-        renderTeams();
-      } catch(e) {
-        setProgress(false);
-        setStatus(`✗ ${e.message}`, 'err');
-      }
-    }
-
-    // ── Connect / Disconnect ─────────────────────────────
-    async function connectAPI() {
-      const input = document.getElementById('apiKeyInput');
-      const key = (input.value || '').trim();
-      if (!key || key === '••••••••') {
-        // Use saved key
-        if (!apiKey) { setStatus('Please enter an API key.', 'err'); return; }
-      } else {
-        apiKey = key;
-        localStorage.setItem('wc2026_api_key', apiKey);
-        input.value = '';
-      }
-
-      setStatus('Connecting…', '');
-      try {
-        const data = await fetchFromAPI('/competitions/WC/teams?season=2026');
-        wcTeams = data.teams || [];
-        document.getElementById('disconnectBtn').style.display = 'inline-flex';
-
-        // Load whatever is already cached (instant)
-        const cached = loadCachedSquads();
-        setStatus(`✓ Connected — ${cached} squads from cache, fetching rest…`, 'ok');
-        renderTeams();
-
-        // Fetch remaining in background
-        fetchAllSquads();
-      } catch(e) {
-        setStatus(`✗ ${e.message}`, 'err');
-      }
-    }
-
-    function disconnectAPI() {
-      apiKey = ''; wcTeams = []; teamsData = {};
-      localStorage.removeItem(CACHE_KEY);
-      localStorage.removeItem('wc2026_api_key');
-      document.getElementById('apiKeyInput').value = '';
-      document.getElementById('disconnectBtn').style.display = 'none';
-      document.getElementById('progressWrap').style.display = 'none';
-      setStatus('Disconnected.', '');
-      renderTeams();
     }
 
     // ── Render Teams Grid ────────────────────────────────
@@ -311,7 +209,6 @@
       document.getElementById('teamsGrid').innerHTML = filtered.map(team => {
         const cached    = teamsData[team.name];
         const positions = cached ? countPositions(cached.squad) : null;
-        const loading   = apiKey && wcTeams.length && !cached;
 
         return `<div class="team-card" onclick="openTeam('${team.name.replace(/'/g,"\\'")}')">
           <div class="team-card-flag">${getFlag(team.name)}</div>
@@ -324,7 +221,7 @@
               <span title="Midfielders" style="font-size:0.75rem;color:#60a5fa;">⚙️ ${positions.mid}</span>
               <span title="Forwards"    style="font-size:0.75rem;color:var(--red);">⚡ ${positions.fwd}</span>
             </div>`
-          : loading ? `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:0.6rem;">⏳ loading…</div>` : ''}
+          : ''}
         </div>`;
       }).join('');
     }
@@ -356,7 +253,7 @@
       // Data already loaded from single bulk fetch
       if (teamsData[teamName]) {
         body.innerHTML = renderSquadTable(teamsData[teamName].squad) + gamesHtml;
-      } else if (apiKey && wcTeams.length) {
+      } else if (wcTeams.length) {
         body.innerHTML = `
           <div style="background:var(--gold-dim);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
             <div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem;">Team not found</div>
@@ -365,8 +262,8 @@
       } else {
         body.innerHTML = `
           <div style="background:var(--gold-dim);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
-            <div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem;">Connect for player data</div>
-            <div style="font-size:0.8rem;color:var(--text-secondary);">Get a free key at <a href="https://www.football-data.org" target="_blank" rel="noopener" style="color:var(--gold);">football-data.org</a> and enter it above.</div>
+            <div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem;">Roster data unavailable</div>
+            <div style="font-size:0.8rem;color:var(--text-secondary);">The bundled roster file could not be loaded.</div>
           </div>` + gamesHtml;
       }
     }
@@ -477,8 +374,17 @@
     document.getElementById('searchTeam').addEventListener('input', renderTeams);
     document.getElementById('groupFilter').addEventListener('change', renderTeams);
 
-    if (apiKey) connectAPI();  // auto-reconnect and load from cache
-    renderTeams();
+    async function initTeamsPage() {
+      const bundled = await loadBundledSquads();
+      if (bundled) {
+        setStatus(`✓ ${bundled} squads loaded`, 'ok');
+      } else {
+        setStatus('Roster data unavailable', 'err');
+      }
+      renderTeams();
+    }
+
+    initTeamsPage();
   </script>
 </body>
 </html>
