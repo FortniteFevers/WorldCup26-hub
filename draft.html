@@ -49,7 +49,28 @@
       gap: 1rem;
       margin-top: 2rem;
     }
+    @media (min-width: 600px) { .d-mode-grid { grid-template-columns: 1fr 1fr 1fr; } }
     @media (max-width: 480px) { .d-mode-grid { grid-template-columns: 1fr; } }
+
+    /* Coming Soon card */
+    .d-mode-card.coming-soon {
+      opacity: 0.55;
+      cursor: default;
+    }
+    .d-mode-card.coming-soon:hover { transform: none; box-shadow: none; border-color: var(--border); }
+    .d-coming-badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.18rem 0.55rem;
+      border-radius: 100px;
+      background: rgba(139,92,246,0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(139,92,246,0.3);
+      margin-bottom: 0.5rem;
+    }
 
     .d-mode-card {
       background: var(--bg-card);
@@ -87,6 +108,85 @@
       letter-spacing: 0.12em;
       color: var(--text-muted);
     }
+
+    /* Country switch button */
+    .d-switch-bar {
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .d-switch-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .d-switch-btn:hover:not(:disabled) {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-dim);
+    }
+    .d-switch-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* Position filter tabs on player list */
+    .d-pos-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.85rem;
+    }
+    .d-pos-tab {
+      padding: 0.28rem 0.7rem;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.13s;
+      font-family: 'Inter', sans-serif;
+    }
+    .d-pos-tab:hover  { color: var(--text-primary); border-color: var(--border-bright); }
+    .d-pos-tab.active { background: var(--gold-dim); color: var(--gold); border-color: rgba(245,200,66,0.4); }
+
+    /* Placing-mode slot highlights */
+    .d-lineup-slot.placeable {
+      border-color: rgba(245,200,66,0.55);
+      cursor: pointer;
+      animation: slotGlow 1.1s ease-in-out infinite;
+    }
+    @keyframes slotGlow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(245,200,66,0.25); }
+      50%      { box-shadow: 0 0 0 5px rgba(245,200,66,0); }
+    }
+    .d-lineup-slot.swap-source {
+      border-color: #60a5fa;
+      background: rgba(96,165,250,0.1);
+    }
+    .d-lineup-slot.swap-target:not(.filled) { cursor: default; }
+    .d-lineup-slot.swap-target.filled { cursor: pointer; border-color: rgba(96,165,250,0.35); }
+
+    /* Pending player banner */
+    .d-pending-banner {
+      display: none;
+      background: var(--gold-dim);
+      border: 1px solid rgba(245,200,66,0.35);
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+    .d-pending-banner.show { display: block; }
     .d-slots-bar {
       display: flex;
       gap: 0.4rem;
@@ -596,6 +696,13 @@
           <div class="d-mode-desc">Names hidden — only position and age shown. Test your World Cup knowledge.</div>
           <button class="btn btn-outline" style="width:fit-content;margin-top:0.5rem;" onclick="startDraft('scout');event.stopPropagation()">Play Scout</button>
         </div>
+        <div class="d-mode-card coming-soon">
+          <div class="d-mode-icon">⭐</div>
+          <div class="d-mode-name">All Time</div>
+          <div class="d-coming-badge">Coming Soon</div>
+          <div class="d-mode-desc">Draft legends from any era — Pelé, Maradona, Zidane, Ronaldo. Build the greatest squad in football history.</div>
+          <button class="btn btn-outline" style="width:fit-content;margin-top:0.5rem;opacity:0.4;" disabled>Coming Soon</button>
+        </div>
       </div>
       <div style="margin-top:1.5rem;text-align:center;">
         <a href="myteam.html" style="font-size:0.8rem;color:var(--text-muted);text-decoration:none;">← Back to My Team</a>
@@ -606,8 +713,8 @@
     <div id="screenDraft" class="d-screen">
       <div class="d-round-bar">
         <div>
-          <div class="d-round-label">Round <span id="dRoundNum">1</span> of 5</div>
-          <div style="font-size:0.72rem;color:var(--gold);font-weight:700;margin-top:0.2rem;" id="dNeedLabel"></div>
+          <div class="d-round-label">Pick <span id="dRoundNum">1</span> of 11</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600;margin-top:0.2rem;" id="dNeedLabel"></div>
         </div>
         <div class="d-slots-bar" id="dSlotBar">
           <div class="d-slot-pip active" id="pip0"></div>
@@ -625,48 +732,58 @@
       </div>
 
       <div class="d-spin-area">
-        <div class="d-spin-need">Picking a <span id="dPosLabel">Goalkeeper</span></div>
+        <div class="d-spin-need">Spin to pick your <span id="dPosLabel" style="background:var(--gold-dim);color:var(--gold);padding:0.15rem 0.6rem;border-radius:100px;font-size:0.65rem;font-weight:800;letter-spacing:0.08em;">next player</span></div>
         <div class="d-slot-display">
           <div class="d-slot-team" id="dSlotTeam">
             <div class="d-slot-question">?</div>
           </div>
         </div>
         <button class="d-spin-btn" id="dSpinBtn" onclick="doSpin()">SPIN</button>
+        <div class="d-switch-bar">
+          <button class="d-switch-btn" id="dSwitchBtn" onclick="doCountrySwitch()" disabled>
+            🔄 Switch Country — <span id="dSwitchCount">2</span> left
+          </button>
+        </div>
+      </div>
+
+      <!-- Pending player banner -->
+      <div class="d-pending-banner" id="dPendingBanner">
+        👇 Tap a slot in the formation below to place this player
       </div>
 
       <!-- Player list (shown after spin) -->
       <div class="d-player-list" id="dPlayerList">
-        <div class="d-filter-bar" id="dFilterBar"></div>
+        <div class="d-pos-tabs" id="dPosTabs"></div>
         <div class="d-players-grid" id="dPlayersGrid"></div>
       </div>
 
       <!-- Lineup formation display -->
       <div class="d-formation" id="dFormation">
-        <div class="d-form-label">4-3-3</div>
+        <div class="d-form-label" id="dFormLabel">4-3-3 · tap a filled slot to swap</div>
         <div class="d-form-row d-form-fwd">
-          <div class="d-lineup-slot" id="ls8"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls9"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls10"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls8"  onclick="handleSlotClick(8)"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls9"  onclick="handleSlotClick(9)"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls10" onclick="handleSlotClick(10)"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
         </div>
         <div class="d-form-row d-form-mid">
-          <div class="d-lineup-slot" id="ls5"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls6"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls7"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls5" onclick="handleSlotClick(5)"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls6" onclick="handleSlotClick(6)"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls7" onclick="handleSlotClick(7)"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
         </div>
         <div class="d-form-row d-form-def">
-          <div class="d-lineup-slot" id="ls1"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls2"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls3"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls4"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls1" onclick="handleSlotClick(1)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls2" onclick="handleSlotClick(2)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls3" onclick="handleSlotClick(3)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls4" onclick="handleSlotClick(4)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
         </div>
         <div class="d-form-row d-form-gk">
-          <div class="d-lineup-slot" id="ls0"><div class="d-ls-label">GK</div><div class="d-ls-empty">·</div></div>
+          <div class="d-lineup-slot" id="ls0" onclick="handleSlotClick(0)"><div class="d-ls-label">GK</div><div class="d-ls-empty">·</div></div>
         </div>
       </div>
 
       <!-- Simulate CTA (shown after all 11 picks) -->
       <div id="dSimulateCta" style="display:none;text-align:center;margin-top:1.5rem;">
-        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">Squad complete. Time to find out if you can go 104-0.</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;">Squad complete — swap positions anytime before kicking off.</div>
         <button class="btn" style="font-size:1rem;padding:0.9rem 2.5rem;" onclick="startTournament()">⚡ Simulate Tournament</button>
       </div>
     </div>
@@ -745,32 +862,26 @@
       Object.entries(TEAM_JSON_NAME).map(([k,v]) => [v, k])
     );
 
-    // ── Round definitions (4-3-3, 11 rounds) ─────
-    const ROUND_DEFS = [
-      { key:'GK',  pos:'Goalkeeper', label:'Goalkeeper', posClass:'pos-gk',  pipClass:'filled-gk',  color:'#a78bfa' },
-      { key:'DEF', pos:'Defence',    label:'Defender',   posClass:'pos-def', pipClass:'filled-def', color:'#60a5fa' },
-      { key:'DEF', pos:'Defence',    label:'Defender',   posClass:'pos-def', pipClass:'filled-def', color:'#60a5fa' },
-      { key:'DEF', pos:'Defence',    label:'Defender',   posClass:'pos-def', pipClass:'filled-def', color:'#60a5fa' },
-      { key:'DEF', pos:'Defence',    label:'Defender',   posClass:'pos-def', pipClass:'filled-def', color:'#60a5fa' },
-      { key:'MID', pos:'Midfield',   label:'Midfielder', posClass:'pos-mid', pipClass:'filled-mid', color:'#4ade80' },
-      { key:'MID', pos:'Midfield',   label:'Midfielder', posClass:'pos-mid', pipClass:'filled-mid', color:'#4ade80' },
-      { key:'MID', pos:'Midfield',   label:'Midfielder', posClass:'pos-mid', pipClass:'filled-mid', color:'#4ade80' },
-      { key:'FWD', pos:'Offence',    label:'Forward',    posClass:'pos-fwd', pipClass:'filled-fwd', color:'#fb923c' },
-      { key:'FWD', pos:'Offence',    label:'Forward',    posClass:'pos-fwd', pipClass:'filled-fwd', color:'#fb923c' },
-      { key:'FWD', pos:'Offence',    label:'Forward',    posClass:'pos-fwd', pipClass:'filled-fwd', color:'#fb923c' },
-    ];
+    // ── Slot definitions (fixed: GK/DEF/MID/FWD labels per slot) ──
+    const SLOT_POSITIONS = ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','FWD','FWD','FWD'];
+    const SLOT_COLORS    = { GK:'#a78bfa', DEF:'#60a5fa', MID:'#4ade80', FWD:'#fb923c' };
+    const SLOT_PIP_CLASS = { GK:'filled-gk', DEF:'filled-def', MID:'filled-mid', FWD:'filled-fwd' };
 
     // ── State ─────────────────────────────────────
-    let gameMode      = 'classic';
-    let draftRound    = 0;
-    let teamPool      = [];
-    let usedTeams     = [];
-    let lineup        = new Array(11).fill(null); // 11 players (4-3-3)
-    let currentTeam   = null;
-    let allPlayers    = [];
-    let playersByTeam = {};
-    let isSpinning    = false;
-    let allTeamNames  = []; // flattened from GROUPS
+    let gameMode        = 'classic';
+    let draftRound      = 0;          // how many players placed so far
+    let teamPool        = [];
+    let usedTeams       = [];
+    let lineup          = new Array(11).fill(null); // 11 players (4-3-3)
+    let currentTeam     = null;
+    let allPlayers      = [];
+    let playersByTeam   = {};
+    let isSpinning      = false;
+    let allTeamNames    = [];
+    let pendingPlayer   = null;       // player selected, waiting for slot tap
+    let swapSlotA       = null;       // first slot selected for a swap (null = none)
+    let countrySwitches = 2;          // remaining country re-spins
+    let _displayedPlayers = [];       // players currently shown in grid (after filter)
 
     // ── Share state (set on result screen) ────────
     let _shareResults   = [];
@@ -861,80 +972,91 @@
       return COUNTRY_FLAGS[groupsName] || COUNTRY_FLAGS[name] || '🏳️';
     }
 
+    // ── Helpers ───────────────────────────────────
+    function getRemainingNeeds() {
+      const needs = { GK:1, DEF:4, MID:3, FWD:3 };
+      lineup.forEach((p, i) => { if (p) needs[SLOT_POSITIONS[i]]--; });
+      return Object.entries(needs).filter(([,v]) => v > 0).map(([k,v]) => `${v} ${k}`).join(' · ');
+    }
+
     // ── Start game ────────────────────────────────
     function startDraft(mode) {
-      gameMode   = mode;
-      draftRound = 0;
-      usedTeams  = [];
-      lineup     = new Array(11).fill(null);
-      currentTeam = null;
+      gameMode        = mode;
+      draftRound      = 0;
+      usedTeams       = [];
+      lineup          = new Array(11).fill(null);
+      currentTeam     = null;
+      pendingPlayer   = null;
+      swapSlotA       = null;
+      countrySwitches = 2;
 
-      // Build & shuffle team pool
       allTeamNames = Object.values(GROUPS).flat();
-      teamPool = [...allTeamNames].sort(() => Math.random() - 0.5);
+      teamPool     = [...allTeamNames].sort(() => Math.random() - 0.5);
 
       resetDraftUI();
       showScreen('screenDraft');
     }
 
     function resetDraftUI() {
+      pendingPlayer = null;
+      swapSlotA     = null;
+
       // Reset pips
       for (let i = 0; i < 11; i++) {
         const pip = document.getElementById('pip' + i);
-        if (pip) pip.className = 'd-slot-pip' + (i === draftRound ? ' active' : '');
+        if (pip) pip.className = 'd-slot-pip' + (i === 0 ? ' active' : '');
       }
 
-      // Reset lineup slots
-      const slotLabels = ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','FWD','FWD','FWD'];
-      for (let i = 0; i < 11; i++) {
-        const el = document.getElementById('ls' + i);
-        if (!el) continue;
-        el.className = 'd-lineup-slot';
-        el.innerHTML = `<div class="d-ls-label">${slotLabels[i]}</div><div class="d-ls-empty">·</div>`;
-      }
-
+      renderFormation();
       updateRoundHeader();
 
       // Reset spin area
       document.getElementById('dSlotTeam').innerHTML = '<div class="d-slot-question">?</div>';
-      document.getElementById('dSpinBtn').disabled = false;
+      document.getElementById('dSpinBtn').disabled   = false;
       document.getElementById('dSpinBtn').textContent = 'SPIN';
-      document.getElementById('dPlayerList').style.display = 'none';
+      document.getElementById('dPlayerList').style.display  = 'none';
       document.getElementById('dSimulateCta').style.display = 'none';
+      document.getElementById('dPendingBanner').classList.remove('show');
       document.getElementById('dRoundNum').textContent = '1';
+
+      // Country switch reset
+      document.getElementById('dSwitchCount').textContent = countrySwitches;
+      document.getElementById('dSwitchBtn').disabled = true; // enabled after first spin
     }
 
     function updateRoundHeader() {
-      const rd = ROUND_DEFS[draftRound];
-      if (!rd) return;
-      document.getElementById('dRoundNum').textContent = draftRound + 1;
-      document.getElementById('dNeedLabel').textContent = 'Picking your ' + rd.label;
-
-      const posLabel = document.getElementById('dPosLabel');
-      posLabel.textContent = rd.label;
-      posLabel.style.cssText = `background:${rd.color}22;color:${rd.color};padding:0.2rem 0.65rem;border-radius:100px;font-size:0.65rem;font-weight:800;letter-spacing:0.08em;`;
+      document.getElementById('dRoundNum').textContent = Math.min(draftRound + 1, 11);
+      document.getElementById('dNeedLabel').textContent = draftRound < 11
+        ? `Need: ${getRemainingNeeds()}`
+        : 'Squad complete!';
     }
 
     // ── Spin ──────────────────────────────────────
+    function getAllTeamPlayers(groupsName) {
+      const jsonName = TEAM_JSON_NAME[groupsName] || groupsName;
+      const players  = playersByTeam[jsonName] || playersByTeam[groupsName] || [];
+      return [...players].sort((a, b) => playerRating(b) - playerRating(a));
+    }
+
     function doSpin() {
       if (isSpinning) return;
-      isSpinning = true;
+      isSpinning    = true;
+      pendingPlayer = null;
+      document.getElementById('dPendingBanner').classList.remove('show');
+      renderFormation();
 
       const btn = document.getElementById('dSpinBtn');
       btn.disabled = true;
       btn.classList.add('spinning');
 
-      // Available teams (not yet used in this draft)
       const available = teamPool.filter(t => !usedTeams.includes(t));
       if (!available.length) { isSpinning = false; return; }
 
-      // Pick final team
       const finalTeam = available[Math.floor(Math.random() * available.length)];
-
-      const slotEl   = document.getElementById('dSlotTeam');
-      let   step     = 0;
-      const TOTAL    = 36;
-      let   interval = 55;
+      const slotEl    = document.getElementById('dSlotTeam');
+      let   step      = 0;
+      const TOTAL     = 36;
+      let   interval  = 55;
 
       function tick() {
         if (step < TOTAL) {
@@ -943,27 +1065,28 @@
             <div class="d-slot-flag">${COUNTRY_FLAGS[randTeam] || '🌍'}</div>
             <div class="d-slot-name">${randTeam}</div>`;
           slotEl.classList.remove('spinning');
-          void slotEl.offsetWidth; // reflow to retrigger animation
+          void slotEl.offsetWidth;
           slotEl.classList.add('spinning');
           step++;
           if (step > TOTAL - 14) interval += 35;
           setTimeout(tick, interval);
         } else {
-          // Land on final team
           slotEl.innerHTML = `
             <div class="d-slot-flag">${COUNTRY_FLAGS[finalTeam] || '🌍'}</div>
             <div class="d-slot-name">${finalTeam}</div>`;
           slotEl.classList.add('spinning');
           currentTeam = finalTeam;
           usedTeams.push(finalTeam);
-
           btn.classList.remove('spinning');
 
-          const rd = ROUND_DEFS[draftRound];
-          const players = getTeamPlayers(finalTeam, rd.pos);
+          // Enable country switch now that a team has landed
+          if (countrySwitches > 0) {
+            document.getElementById('dSwitchBtn').disabled = false;
+          }
 
+          const players = getAllTeamPlayers(finalTeam);
           if (!players.length) {
-            btn.disabled = false;
+            btn.disabled    = false;
             btn.textContent = 'NO DATA — RE-SPIN';
             usedTeams.pop();
             isSpinning = false;
@@ -979,28 +1102,79 @@
       tick();
     }
 
-    // ── Player list ───────────────────────────────
-    function showPlayerList(players) {
-      const listEl   = document.getElementById('dPlayerList');
-      const gridEl   = document.getElementById('dPlayersGrid');
-      const filterEl = document.getElementById('dFilterBar');
+    // ── Country switch ────────────────────────────
+    function doCountrySwitch() {
+      if (countrySwitches <= 0 || !currentTeam) return;
 
+      // Remove the current team from usedTeams so it can be spun again later
+      usedTeams = usedTeams.filter(t => t !== currentTeam);
+      currentTeam   = null;
+      pendingPlayer = null;
+
+      countrySwitches--;
+      document.getElementById('dSwitchCount').textContent = countrySwitches;
+      if (countrySwitches === 0) {
+        document.getElementById('dSwitchBtn').disabled = true;
+      }
+
+      // Reset and auto-spin
+      document.getElementById('dPlayerList').style.display = 'none';
+      document.getElementById('dPendingBanner').classList.remove('show');
+      document.getElementById('dSlotTeam').innerHTML = '<div class="d-slot-question">?</div>';
+      document.getElementById('dSpinBtn').textContent = 'SPIN';
+      renderFormation();
+
+      setTimeout(doSpin, 280);
+    }
+
+    // ── Player list ───────────────────────────────
+    function showPlayerList(allTeamPlayers) {
+      window._currentPlayers = allTeamPlayers;
+      window._listFilter     = 'all';
+
+      const listEl = document.getElementById('dPlayerList');
       listEl.style.display = 'block';
 
-      // No sub-filters needed (already filtered to one position per round)
-      filterEl.innerHTML = `
-        <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">
-          ${players.length} players from ${currentTeam} — sorted by rating
-        </span>`;
+      // Position tabs
+      const tabsEl = document.getElementById('dPosTabs');
+      tabsEl.innerHTML =
+        `<span style="font-size:0.7rem;font-weight:600;color:var(--text-muted);margin-right:0.3rem;">${currentTeam}</span>` +
+        ['all','Goalkeeper','Defence','Midfield','Offence'].map(f => {
+          const label = { all:'All', Goalkeeper:'GK', Defence:'DEF', Midfield:'MID', Offence:'FWD' }[f];
+          return `<button class="d-pos-tab${f==='all'?' active':''}" id="ptab-${f}" onclick="setListFilter('${f}')">${label}</button>`;
+        }).join('');
 
-      gridEl.innerHTML = players.map((p, i) => {
+      renderPlayerGrid();
+
+      setTimeout(() => {
+        listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    function setListFilter(filter) {
+      window._listFilter = filter;
+      ['all','Goalkeeper','Defence','Midfield','Offence'].forEach(f => {
+        const btn = document.getElementById('ptab-' + f);
+        if (btn) btn.classList.toggle('active', f === filter);
+      });
+      renderPlayerGrid();
+    }
+
+    function renderPlayerGrid() {
+      const all    = window._currentPlayers || [];
+      const filter = window._listFilter || 'all';
+      _displayedPlayers = filter === 'all' ? all : all.filter(p => p.position === filter);
+      const gridEl = document.getElementById('dPlayersGrid');
+
+      gridEl.innerHTML = _displayedPlayers.map((p, i) => {
         const rat  = playerRating(p);
         const age  = playerAge(p.dateOfBirth);
         const flag = getFlag(p.teamName);
         const name = gameMode === 'scout' ? `#${p.jerseyNumber || '??'} · Age ${age}` : p.name;
         const meta = gameMode === 'scout' ? '' : `Age ${age}`;
+        const isPending = pendingPlayer && pendingPlayer.name === p.name;
 
-        return `<div class="d-player-card" id="pc${i}" onclick="pickPlayer(${i})">
+        return `<div class="d-player-card${isPending ? ' selected' : ''}" id="pc${i}" onclick="pickPlayer(${i})">
           <div class="d-pc-top">
             <div class="d-pc-flag">${flag}</div>
             <div class="d-pc-pos ${posClass(p.position)}">${posShort(p.position)}</div>
@@ -1013,78 +1187,146 @@
           </div>
         </div>`;
       }).join('');
-
-      // Store players for pick handler
-      window._currentPlayers = players;
-
-      // Scroll to list
-      setTimeout(() => {
-        listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
     }
 
     function pickPlayer(idx) {
-      const player = window._currentPlayers[idx];
+      const player = _displayedPlayers[idx];
       if (!player) return;
 
-      // Highlight picked card
+      pendingPlayer = player;
+
+      // Highlight selected card, keep all others still clickable (re-pick allowed)
       document.querySelectorAll('.d-player-card').forEach((el, i) => {
-        el.style.pointerEvents = 'none';
-        if (i === idx) el.classList.add('selected');
-        else el.style.opacity = '0.4';
+        el.classList.toggle('selected', i === idx);
       });
 
-      lineup[draftRound] = { ...player, rating: playerRating(player) };
+      // Show formation banner + light up empty slots
+      document.getElementById('dPendingBanner').classList.add('show');
+      renderFormation();
 
-      // Update lineup bar slot
-      updateLineupBar(draftRound, player);
+      // Scroll to formation
+      setTimeout(() => {
+        document.getElementById('dFormation').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 80);
+    }
+
+    // ── Formation render ──────────────────────────
+    function renderFormation() {
+      const isSwapping = swapSlotA !== null;
+      const isPlacing  = pendingPlayer !== null;
+
+      for (let i = 0; i < 11; i++) {
+        const el  = document.getElementById('ls' + i);
+        if (!el) continue;
+        const p   = lineup[i];
+        const pos = SLOT_POSITIONS[i];
+        const col = SLOT_COLORS[pos];
+
+        el.className = 'd-lineup-slot';
+
+        if (p) {
+          // ── Filled slot ──
+          el.classList.add('filled');
+          if (isSwapping && swapSlotA === i)  el.classList.add('swap-source');
+          if (isSwapping && swapSlotA !== i)  el.classList.add('swap-target');
+
+          const flag = getFlag(p.teamName);
+          const name = p.name.split(' ').pop();
+          el.innerHTML = `
+            <div class="d-ls-label" style="color:${col}">${pos}</div>
+            <div class="d-ls-flag">${flag}</div>
+            <div class="d-ls-name">${gameMode === 'scout' && draftRound < 11 ? '???' : name}</div>
+            <div class="d-ls-ov" style="color:${col}">${p.rating}</div>`;
+        } else {
+          // ── Empty slot ──
+          if (isPlacing) el.classList.add('placeable');
+          el.innerHTML = `<div class="d-ls-label">${pos}</div><div class="d-ls-empty">+</div>`;
+        }
+      }
+
+      // Update formation label hint
+      const lbl = document.getElementById('dFormLabel');
+      if (lbl) {
+        if (isPlacing)      lbl.textContent = '👇 Tap any slot to place your player';
+        else if (isSwapping) lbl.textContent = '↔ Now tap another slot to swap';
+        else                 lbl.textContent = '4-3-3 · tap a filled slot to swap';
+      }
+    }
+
+    // ── Slot click handler ────────────────────────
+    function handleSlotClick(slotIdx) {
+      if (pendingPlayer) {
+        // Placing mode: tap empty slot to place
+        if (lineup[slotIdx] !== null) return; // occupied — ignore
+        placeInSlot(slotIdx);
+      } else if (draftRound >= 1) {
+        // Swap mode: only works when at least 1 player placed
+        if (lineup[slotIdx] === null) return; // empty — ignore
+        if (swapSlotA === null) {
+          swapSlotA = slotIdx;
+        } else if (swapSlotA === slotIdx) {
+          swapSlotA = null; // deselect
+        } else {
+          // Perform the swap
+          [lineup[swapSlotA], lineup[slotIdx]] = [lineup[slotIdx], lineup[swapSlotA]];
+          swapSlotA = null;
+        }
+        renderFormation();
+      }
+    }
+
+    function placeInSlot(slotIdx) {
+      const player = pendingPlayer;
+      lineup[slotIdx] = { ...player, rating: playerRating(player) };
+      pendingPlayer   = null;
+
+      // Dim all player cards — pick is done
+      document.querySelectorAll('.d-player-card').forEach(el => {
+        el.style.pointerEvents = 'none';
+        el.style.opacity = '0.38';
+      });
+      document.getElementById('dPendingBanner').classList.remove('show');
 
       // Update pip
       const pip = document.getElementById('pip' + draftRound);
-      pip.className = 'd-slot-pip ' + ROUND_DEFS[draftRound].pipClass;
+      if (pip) pip.className = 'd-slot-pip ' + SLOT_PIP_CLASS[SLOT_POSITIONS[slotIdx]];
 
-      setTimeout(() => {
-        draftRound++;
-        if (draftRound >= 11) {
-          // Draft complete
+      draftRound++;
+      renderFormation();
+      updateRoundHeader();
+      updatePips();
+
+      if (draftRound >= 11) {
+        document.getElementById('dPlayerList').style.display  = 'none';
+        document.getElementById('dSimulateCta').style.display = 'block';
+        document.getElementById('dSpinBtn').disabled          = true;
+        document.getElementById('dSwitchBtn').disabled        = true;
+        document.getElementById('dFormLabel').textContent     = '4-3-3 · tap two slots to swap before simulating';
+      } else {
+        // Next round — reset spin area after brief pause
+        setTimeout(() => {
+          document.getElementById('dSlotTeam').innerHTML      = '<div class="d-slot-question">?</div>';
+          document.getElementById('dSpinBtn').disabled        = false;
+          document.getElementById('dSpinBtn').textContent     = 'SPIN';
           document.getElementById('dPlayerList').style.display = 'none';
-          document.getElementById('dSimulateCta').style.display = 'block';
-          document.getElementById('dSpinBtn').disabled = true;
-          document.getElementById('dNeedLabel').textContent = 'Squad complete!';
-          document.getElementById('dPosLabel').textContent = '11/11 filled';
-          document.getElementById('dPosLabel').style.cssText = 'background:var(--gold-dim);color:var(--gold);padding:0.2rem 0.65rem;border-radius:100px;font-size:0.65rem;font-weight:800;letter-spacing:0.08em;';
-        } else {
-          // Next round
-          updateRoundHeader();
-          document.getElementById('dRoundNum').textContent = draftRound + 1;
-          const nextPip = document.getElementById('pip' + draftRound);
-          nextPip.className = 'd-slot-pip active';
-
-          // Reset spin area for next round
-          document.getElementById('dSlotTeam').innerHTML = '<div class="d-slot-question">?</div>';
-          document.getElementById('dSpinBtn').disabled = false;
-          document.getElementById('dSpinBtn').textContent = 'SPIN';
-          document.getElementById('dPlayerList').style.display = 'none';
-
-          // Scroll back up to spin area
+          document.getElementById('dSwitchBtn').disabled      = true; // re-disabled until next spin lands
           document.getElementById('dSpinBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 550);
+        }, 500);
+      }
     }
 
-    function updateLineupBar(slot, player) {
-      const el   = document.getElementById('ls' + slot);
-      const rat  = playerRating(player);
-      const flag = getFlag(player.teamName);
-      const name = player.name.split(' ').pop(); // last name only
-      const col  = ROUND_DEFS[slot].color;
-
-      el.className = 'd-lineup-slot filled';
-      el.innerHTML = `
-        <div class="d-ls-label" style="color:${col}">${ROUND_DEFS[slot].key}</div>
-        <div class="d-ls-flag">${flag}</div>
-        <div class="d-ls-name">${gameMode === 'scout' ? '???' : name}</div>
-        <div class="d-ls-ov" style="color:${col}">${rat}</div>`;
+    function updatePips() {
+      for (let i = 0; i < 11; i++) {
+        const pip = document.getElementById('pip' + i);
+        if (!pip) continue;
+        if (lineup[i]) {
+          pip.className = 'd-slot-pip ' + SLOT_PIP_CLASS[SLOT_POSITIONS[i]];
+        } else if (i === draftRound) {
+          pip.className = 'd-slot-pip active';
+        } else {
+          pip.className = 'd-slot-pip';
+        }
+      }
     }
 
     // ── Tournament simulation ─────────────────────
