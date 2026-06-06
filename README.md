@@ -11,7 +11,7 @@ An interactive public field guide for following the 2026 FIFA World Cup. It brin
 - **Groups View** - See all 12 groups, standings structure, matchday schedules, and advancement rules.
 - **Stadium Map** - Explore all 16 host venues on an interactive Leaflet map with venue cards and match counts.
 - **Calendar Export** - Select games and download an `.ics` file or add individual matches to Google Calendar.
-- **Teams Hub** - Browse all 48 qualified teams and optionally connect a football-data.org API key for live squad data.
+- **Teams Hub** - Browse all 48 qualified teams with bundled football-data.org squad data.
 - **My Team** - Pick a country, build a starting XI on a tactical pitch, choose formations, and simulate a match.
 - **Bracket Simulator** - Simulate the full tournament from groups through the final, including best third-place advancement.
 - **World Cup Guide** - Beginner-friendly explanations for how the tournament format works.
@@ -30,7 +30,7 @@ An interactive public field guide for following the 2026 FIFA World Cup. It brin
 - **Animations:** Lenis smooth scrolling
 - **Image Export:** html2canvas for bracket sharing
 - **API Data:** football-data.org for optional squad/player data
-- **Storage:** localStorage for theme, API key state, cached squads, and simulator data
+- **Storage:** localStorage for theme and simulator data
 
 ## Project Structure
 
@@ -54,6 +54,9 @@ world-cup-2026/
 ├── auth.js               # Clerk JS integration for static pages
 ├── theme.js              # Theme toggle and mobile nav behavior
 ├── styles.css            # Global responsive styles and themes
+├── football-data/        # Local source copy of football-data.org exports
+├── scripts/
+│   └── export-football-data.mjs # Pulls football-data.org data into JSON files
 ├── proxy.ts              # Clerk middleware for Next/Vercel
 ├── proxy.py              # Optional local-only CORS helper for API testing
 ├── package.json          # Next, React, Clerk, and Vercel dependencies
@@ -73,61 +76,6 @@ All tournament schedule and venue data lives in `data.js`.
 - **Stadiums:** 16 venues across the United States, Mexico, and Canada
 
 The schedule, stadium coordinates, capacities, groups, flags, and helper mappings are currently stored client-side.
-
-## Local Development
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Create `.env.local` for Clerk if you want to test sign-in locally:
-
-```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key_here
-CLERK_SECRET_KEY=your_secret_key_here
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Then open:
-
-```text
-http://localhost:3000
-```
-
-The site should remain accessible without signing in. Sign-in is only for optional account-based features.
-
-## Optional API Integration
-
-Roster and player data use [football-data.org](https://www.football-data.org). Users can paste their own API key on the Teams or My Team pages to fetch squad data.
-
-- The API key is stored locally in the browser.
-- Squad data is cached in localStorage after it loads.
-- The deployed site routes browser requests through a CORS proxy URL.
-- `proxy.py` exists only as a local development helper if direct local API testing needs it.
-
-Future monetization can use the existing account system to unlock an API connection as a one-time paid feature while keeping the rest of the guide free.
-
-## Deployment
-
-The project is set up for Vercel with GitHub integration.
-
-Required Vercel environment variables:
-
-```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key_here
-CLERK_SECRET_KEY=your_secret_key_here
-```
-
-Do not commit secrets. Keep `.env.local`, `node_modules`, `.next`, and other generated files out of Git.
-
-After changing Vercel environment variables, redeploy the project so the new values are included in the build.
 
 ## Design
 
@@ -155,6 +103,4 @@ This project is not affiliated with FIFA or any official organization.
 
 ## License
 
-MIT License
-
-Copyright (c) 2026 Zach Andelman
+MIT License, Zach James Andelman
