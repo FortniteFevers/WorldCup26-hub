@@ -1,4 +1,5 @@
-// Root route is handled by proxy.ts rewrite → /index.html
+import { redirect } from 'next/navigation'
+
 export default function Home() {
-  return null
+  redirect('/index.html')
 }
