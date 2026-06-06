@@ -922,33 +922,49 @@
       return h;
     }
 
+    // FC26 ratings lookup — loaded async
+    let FC26_RATINGS = null;
+    fetch('/football-data/fc26-ratings.json')
+      .then(r => r.json())
+      .then(d => { FC26_RATINGS = d; })
+      .catch(() => {});
+
+    function normalizeName(s) {
+      return (s || '').toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
     function playerRating(player) {
+      // 1. Try FC26 real overall rating first
+      if (FC26_RATINGS) {
+        const key = normalizeName(player.name);
+        if (FC26_RATINGS[key] !== undefined) {
+          return FC26_RATINGS[key];
+        }
+      }
+
+      // 2. Fallback: team base + jersey proxy + age factor (for unmatched players)
       const groupsName = TEAM_GROUPS_NAME[player.teamName] || player.teamName;
       const base = RATINGS[groupsName] || 68;
 
-      // Jersey number as quality proxy within the team
-      // #10 is typically the best; #1-11 starters; #20+ squad fillers
       const j = player.jerseyNumber;
       let jerseyBonus = 0;
-      if      (j === 10)          jerseyBonus =  9;
-      else if (j === 7 || j === 9) jerseyBonus =  6;
-      else if (j >= 1 && j <= 11)  jerseyBonus =  3;
-      else if (j >= 12 && j <= 16) jerseyBonus =  0;
-      else if (j >= 17 && j <= 20) jerseyBonus = -4;
-      else if (j > 20)             jerseyBonus = -7;
-      else                         jerseyBonus = -2; // undefined jersey
+      if      (j === 10)            jerseyBonus =  9;
+      else if (j === 7 || j === 9)  jerseyBonus =  6;
+      else if (j >= 1 && j <= 11)   jerseyBonus =  3;
+      else if (j >= 12 && j <= 16)  jerseyBonus =  0;
+      else if (j >= 17 && j <= 20)  jerseyBonus = -4;
+      else if (j > 20)              jerseyBonus = -7;
+      else                          jerseyBonus = -2;
 
-      // Age factor — peak is 26-30
       const age = playerAge(player.dateOfBirth);
       let ageBonus = 0;
       if      (typeof age === 'number' && age >= 26 && age <= 30) ageBonus =  3;
       else if (typeof age === 'number' && age >= 23 && age <= 33) ageBonus =  0;
-      else if (typeof age === 'number' && age < 23)               ageBonus = age - 24; // −1 to −5 for teens
-      else if (typeof age === 'number' && age > 33)               ageBonus = 33 - age; // −1 to −6 for veterans
+      else if (typeof age === 'number' && age < 23)               ageBonus = age - 24;
+      else if (typeof age === 'number' && age > 33)               ageBonus = 33 - age;
 
-      // Small name-hash jitter for variety (±3 instead of ±10)
       const jitter = (nameHash(player.name) % 7) - 3;
-
       return Math.max(45, Math.min(94, base + jerseyBonus + ageBonus + jitter));
     }
 

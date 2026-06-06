@@ -7,6 +7,7 @@ const nextConfig = {
       { source: '/groups',  destination: '/groups.html'  },
       { source: '/teams',   destination: '/teams.html'   },
       { source: '/my-team', destination: '/myteam.html'  },
+      { source: '/players', destination: '/players.html'  },
       { source: '/guide',   destination: '/guide.html'   },
       { source: '/bracket', destination: '/bracket.html' },
       { source: '/104-0',   destination: '/draft.html'   },

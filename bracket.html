@@ -548,7 +548,8 @@
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
-      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/players">Players</a></li>
+        <li><a href="/my-team">My Team</a></li>
       <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
@@ -567,6 +568,7 @@
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/players" onclick="closeMobileMenu()">Players</a>
     <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
     <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
@@ -663,20 +665,47 @@
   function raf(t) { lenis.raf(t); requestAnimationFrame(raf); }
   requestAnimationFrame(raf);
 
-  // ── Team strength ratings ─────────────────────────
+  // ── Team strength ratings (manual fallbacks, overridden by FC26 data) ────
   const RATINGS = {
     'Brazil':91,'France':90,'Argentina':91,'England':87,'Spain':89,
     'Germany':88,'Portugal':87,'Belgium':84,'Netherlands':86,
     'USA':80,'Japan':80,'Croatia':78,'Uruguay':80,'Switzerland':81,
     'Colombia':79,'South Korea':79,'Türkiye':77,'Austria':75,
     'Norway':74,'Sweden':76,'Morocco':72,'Senegal':75,
-    'Mexico':78,'Canada':74,'Ecuador':73,'Australia':73,'Denmark':80,
+    'Mexico':78,'Canada':74,'Ecuador':73,'Australia':73,
     'Ivory Coast':72,'Ghana':68,'Paraguay':71,'Scotland':71,
     'Bosnia & Herz.':70,'Czechia':76,'Algeria':64,'Egypt':68,
     'Iran':67,'Saudi Arabia':66,'Tunisia':67,'South Africa':65,
     'Qatar':58,'New Zealand':58,'Haiti':46,'Cape Verde':62,
     'DR Congo':60,'Uzbekistan':58,'Jordan':52,'Iraq':60,'Curaçao':53,'Panama':64,'TBD':70,
   };
+
+  // ── FC26 name map (site name → fc26-team-stats key) ──
+  const FC26_TEAM_NAME_MAP = {
+    'USA': 'United States', 'Türkiye': 'Turkey',
+    'Bosnia & Herz.': 'Bosnia-Herzegovina', 'Cape Verde': 'Cape Verde Islands',
+    'DR Congo': 'Congo DR',
+  };
+
+  // Load FC26 team stats and apply avg OVR to RATINGS
+  let FC26_TEAM_STATS = {};
+  fetch('football-data/fc26-team-stats.json').then(r=>r.json()).then(data => {
+    FC26_TEAM_STATS = data;
+    // Update RATINGS with FC26 averages
+    Object.keys(RATINGS).forEach(siteName => {
+      if (siteName === 'TBD') return;
+      const fc26Key = FC26_TEAM_NAME_MAP[siteName] || siteName;
+      if (data[fc26Key]) {
+        RATINGS[siteName] = data[fc26Key].avg;
+      }
+    });
+    // Re-render the current group view so OVR badges update
+    renderGroupsView();
+  }).catch(() => {});
+
+  function fc26OvrColor(ovr) {
+    return ovr >= 88 ? '#f5c842' : ovr >= 83 ? '#4ade80' : ovr >= 77 ? '#34d399' : ovr >= 70 ? '#60a5fa' : 'var(--text-muted)';
+  }
 
   // ── R32 Seeding (approximation of 2026 FIFA format) ──
   // Left half: R32 matches 0–7 | Right half: R32 matches 8–15
@@ -821,10 +850,15 @@
       const rowCls = is1 ? 'rank-1' : is2 ? 'rank-2' : (bothPicked ? 'full' : '');
       const rankNum = is1 ? '1' : is2 ? '2' : '';
       const tag = is1 ? '<span class="gs-pick-tag">1st ✓</span>' : is2 ? '<span class="gs-pick-tag">2nd ✓</span>' : '';
+      const ovr = RATINGS[t];
+      const ovrBadge = ovr
+        ? `<span style="font-size:0.62rem;font-weight:900;color:${fc26OvrColor(ovr)};margin-left:auto;padding-right:${tag?'0.35rem':'0'};">${ovr}</span>`
+        : '';
       return `<div class="gs-pick-row ${rowCls}" onclick="togglePick('${grp}','${t.replace(/'/g,"\\'")}')">
         <div class="gs-rank">${rankNum}</div>
         <span class="gs-pick-flag">${getFlag(t)}</span>
         <span class="gs-pick-name">${t}</span>
+        ${ovrBadge}
         ${tag}
       </div>`;
     }).join('');

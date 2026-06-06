@@ -505,7 +505,8 @@
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
-      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/players">Players</a></li>
+        <li><a href="/my-team">My Team</a></li>
       <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
@@ -525,6 +526,7 @@
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/players" onclick="closeMobileMenu()">Players</a>
     <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
     <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
@@ -661,6 +663,23 @@
     </div>
   </div>
 
+  <!-- ═══════════ PLAYERS TO WATCH ═══════════ -->
+  <div class="lp-wrap" id="playersToWatchSection" style="margin-bottom:5rem;">
+    <div class="lp-sec-hdr">
+      <div>
+        <div class="lp-eyebrow">FC26 Ratings</div>
+        <div class="lp-title">Players to Watch</div>
+        <div class="lp-subtitle">Top-rated players at the 2026 World Cup</div>
+      </div>
+      <a href="/players" class="btn btn-outline btn-sm">All Players →</a>
+    </div>
+    <div id="topPlayersGrid" style="
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+      gap:0.85rem;
+    "></div>
+  </div>
+
   <!-- ═══════════ FOOTER ═══════════ -->
   <footer class="lp-footer">
     <div class="lp-footer-copy">
@@ -723,6 +742,61 @@
     }
     tick();
     setInterval(tick, 1000);
+
+    // ── Players to Watch ──────────────────────────
+    function ovrColor(ovr) {
+      return ovr >= 88 ? '#f5c842' : ovr >= 83 ? '#4ade80' : ovr >= 77 ? '#34d399' : ovr >= 70 ? '#60a5fa' : 'var(--text-muted)';
+    }
+
+    fetch('football-data/fc26-top-players.json')
+      .then(r => r.json())
+      .then(players => {
+        const grid = document.getElementById('topPlayersGrid');
+        if (!grid) return;
+        grid.innerHTML = players.map(p => {
+          const col = ovrColor(p.overall);
+          const pos = (p.position || '').split(',')[0].trim();
+          return `
+          <div style="
+            background:var(--bg-card);border:1px solid var(--border);
+            border-radius:14px;overflow:hidden;
+            transition:border-color 0.2s,transform 0.2s;cursor:default;
+          " onmouseenter="this.style.borderColor='var(--border-bright)';this.style.transform='translateY(-2px)'"
+             onmouseleave="this.style.borderColor='var(--border)';this.style.transform=''">
+            <div style="
+              display:flex;justify-content:center;align-items:flex-end;
+              height:110px;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--input-bg) 100%);
+              padding-bottom:0;position:relative;overflow:hidden;">
+              <div style="position:absolute;top:0.5rem;left:0.65rem;
+                font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+                background:var(--input-bg);border:1px solid var(--border);border-radius:4px;
+                padding:0.1rem 0.4rem;color:var(--text-muted);">${pos}</div>
+              <div style="position:absolute;top:0.5rem;right:0.65rem;
+                font-size:0.85rem;font-weight:900;color:${col};">${p.overall}</div>
+              <img src="${p.faceUrl}" referrerpolicy="no-referrer"
+                style="width:90px;height:90px;object-fit:cover;object-position:top;border-radius:50% 50% 0 0;"
+                onerror="this.parentElement.innerHTML='<div style=font-size:3rem;padding-bottom:0.5rem;>👤</div>'"
+                loading="lazy">
+            </div>
+            <div style="padding:0.65rem 0.75rem 0.8rem;">
+              <div style="font-size:0.82rem;font-weight:700;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);">${p.team}</div>
+              ${p.pace != null ? `
+              <div style="display:flex;gap:0.4rem;margin-top:0.55rem;flex-wrap:wrap;">
+                ${[['PAC',p.pace],['SHO',p.shooting],['PAS',p.passing],['DRI',p.dribbling]].filter(([,v])=>v!=null).map(([l,v])=>`
+                  <div style="text-align:center;background:var(--input-bg);border-radius:5px;padding:0.18rem 0.4rem;">
+                    <div style="font-size:0.7rem;font-weight:800;color:${ovrColor(v)};">${v}</div>
+                    <div style="font-size:0.48rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);">${l}</div>
+                  </div>`).join('')}
+              </div>` : ''}
+            </div>
+          </div>`;
+        }).join('');
+      })
+      .catch(() => {
+        const s = document.getElementById('playersToWatchSection');
+        if (s) s.style.display = 'none';
+      });
   </script>
 </body>
 </html>

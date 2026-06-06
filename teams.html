@@ -20,7 +20,8 @@
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams" class="active">Teams</a></li>
-      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/players">Players</a></li>
+        <li><a href="/my-team">My Team</a></li>
       <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
@@ -41,6 +42,7 @@
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" class="active" onclick="closeMobileMenu()">Teams</a>
+    <a href="/players" onclick="closeMobileMenu()">Players</a>
     <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
     <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
@@ -55,8 +57,8 @@
     <!-- Data Panel -->
     <div class="api-panel">
       <div class="api-panel-text">
-        <h3>🔗 Squad data</h3>
-        <p>Roster data is bundled locally from football-data.org, so teams and players load without any setup.</p>
+        <h3>🎮 Powered by EA Sports FC 26</h3>
+        <p>Player ratings, squad strength, and face images sourced from the <strong>EA Sports FC 26</strong> dataset — the same ratings used in the game.</p>
       </div>
       <div class="api-status ok" id="apiStatus" style="min-width:220px;text-align:right;"></div>
     </div>
@@ -72,6 +74,12 @@
         <option value="G">Group G</option><option value="H">Group H</option>
         <option value="I">Group I</option><option value="J">Group J</option>
         <option value="K">Group K</option><option value="L">Group L</option>
+      </select>
+      <select id="sortTeams" class="filter-select" onchange="renderTeams()">
+        <option value="group">Sort: By Group</option>
+        <option value="ovr_desc">Sort: ⬇ Squad OVR</option>
+        <option value="ovr_asc">Sort: ⬆ Squad OVR</option>
+        <option value="name">Sort: A → Z</option>
       </select>
     </div>
 
@@ -108,6 +116,27 @@
 
     let teamsData = {};   // teamName → { squad:[], apiId }
     let wcTeams   = [];   // raw API team objects
+
+    // ── FC26 data ────────────────────────────────────
+    let FC26_TEAM_STATS = {};
+    let FC26_RATINGS    = {};
+
+    const FC26_TEAM_NAME_MAP = {
+      'USA': 'United States', 'Türkiye': 'Turkey',
+      'Bosnia & Herz.': 'Bosnia-Herzegovina', 'Cape Verde': 'Cape Verde Islands',
+      'DR Congo': 'Congo DR',
+    };
+    function fc26TeamStats(name) {
+      return FC26_TEAM_STATS[FC26_TEAM_NAME_MAP[name] || name] || null;
+    }
+    function normalizeName(s) {
+      return (s || '').toLowerCase()
+        .replace(/å/g,'aa').replace(/ø/g,'o').replace(/æ/g,'ae').replace(/ß/g,'ss')
+        .normalize('NFD').replace(/[̀-ͯ]/g,'');
+    }
+    function fc26OvrColor(ovr) {
+      return ovr >= 88 ? '#f5c842' : ovr >= 83 ? '#4ade80' : ovr >= 77 ? '#34d399' : ovr >= 70 ? '#60a5fa' : 'var(--text-muted)';
+    }
 
     // ── All teams ordered from GROUPS ──────────────────
     const ALL_TEAMS = [];
@@ -199,21 +228,55 @@
     function renderTeams() {
       const search    = document.getElementById('searchTeam').value.toLowerCase();
       const grpFilter = document.getElementById('groupFilter').value;
-      const filtered  = ALL_TEAMS.filter(t =>
+      const sort      = document.getElementById('sortTeams').value;
+
+      let filtered = ALL_TEAMS.filter(t =>
         (!search    || t.name.toLowerCase().includes(search)) &&
         (!grpFilter || t.group === grpFilter)
       );
 
-      document.getElementById('teamsGrid').innerHTML = filtered.map(team => {
+      // Apply sort
+      if (sort === 'ovr_desc') {
+        filtered = [...filtered].sort((a, b) => {
+          const ra = fc26TeamStats(a.name)?.avg || 0;
+          const rb = fc26TeamStats(b.name)?.avg || 0;
+          return rb - ra;
+        });
+      } else if (sort === 'ovr_asc') {
+        filtered = [...filtered].sort((a, b) => {
+          const ra = fc26TeamStats(a.name)?.avg || 0;
+          const rb = fc26TeamStats(b.name)?.avg || 0;
+          return ra - rb;
+        });
+      } else if (sort === 'name') {
+        filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+      }
+      // 'group' = default insertion order (ALL_TEAMS already in group order)
+
+      const showRank = sort === 'ovr_desc' || sort === 'ovr_asc';
+
+      document.getElementById('teamsGrid').innerHTML = filtered.map((team, idx) => {
         const cached    = teamsData[team.name];
         const positions = cached ? countPositions(cached.squad) : null;
+        const ts        = fc26TeamStats(team.name);
+        const rankBadge = showRank && ts
+          ? `<div style="position:absolute;top:0.65rem;left:0.7rem;
+               font-size:0.62rem;font-weight:900;color:var(--text-muted);
+               background:var(--input-bg);border:1px solid var(--border);
+               border-radius:100px;padding:0.1rem 0.45rem;line-height:1.4;">#${idx+1}</div>`
+          : '';
 
         return `<div class="team-card" onclick="openTeam('${team.name.replace(/'/g,"\\'")}')">
+          ${rankBadge}
           <div class="team-card-flag">${getFlag(team.name)}</div>
           <div class="team-card-name">${team.name}</div>
           <div class="team-card-group">Group ${team.group}</div>
+          ${ts ? `<div style="margin:0.4rem auto 0;display:inline-flex;align-items:center;gap:0.35rem;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.55rem;">
+            <span style="font-size:0.55rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-weight:700;">AVG OVR</span>
+            <span style="font-size:0.85rem;font-weight:900;color:${fc26OvrColor(ts.avg)};">${ts.avg}</span>
+          </div>` : ''}
           ${positions ? `
-            <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.75rem;flex-wrap:wrap;">
+            <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.65rem;flex-wrap:wrap;">
               <span title="Goalkeepers" style="font-size:0.75rem;color:var(--gold);">🧤 ${positions.gk}</span>
               <span title="Defenders"   style="font-size:0.75rem;color:#22c55e;">🛡️ ${positions.def}</span>
               <span title="Midfielders" style="font-size:0.75rem;color:#60a5fa;">⚙️ ${positions.mid}</span>
@@ -233,7 +296,32 @@
       lenis.stop(); // pause page scroll while modal is open
 
       const body = document.getElementById('modalBody');
+      const ts = fc26TeamStats(teamName);
       const teamGames = GAMES.filter(g => g.team1 === teamName || g.team2 === teamName);
+
+      // Top players section from FC26
+      const topPlayersHtml = ts && ts.top.length ? `
+        <div class="fc26-top-players-section" style="margin-bottom:1.5rem;">
+          <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.75rem;">
+            ⭐ FC26 Top Players &nbsp;<span style="color:var(--gold);font-weight:900;">AVG ${ts.avg}</span>
+          </div>
+          <div style="display:flex;gap:0.65rem;flex-wrap:wrap;">
+            ${ts.top.map(p => {
+              const col = fc26OvrColor(p.overall);
+              return `<div style="display:flex;align-items:center;gap:0.5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:0.45rem 0.65rem;min-width:0;">
+                <img src="${p.faceUrl}" referrerpolicy="no-referrer" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg-surface);" onerror="this.style.display='none'" loading="lazy">
+                <div style="min-width:0;">
+                  <div style="font-size:0.76rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                  <div style="display:flex;align-items:center;gap:0.35rem;">
+                    <span style="font-size:0.6rem;color:var(--text-muted);">${p.position}</span>
+                    <span style="font-size:0.75rem;font-weight:900;color:${col};">${p.overall}</span>
+                  </div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : '';
+
       const gamesHtml = `
         <div class="team-games-section">
           <div class="team-games-title">Matches</div>
@@ -250,15 +338,15 @@
 
       // Data already loaded from single bulk fetch
       if (teamsData[teamName]) {
-        body.innerHTML = renderSquadTable(teamsData[teamName].squad) + gamesHtml;
+        body.innerHTML = topPlayersHtml + renderSquadTable(teamsData[teamName].squad) + gamesHtml;
       } else if (wcTeams.length) {
-        body.innerHTML = `
+        body.innerHTML = topPlayersHtml + `
           <div style="background:var(--gold-dim);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
             <div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem;">Team not found</div>
             <div style="font-size:0.8rem;color:var(--text-secondary);">Squad data for this team is unavailable.</div>
           </div>` + gamesHtml;
       } else {
-        body.innerHTML = `
+        body.innerHTML = topPlayersHtml + `
           <div style="background:var(--gold-dim);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
             <div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem;">Roster data unavailable</div>
             <div style="font-size:0.8rem;color:var(--text-secondary);">The bundled roster file could not be loaded.</div>
@@ -328,16 +416,20 @@
         </div>
         <div style="overflow-x:auto;">
           <table class="player-table">
-            <thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Age</th><th>Nationality</th></tr></thead>
+            <thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Age</th><th title="FC26 Overall Rating">OVR</th><th>Nationality</th></tr></thead>
             <tbody>
-              ${rows.map(p=>`
-                <tr>
+              ${rows.map(p=>{
+                const ovr = FC26_RATINGS[normalizeName(p.name)];
+                const ovrCol = ovr ? fc26OvrColor(ovr) : 'var(--text-muted)';
+                return `<tr>
                   <td style="color:var(--text-muted);">${p.shirtNumber??'—'}</td>
                   <td style="font-weight:600;">${p.name}</td>
                   <td>${posBadge(p.position)}</td>
                   <td>${calcAge(p.dateOfBirth)}</td>
+                  <td style="font-weight:800;color:${ovrCol};font-size:0.82rem;">${ovr||'—'}</td>
                   <td style="color:var(--text-secondary);">${p.nationality||'—'}</td>
-                </tr>`).join('')}
+                </tr>`;
+              }).join('')}
             </tbody>
           </table>
         </div>`;
@@ -345,14 +437,16 @@
 
     function resortSquad(sortBy) {
       if (!_currentSquad) return;
-      // Replace only the squad table part, not the games section
+      // Preserve top players and games sections
       const body = document.getElementById('modalBody');
+      const topSection   = body.querySelector('.fc26-top-players-section');
+      const topHtml      = topSection ? topSection.outerHTML : '';
       const gamesSection = body.querySelector('.team-games-section');
-      const gamesHtml = gamesSection ? gamesSection.outerHTML : '';
+      const gamesHtml    = gamesSection ? gamesSection.outerHTML : '';
       // Get scroll position to restore
       const modal = document.getElementById('modal');
       const scrollTop = modal.scrollTop;
-      body.innerHTML = renderSquadTable(_currentSquad, sortBy) + `<div class="team-games-section">${gamesSection ? gamesSection.innerHTML : ''}</div>`;
+      body.innerHTML = topHtml + renderSquadTable(_currentSquad, sortBy) + `<div class="team-games-section">${gamesSection ? gamesSection.innerHTML : ''}</div>`;
       modal.scrollTop = scrollTop;
     }
 
@@ -371,9 +465,16 @@
     // ── Init ─────────────────────────────────────────────
     document.getElementById('searchTeam').addEventListener('input', renderTeams);
     document.getElementById('groupFilter').addEventListener('change', renderTeams);
+    // sortTeams uses onchange inline, but also wire it here for safety
+    document.getElementById('sortTeams').addEventListener('change', renderTeams);
 
     async function initTeamsPage() {
-      const bundled = await loadBundledSquads();
+      // Load FC26 data in parallel with squad data
+      const [bundled] = await Promise.all([
+        loadBundledSquads(),
+        fetch('football-data/fc26-team-stats.json').then(r=>r.json()).then(d=>{ FC26_TEAM_STATS=d; }).catch(()=>{}),
+        fetch('football-data/fc26-ratings.json').then(r=>r.json()).then(d=>{ FC26_RATINGS=d; }).catch(()=>{}),
+      ]);
       if (bundled) {
         setStatus(`✓ ${bundled} squads loaded`, 'ok');
       } else {

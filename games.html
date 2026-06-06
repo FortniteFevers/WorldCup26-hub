@@ -316,7 +316,8 @@
       <li><a href="/games" class="active">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
-      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/players">Players</a></li>
+        <li><a href="/my-team">My Team</a></li>
       <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
@@ -336,6 +337,7 @@
     <a href="/games" class="active" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/players" onclick="closeMobileMenu()">Players</a>
     <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
     <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
@@ -541,6 +543,21 @@
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
+    // ── FC26 team strength ─────────────────────────
+    let FC26_TEAM_STATS = {};
+    const FC26_TEAM_NAME_MAP = {
+      'USA': 'United States', 'Türkiye': 'Turkey',
+      'Bosnia & Herz.': 'Bosnia-Herzegovina', 'Cape Verde': 'Cape Verde Islands',
+      'DR Congo': 'Congo DR',
+    };
+    function fc26TeamStats(name) {
+      return FC26_TEAM_STATS[FC26_TEAM_NAME_MAP[name] || name] || null;
+    }
+    fetch('football-data/fc26-team-stats.json').then(r=>r.json()).then(d=>{
+      FC26_TEAM_STATS = d;
+      applyFilters(); // re-render cards with strength bars
+    }).catch(()=>{});
+
     // ── Shared state ───────────────────────────────
     let selected   = new Set();   // game IDs for export
     let filteredIds = GAMES.map(g => g.id);
@@ -601,6 +618,30 @@
     let selectedDate = '';
     let calYear = 2026, calMonth = 5;
 
+    function ovrColor(ovr) {
+      return ovr >= 88 ? '#f5c842' : ovr >= 83 ? '#4ade80' : ovr >= 77 ? '#34d399' : ovr >= 70 ? '#60a5fa' : '#94a3b8';
+    }
+
+    function strengthBarHtml(t1, t2) {
+      const s1 = fc26TeamStats(t1), s2 = fc26TeamStats(t2);
+      if (!s1 || !s2) return '';
+      const r1 = s1.avg, r2 = s2.avg, total = r1 + r2;
+      const pct1 = Math.round(r1 / total * 100);
+      const pct2 = 100 - pct1;
+      const c1 = ovrColor(r1), c2 = ovrColor(r2);
+      return `<div style="padding:0.35rem 0.9rem 0.5rem;border-top:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+          <span style="font-size:0.65rem;font-weight:900;color:${c1};">${r1}</span>
+          <span style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-weight:700;">Squad Strength</span>
+          <span style="font-size:0.65rem;font-weight:900;color:${c2};">${r2}</span>
+        </div>
+        <div style="display:flex;height:4px;border-radius:2px;overflow:hidden;gap:1px;">
+          <div style="flex:${pct1};background:${c1};border-radius:2px 0 0 2px;"></div>
+          <div style="flex:${pct2};background:${c2};border-radius:0 2px 2px 0;"></div>
+        </div>
+      </div>`;
+    }
+
     function createGameCard(game) {
       const ko = game.type !== 'Group';
       const stageClass = ko ? 'knockout' : '';
@@ -623,6 +664,7 @@
             <span class="fc-team-name">${game.team2}</span>
           </div>
         </div>
+        ${strengthBarHtml(game.team1, game.team2)}
         <div class="fc-banner">
           <div class="fc-banner-left">
             <span class="fc-banner-time">${formatFIFADate(game.date)} · ${game.time} ET</span>

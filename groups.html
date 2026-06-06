@@ -214,7 +214,8 @@
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups" class="active">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
-      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/players">Players</a></li>
+        <li><a href="/my-team">My Team</a></li>
       <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
@@ -235,6 +236,7 @@
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" class="active" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/players" onclick="closeMobileMenu()">Players</a>
     <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
     <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
@@ -287,6 +289,24 @@
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
+    // ── FC26 team strength data ────────────────────────
+    let FC26_TEAM_STATS = {};
+    const FC26_TEAM_NAME_MAP = {
+      'USA': 'United States', 'Türkiye': 'Turkey',
+      'Bosnia & Herz.': 'Bosnia-Herzegovina', 'Cape Verde': 'Cape Verde Islands',
+      'DR Congo': 'Congo DR',
+    };
+    function fc26TeamStats(name) {
+      return FC26_TEAM_STATS[FC26_TEAM_NAME_MAP[name] || name] || null;
+    }
+    function fc26OvrColor(ovr) {
+      return ovr >= 88 ? '#f5c842' : ovr >= 83 ? '#4ade80' : ovr >= 77 ? '#34d399' : ovr >= 70 ? '#60a5fa' : 'var(--text-muted)';
+    }
+    fetch('football-data/fc26-team-stats.json').then(r=>r.json()).then(d=>{
+      FC26_TEAM_STATS = d;
+      renderAll(); // re-render once ratings are loaded
+    }).catch(()=>{});
+
     // ── Get group stage matches only ──────────────────────
     function getGroupMatches(group) {
       return GAMES.filter(g => g.type === 'Group' && getTeamGroup(g.team1) === group);
@@ -323,6 +343,10 @@
 
       const rows = standings.map((team, i) => {
         const cls = i < 2 ? 'advance' : i === 2 ? 'third-place' : '';
+        const ts = fc26TeamStats(team.name);
+        const ovrHtml = ts
+          ? `<span style="font-size:0.72rem;font-weight:900;color:${fc26OvrColor(ts.avg)};">${ts.avg}</span>`
+          : `<span style="color:var(--text-muted);">—</span>`;
         return `<tr class="${cls}">
           <td>
             <div class="team-cell">
@@ -337,6 +361,7 @@
           <td>${team.l}</td>
           <td>${team.gd > 0 ? '+'+team.gd : team.gd}</td>
           <td class="pts-cell">${team.pts}</td>
+          <td>${ovrHtml}</td>
         </tr>`;
       }).join('');
 
@@ -366,6 +391,7 @@
               <th title="Losses">L</th>
               <th title="Goal Difference">GD</th>
               <th title="Points">Pts</th>
+              <th title="FC26 Average Overall Rating">OVR</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
