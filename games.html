@@ -183,27 +183,71 @@
       applyFilters();
     }
 
+    // ── Country codes for flagcdn.com flag images ──────
+    const COUNTRY_CODES = {
+      'Mexico':'mx','South Africa':'za','South Korea':'kr','Czechia':'cz',
+      'Canada':'ca','Bosnia & Herz.':'ba','USA':'us','Paraguay':'py',
+      'Qatar':'qa','Switzerland':'ch','Brazil':'br','Morocco':'ma',
+      'Haiti':'ht','Scotland':'gb-sct','Australia':'au','Türkiye':'tr',
+      'Ivory Coast':'ci','Ecuador':'ec','Germany':'de','Curaçao':'cw',
+      'Netherlands':'nl','Japan':'jp','Sweden':'se','Tunisia':'tn',
+      'Spain':'es','Cape Verde':'cv','Belgium':'be','Egypt':'eg',
+      'Saudi Arabia':'sa','Uruguay':'uy','Iran':'ir','New Zealand':'nz',
+      'France':'fr','Senegal':'sn','Iraq':'iq','Norway':'no',
+      'Argentina':'ar','Algeria':'dz','Austria':'at','Jordan':'jo',
+      'Ghana':'gh','Panama':'pa','England':'gb-eng','Croatia':'hr',
+      'Portugal':'pt','DR Congo':'cd','Uzbekistan':'uz','Colombia':'co'
+    };
+
+    function getFlagImg(team) {
+      const code = COUNTRY_CODES[team];
+      if (!code) return `<span class="fc-flag-emoji">${getFlag(team)}</span>`;
+      return `<img class="fc-flag" src="https://flagcdn.com/w80/${code}.png" alt="${team}" loading="lazy">`;
+    }
+
+    function formatFIFADate(dateStr) {
+      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      const d = new Date(dateStr + 'T12:00:00');
+      return `${months[d.getMonth()]} ${d.getDate()}`;
+    }
+
+    function formatTime24(timeStr) {
+      // Keep 12-hour format, just normalize spacing: "9:00 PM" → "9:00 PM"
+      const m = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!m) return timeStr;
+      return `${m[1]}:${m[2]} ${m[3].toUpperCase()}`;
+    }
+
     // ── Filters ────────────────────────────────────
     function createGameCard(game) {
       const ko = game.type !== 'Group';
-      const isFinal = game.type === 'Final';
+      const stageClass = ko ? 'knockout' : '';
+      const grp = !ko ? getTeamGroup(game.team1) : null;
+      const stageLabel = ko ? game.type : `Group ${grp}`;
+      const stadiumInfo = STADIUMS[game.stadium];
+      const venue = stadiumInfo ? `${game.stadium} · ${stadiumInfo.city}` : game.stadium;
+
       return `<div class="game-card">
-        <div class="game-header">
-          <span class="game-date">${formatDate(game.date)}</span>
-          <span class="game-type ${ko ? (isFinal ? 'final' : 'knockout') : ''}">${game.type}</span>
+        <div class="fc-top">
+          <span class="fc-stage ${stageClass}">${stageLabel}</span>
         </div>
-        <div class="game-match">
-          <div class="team"><span class="team-flag">${getFlag(game.team1)}</span><span class="team-name">${game.team1}</span></div>
-          <span class="vs">VS</span>
-          <div class="team"><span class="team-name">${game.team2}</span><span class="team-flag">${getFlag(game.team2)}</span></div>
-        </div>
-        <div class="game-footer">
-          <div class="detail"><span>🕐</span>${game.time} ET</div>
-          <div class="detail"><span>📍</span>${game.stadium}${STADIUMS[game.stadium] ? ' · ' + STADIUMS[game.stadium].country : ''}</div>
-          <div class="detail" style="margin-left:auto;">
-            <a href="${toGoogleCalURL(game)}" target="_blank" rel="noopener"
-              style="font-size:0.75rem;color:var(--gold);text-decoration:none;font-weight:600;">+ Calendar</a>
+        <div class="fc-match-body">
+          <div class="fc-team fc-team-left">
+            <span class="fc-team-name">${game.team1}</span>
+            ${getFlagImg(game.team1)}
           </div>
+          <div class="fc-v">V</div>
+          <div class="fc-team fc-team-right">
+            ${getFlagImg(game.team2)}
+            <span class="fc-team-name">${game.team2}</span>
+          </div>
+        </div>
+        <div class="fc-banner">
+          <div class="fc-banner-left">
+            <span class="fc-banner-time">${formatFIFADate(game.date)} · ${formatTime24(game.time)} ET</span>
+            <span class="fc-banner-venue">${venue}</span>
+          </div>
+          <a href="${toGoogleCalURL(game)}" target="_blank" rel="noopener" class="fc-banner-cal">+ Calendar</a>
         </div>
       </div>`;
     }

@@ -15,6 +15,7 @@
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 1.25rem; margin-bottom: 3rem;
     }
+    @media (min-width: 900px) { .mode-grid { grid-template-columns: 1fr 1fr 1fr; } }
     @media (max-width: 600px) { .mode-grid { grid-template-columns: 1fr; } }
 
     .mode-card {
@@ -254,6 +255,19 @@
             <div class="mode-card-feat">Click to pick or auto-simulate any match</div>
           </div>
           <a href="bracket.html" class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="event.stopPropagation()">Open Bracket →</a>
+        </div>
+        <div class="mode-card" onclick="window.location.href='draft.html'" style="position:relative;overflow:hidden;">
+          <div style="position:absolute;top:1rem;right:1rem;font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.55rem;border-radius:100px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,200,66,0.3);">NEW</div>
+          <div class="mode-card-icon">🎰</div>
+          <div class="mode-card-title" style="background:linear-gradient(135deg,var(--gold) 0%,#ff8c00 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">104-0</div>
+          <div class="mode-card-desc">Spin to draft 11 World Cup players in a 4-3-3. Then simulate your squad's 8-game run to the trophy.</div>
+          <div class="mode-card-features">
+            <div class="mode-card-feat">11-round spin draft (GK · 4 DEF · 3 MID · 3 FWD)</div>
+            <div class="mode-card-feat">Real players from all 48 World Cup squads</div>
+            <div class="mode-card-feat">Classic mode + Scout mode (names hidden)</div>
+            <div class="mode-card-feat">Simulate 8 games from group to Final</div>
+          </div>
+          <a href="draft.html" class="btn" style="margin-top:0.5rem;width:fit-content;background:linear-gradient(135deg,var(--gold),#e8a000);color:#0a0a0a;" onclick="event.stopPropagation()">Play 104-0 →</a>
         </div>
       </div>
     </div>

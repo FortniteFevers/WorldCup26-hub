@@ -335,8 +335,8 @@
       align-items: start;
     }
     .guide-toc {
-      position: sticky;
-      top: 84px;
+      /* position handled by JS — Lenis breaks native sticky */
+      will-change: transform;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -361,6 +361,11 @@
       line-height: 1.4;
     }
     .guide-toc a:hover { color: var(--text-primary); background: var(--input-bg); }
+    .guide-toc a.toc-active {
+      color: var(--gold);
+      background: var(--gold-dim);
+      font-weight: 700;
+    }
     @media (max-width: 900px) {
       .guide-layout {
         display: block; /* drop grid entirely on mobile/tablet */
@@ -371,6 +376,379 @@
       border: none;
       border-top: 1px solid var(--border);
       margin: 3rem 0;
+    }
+
+    /* ── Broadcast section ── */
+    .broadcast-hero {
+      background: linear-gradient(160deg, #050810 0%, #0d1830 100%);
+      border: 1px solid rgba(245,200,66,0.22);
+      border-radius: 18px;
+      padding: 2.75rem 2rem 2.25rem;
+      text-align: center;
+      margin: 1.75rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .broadcast-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(245,200,66,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .broadcast-num {
+      font-size: clamp(5rem, 14vw, 8.5rem);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      position: relative;
+    }
+    .broadcast-num-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(245,200,66,0.55);
+      margin-top: 0.25rem;
+      margin-bottom: 1.75rem;
+      position: relative;
+    }
+    .broadcast-quote {
+      font-size: clamp(1rem, 2.8vw, 1.25rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.55;
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .broadcast-quote em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--gold) 0%, #ffaa00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .broadcast-facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+    .broadcast-fact {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      text-align: center;
+    }
+    .broadcast-fact-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+    .broadcast-fact-val {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--text-primary);
+      margin-bottom: 0.15rem;
+    }
+    .broadcast-fact-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+    }
+
+    .broadcast-suspend {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.5rem;
+      margin: 1.5rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      align-items: center;
+    }
+    .broadcast-suspend-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      width: 100%;
+      margin-bottom: 0.15rem;
+    }
+    .broadcast-suspend-item {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .broadcast-suspend-item::before {
+      content: '—';
+      color: var(--text-muted);
+    }
+
+    /* Asterisk / schedule clarification */
+    .broadcast-asterisk {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .broadcast-asterisk-header {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+    .broadcast-asterisk-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .broadcast-asterisk-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.18rem 0.55rem;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .broadcast-asterisk-tag.group   { background: rgba(96,165,250,0.1);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+    .broadcast-asterisk-tag.final   { background: rgba(251,191,36,0.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .broadcast-asterisk-tag.knockout{ background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(245,200,66,0.25); }
+    .broadcast-asterisk-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      flex: 1;
+      min-width: 200px;
+    }
+    .broadcast-asterisk-desc strong { color: var(--text-primary); }
+
+    @media (max-width: 600px) {
+      .broadcast-facts { grid-template-columns: 1fr 1fr; }
+      .broadcast-hero { padding: 2rem 1.25rem 1.75rem; }
+      .broadcast-asterisk-row { flex-direction: column; gap: 0.35rem; }
+    }
+
+    /* Arrival timeline */
+    .arrival-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 1.5rem 0;
+    }
+    .arrival-step {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .arrival-spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 44px;
+      flex-shrink: 0;
+    }
+    .arrival-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+      margin-top: 3px;
+      box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+    .arrival-dot.dim {
+      background: var(--border-bright);
+      box-shadow: none;
+    }
+    .arrival-line {
+      width: 2px;
+      flex: 1;
+      background: var(--border);
+      margin: 4px 0;
+      min-height: 20px;
+    }
+    .arrival-step:last-child .arrival-line { display: none; }
+    .arrival-content {
+      padding: 0 0 1.25rem 0.5rem;
+      flex: 1;
+    }
+    .arrival-time {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.15rem;
+    }
+    .arrival-time.dim { color: var(--text-muted); }
+    .arrival-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.2rem;
+    }
+    .arrival-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Transport stat cards */
+    .transport-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .transport-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .transport-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    .transport-num {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    .transport-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    /* Gold highlight callout */
+    .callout-gold {
+      background: var(--gold-dim);
+      border: 1px solid rgba(245,200,66,0.3);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .callout-gold strong { color: var(--gold); }
+
+    /* Boston venue card */
+    .venue-highlight {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin: 1.5rem 0;
+    }
+    .venue-highlight-header {
+      background: linear-gradient(135deg, #0f1f3d 0%, #1a3060 100%);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .venue-highlight-flag { font-size: 1.6rem; }
+    .venue-highlight-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+    .venue-highlight-city {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 0.1rem;
+    }
+    .venue-highlight-games {
+      padding: 0.75rem 0;
+    }
+    .venue-game-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 1.5rem;
+      font-size: 0.82rem;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .venue-game-row:last-child { border-bottom: none; }
+    .venue-game-teams {
+      font-weight: 600;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .venue-game-date {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    /* Scale stat banner */
+    .scale-banner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .scale-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+    .scale-num {
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    .scale-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+    }
+    .scale-sub {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    @media (max-width: 600px) {
+      .transport-grid { grid-template-columns: 1fr; }
+      .scale-banner { grid-template-columns: 1fr 1fr; }
+      .venue-game-row { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
     }
 
     /* ── Mobile overrides ── */
@@ -446,7 +824,9 @@
         <a href="#groups">Step 2 — Group Stage</a>
         <a href="#knockout">Step 3 — Knockout Stage</a>
         <a href="#why2026">Why 2026 is Different</a>
+        <a href="#broadcast">The Broadcast</a>
         <a href="#hosts">The Host Setup</a>
+        <a href="#attending">Attending a Match</a>
         <a href="#follow">How to Follow a Team</a>
         <a href="#standings">How Standings Work</a>
         <a href="#teams">Teams to Know</a>
@@ -662,6 +1042,66 @@
 
         <hr class="divider">
 
+        <!-- THE BROADCAST -->
+        <div class="guide-section" id="broadcast">
+          <div class="guide-section-label">📺 The Broadcast</div>
+          <h2>One Game. <em>The Whole World.</em></h2>
+          <p class="guide-lead">There's something that happens during every single World Cup match that most fans never think about — and once you know it, every game feels different.</p>
+
+          <div class="broadcast-hero">
+            <div class="broadcast-num">104</div>
+            <div class="broadcast-num-label">Times the Entire World Watches One Game</div>
+            <div class="broadcast-quote">
+              When a World Cup match kicks off, it is <em>the only live soccer game on Earth.</em> Not the biggest game. The only game.
+            </div>
+          </div>
+
+          <p class="guide-text">For all 104 matches, FIFA schedules the tournament so games never overlap — meaning at any given moment there's one game, and one game only, commanding the global soccer audience. No other competition is scheduled against it. There is no other sporting event that does this at this scale.</p>
+
+          <!-- Asterisk / how it actually works -->
+          <div class="broadcast-asterisk">
+            <div class="broadcast-asterisk-header">* How the schedule actually works</div>
+            <div class="broadcast-asterisk-row">
+              <div class="broadcast-asterisk-tag group">Group Stage — Matchdays 1 &amp; 2</div>
+              <div class="broadcast-asterisk-desc">Games are <strong>staggered</strong> throughout the day in different time slots so fans can watch them back-to-back without overlap. Multiple games per day, but never at the same time.</div>
+            </div>
+            <div class="broadcast-asterisk-row">
+              <div class="broadcast-asterisk-tag final">Group Stage — Final Matchday</div>
+              <div class="broadcast-asterisk-desc">The two remaining games within each group kick off <strong>simultaneously</strong> — a FIFA rule to prevent collusion or teams altering their play based on the other result.</div>
+            </div>
+            <div class="broadcast-asterisk-row">
+              <div class="broadcast-asterisk-tag knockout">Knockout Stage</div>
+              <div class="broadcast-asterisk-desc">From the Round of 32 onwards, all matches are played <strong>fully sequentially</strong> — one game at a time. This is where the "only game on Earth" statement is truly, literally accurate.</div>
+            </div>
+          </div>
+
+          <div class="broadcast-facts">
+            <div class="broadcast-fact">
+              <div class="broadcast-fact-icon">📡</div>
+              <div class="broadcast-fact-val">1</div>
+              <div class="broadcast-fact-label">Production Company</div>
+            </div>
+            <div class="broadcast-fact">
+              <div class="broadcast-fact-icon">🌍</div>
+              <div class="broadcast-fact-val">200+</div>
+              <div class="broadcast-fact-label">Countries Broadcasting</div>
+            </div>
+            <div class="broadcast-fact">
+              <div class="broadcast-fact-icon">📺</div>
+              <div class="broadcast-fact-val">104</div>
+              <div class="broadcast-fact-label">Global Exclusives</div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>One camera crew runs the whole thing.</strong> Every World Cup match is recorded by a single production company called <strong>HBS (Host Broadcast Services)</strong>. Networks like Fox, BBC, and ESPN don't send their own camera operators — they buy the rights to the HBS world feed and add their own commentators on top. HBS has 24/7 access to every venue and handles the entire global broadcast for all 104 games. Every camera angle you see on TV? That's them.
+          </div>
+
+          <p class="guide-text">The result is a kind of global synchronization that no league or club competition can match. A Champions League final has competition. The Super Bowl has competition. A World Cup knockout match has the whole planet, undivided — and that happens <strong>72 times</strong> just in the knockout rounds alone.</p>
+        </div>
+
+        <hr class="divider">
+
         <!-- HOST SETUP -->
         <div class="guide-section" id="hosts">
           <div class="guide-section-label">🌎 Host Nations</div>
@@ -675,6 +1115,118 @@
           <div style="margin-top:1.25rem;">
             <a href="locations.html" class="btn btn-outline" style="font-size:0.85rem;">View all 16 stadiums on the map →</a>
           </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- ATTENDING A MATCH -->
+        <div class="guide-section" id="attending">
+          <div class="guide-section-label">🎫 Game Day</div>
+          <h2>Attending a <em>Match</em></h2>
+          <p class="guide-lead">Going to a World Cup game in person is a different scale from any other sporting event. Here's exactly what to expect if you have a ticket.</p>
+
+          <!-- Arrival Timeline -->
+          <h3 style="font-size:1rem;font-weight:800;color:var(--text-primary);margin:1.75rem 0 0.25rem;letter-spacing:-0.01em;">Arrival Guide — Count Back from Kickoff</h3>
+          <p class="guide-text" style="margin-bottom:0.5rem;">Plan your arrival around this timeline. The earlier you get there, the better the experience — and the easier the commute.</p>
+
+          <div class="arrival-timeline">
+            <div class="arrival-step">
+              <div class="arrival-spine">
+                <div class="arrival-dot"></div>
+                <div class="arrival-line"></div>
+              </div>
+              <div class="arrival-content">
+                <div class="arrival-time">4 Hours Before</div>
+                <div class="arrival-title">Parking Lots Open</div>
+                <div class="arrival-desc">Surface lots and garages open. Best time to arrive if you're driving — you beat the rush and have time to tailgate before the crowds hit.</div>
+              </div>
+            </div>
+            <div class="arrival-step">
+              <div class="arrival-spine">
+                <div class="arrival-dot"></div>
+                <div class="arrival-line"></div>
+              </div>
+              <div class="arrival-content">
+                <div class="arrival-time">3 Hours Before</div>
+                <div class="arrival-title">Inner Perimeter Gates Open</div>
+                <div class="arrival-desc">Security begins screening fans into the outer stadium grounds. This is your target arrival window if you're taking transit or want a relaxed entry experience.</div>
+              </div>
+            </div>
+            <div class="arrival-step">
+              <div class="arrival-spine">
+                <div class="arrival-dot"></div>
+                <div class="arrival-line"></div>
+              </div>
+              <div class="arrival-content">
+                <div class="arrival-time">~90 Min Before</div>
+                <div class="arrival-title">Stadium Concourses Open</div>
+                <div class="arrival-desc">Grab food, find your seats, take it in. Kickoff energy builds fast — teams warm up on the pitch and the atmosphere starts early.</div>
+              </div>
+            </div>
+            <div class="arrival-step">
+              <div class="arrival-spine">
+                <div class="arrival-dot" style="background:var(--gold);box-shadow:0 0 0 4px var(--gold-dim),0 0 16px rgba(245,200,66,0.4);"></div>
+                <div class="arrival-line"></div>
+              </div>
+              <div class="arrival-content">
+                <div class="arrival-time" style="color:var(--gold);">Kickoff</div>
+                <div class="arrival-title">The Only Game on Earth</div>
+                <div class="arrival-desc">You're in. One match. The whole world watching.</div>
+              </div>
+            </div>
+            <div class="arrival-step">
+              <div class="arrival-spine">
+                <div class="arrival-dot dim"></div>
+              </div>
+              <div class="arrival-content">
+                <div class="arrival-time dim">Post-Match</div>
+                <div class="arrival-title">Plan Your Exit Early</div>
+                <div class="arrival-desc">Transit fills up fast. If you're taking the train or bus, have a plan — tens of thousands of fans hit the same exit points simultaneously. Staying 10 extra minutes after the final whistle can save you 45 minutes in the crowd.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transport Scale -->
+          <h3 style="font-size:1rem;font-weight:800;color:var(--text-primary);margin:1.75rem 0 0.25rem;letter-spacing:-0.01em;">Getting There</h3>
+          <p class="guide-text" style="margin-bottom:0;">Transit is the move. Each venue is built to handle massive fan flows. A single World Cup host stadium can move tens of thousands of fans per mode of transport:</p>
+
+          <div class="transport-grid">
+            <div class="transport-card">
+              <div class="transport-icon">🚆</div>
+              <div>
+                <div class="transport-num">22K</div>
+                <div class="transport-label">Fans by Train</div>
+              </div>
+            </div>
+            <div class="transport-card">
+              <div class="transport-icon">🚌</div>
+              <div>
+                <div class="transport-num">22K</div>
+                <div class="transport-label">Fans by Bus</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>Bottom line:</strong> Leave for the stadium at least two full hours before you need to be there. Transit systems are running extended capacity on match days, but 40,000–70,000+ fans all moving at once means queues start early at every venue.
+          </div>
+
+          <!-- Scale of the operation -->
+          <h3 style="font-size:1rem;font-weight:800;color:var(--text-primary);margin:1.75rem 0 0.75rem;letter-spacing:-0.01em;">The Scale of a World Cup Game</h3>
+          <div class="scale-banner">
+            <div class="scale-stat">
+              <div class="scale-num" style="color:var(--gold);">3,900</div>
+              <div class="scale-label">Staff Per Match</div>
+              <div class="scale-sub">FIFA game operation</div>
+            </div>
+            <div class="scale-stat">
+              <div class="scale-num" style="color:var(--text-secondary);">2,700</div>
+              <div class="scale-label">Staff Per Match</div>
+              <div class="scale-sub">Typical NFL game</div>
+            </div>
+          </div>
+          <p class="guide-text">A World Cup game requires roughly <strong>45% more staff</strong> than an NFL game at the same venue — and that's before you count the international broadcast crews, FIFA officials, and multilingual support teams. The entire infrastructure running behind what you see on the pitch is enormous.</p>
+          <p class="guide-text" style="margin-bottom:0;">Every host city goes into <strong>event-day mode starting June 10</strong> — the day before the tournament opens. Security perimeters, transit operations, and fan zones run <strong>24/7 continuously</strong> from then through the final on July 19. There is no off day.</p>
         </div>
 
         <hr class="divider">
@@ -878,6 +1430,66 @@
     lenis.on('scroll', () => {});
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
+
+    // ── TOC: smooth scroll on click ────────────────
+    const tocLinks = document.querySelectorAll('.guide-toc a[href^="#"]');
+    tocLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        lenis.scrollTo(link.getAttribute('href'), { offset: -96, duration: 1.3 });
+      });
+    });
+
+    // ── TOC: follow scroll (Lenis-compatible sticky) ─
+    (function() {
+      const toc = document.querySelector('.guide-toc');
+      if (!toc) return;
+      const content = toc.nextElementSibling; // main content column
+      const NAV = 96; // px gap from viewport top
+
+      // Measure TOC's distance from the page top once layout has settled
+      let tocDocTop = 0;
+      requestAnimationFrame(() => {
+        tocDocTop = toc.getBoundingClientRect().top; // scroll=0 at load, so this = page offset
+      });
+
+      lenis.on('scroll', ({ scroll }) => {
+        // Max we can push down: content height minus toc height minus a little breathing room
+        const maxY = content ? Math.max(0, content.offsetHeight - toc.offsetHeight - 32) : 9999;
+        const y    = Math.min(Math.max(0, scroll - tocDocTop + NAV), maxY);
+        toc.style.transform = `translateY(${y}px)`;
+      });
+
+      // Recalculate on resize
+      window.addEventListener('resize', () => {
+        tocDocTop = toc.getBoundingClientRect().top + (lenis.scroll || 0);
+      });
+    })();
+
+    // ── TOC: scroll spy (highlight active section) ─
+    (function() {
+      if (!tocLinks.length) return;
+      const sectionIds = [...tocLinks].map(a => a.getAttribute('href').slice(1));
+      const sections   = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+      function setActive(id) {
+        tocLinks.forEach(a =>
+          a.classList.toggle('toc-active', a.getAttribute('href') === '#' + id)
+        );
+      }
+
+      setActive(sectionIds[0]);
+
+      const observer = new IntersectionObserver(() => {
+        let active = sections[0];
+        sections.forEach(sec => {
+          if (sec.getBoundingClientRect().top <= window.innerHeight * 0.45) active = sec;
+        });
+        setActive(active.id);
+      }, { threshold: 0, rootMargin: '0px 0px -45% 0px' });
+
+      sections.forEach(s => observer.observe(s));
+    })();
   </script>
 </body>
 </html>
