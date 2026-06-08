@@ -1219,40 +1219,69 @@
       return canvas;
     }
 
+    function downloadBlob(blob, fname) {
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href     = url;
+      link.download = fname;
+      document.body.appendChild(link); // must be in DOM for Firefox/Safari
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+
     async function savePlayerCard() {
       const btn = document.getElementById('plSaveBtn');
+      const resetBtn = () => {
+        if (!btn) return;
+        btn.classList.remove('loading');
+        btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Save Player Card`;
+      };
+
       if (btn) { btn.classList.add('loading'); btn.innerHTML = '⏳ Generating…'; }
 
       await new Promise(r => setTimeout(r, 40));
+
       let canvas;
-      try { canvas = await drawPlayerCard(); } catch(e) { console.warn(e); }
-      if (!canvas) { if (btn) { btn.classList.remove('loading'); btn.innerHTML = 'Error — try again'; } return; }
+      try { canvas = await drawPlayerCard(); } catch(e) { console.warn('drawPlayerCard error:', e); }
+      if (!canvas) { resetBtn(); return; }
 
-      canvas.toBlob(async (blob) => {
-        const fname = `${(_modalPlayer?.name||'player').replace(/\s+/g,'-')}-fc26.png`;
-        const file  = new File([blob], fname, { type:'image/png' });
-        const text  = `${_modalPlayer?.name} · ${_modalPlayer?.overall} OVR on EA Sports FC 26 — worldcupfieldguide.com`;
+      const fname = `${(_modalPlayer?.name||'player').replace(/\s+/g,'-')}-fc26.png`;
+      const text  = `${_modalPlayer?.name} · ${_modalPlayer?.overall} OVR — worldcupfieldguide.com`;
 
-        let shared = false;
-        if (navigator.canShare && navigator.canShare({ files:[file] })) {
-          try {
-            await navigator.share({ files:[file], text, url:'https://worldcupfieldguide.com' });
-            shared = true;
-          } catch(e) { if (e.name === 'AbortError') shared = true; }
+      // Try toBlob — may throw SecurityError if canvas is tainted
+      let blob;
+      try {
+        blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob returned null')), 'image/png'));
+      } catch(e) {
+        // Canvas tainted (face image blocked even via proxy) — redraw without face
+        console.warn('Canvas tainted, redrawing without face:', e);
+        _modalPlayer = { ..._modalPlayer, faceUrl: null };
+        try { canvas = await drawPlayerCard(); } catch(_) {}
+        _modalPlayer = _modalPlayer; // restore
+        if (!canvas) { resetBtn(); return; }
+        try {
+          blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(), 'image/png'));
+        } catch(_) { resetBtn(); return; }
+      }
+
+      // On mobile: try Web Share API with file
+      if (navigator.canShare && navigator.canShare({ files: [new File([blob], fname, { type:'image/png' })] })) {
+        try {
+          await navigator.share({
+            files: [new File([blob], fname, { type:'image/png' })],
+            text, url: 'https://worldcupfieldguide.com'
+          });
+          resetBtn(); return;
+        } catch(e) {
+          if (e.name === 'AbortError') { resetBtn(); return; }
+          // Share failed — fall through to download
         }
+      }
 
-        if (!shared) {
-          const url  = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url; link.download = fname; link.click();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }
-
-        if (btn) {
-          btn.classList.remove('loading');
-          btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Save Player Card`;
-        }
-      }, 'image/png');
+      // Desktop / fallback: download the PNG
+      downloadBlob(blob, fname);
+      resetBtn();
     }
 
     // ── Load data ────────────────────────────────────────────────────────────
