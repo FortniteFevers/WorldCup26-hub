@@ -116,17 +116,29 @@
       .players-wrap { padding-left: 0.75rem; padding-right: 0.75rem; overflow-x: hidden; }
       .pl-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
 
-      /* Bottom-sheet modal on mobile */
+      /* Bottom-sheet modal on mobile — modal breaks out of flex overlay
+         and becomes its own fixed element so iOS Safari can scroll it */
       .pl-modal-overlay {
         align-items: flex-end;
         padding: 0;
       }
       .pl-modal {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
         max-width: 100%;
-        max-height: 90vh;
+        height: 90dvh;        /* definite height = iOS scrolls it */
+        max-height: 90dvh;
         border-radius: 20px 20px 0 0;
+        overflow-y: scroll;   /* 'scroll' not 'auto' — iOS needs explicit */
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
+        transform: translateY(100%);  /* override base translateY(20px) */
+      }
+      .pl-modal-overlay.open .pl-modal {
+        transform: translateY(0);
       }
       /* Drag handle visual */
       .pl-modal::before {
