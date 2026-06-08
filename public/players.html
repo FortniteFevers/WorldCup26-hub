@@ -115,6 +115,30 @@
     @media (max-width: 540px) {
       .players-wrap { padding-left: 0.75rem; padding-right: 0.75rem; overflow-x: hidden; }
       .pl-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+
+      /* Bottom-sheet modal on mobile */
+      .pl-modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+      }
+      .pl-modal {
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 20px 20px 0 0;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+      /* Drag handle visual */
+      .pl-modal::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: var(--border-bright);
+        border-radius: 2px;
+        margin: 12px auto 0;
+        opacity: 0.5;
+      }
     }
 
     /* ── Player Card ── */
@@ -288,6 +312,8 @@
       max-width: 560px;
       max-height: 88vh;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       position: relative;
       transform: translateY(20px);
       transition: transform 0.25s;

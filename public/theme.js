@@ -22,24 +22,29 @@ function updateThemeBtn() {
 }
 
 function toggleMobileNav() {
-  const backdrop = document.getElementById('mobileMenuBackdrop');
-  const modal = document.getElementById('mobileMenuModal');
-  const isOpen = backdrop?.classList.contains('open');
+  const backdrop  = document.getElementById('mobileMenuBackdrop');
+  const modal     = document.getElementById('mobileMenuModal');
+  const hamburger = document.querySelector('.hamburger');
+  const isOpen    = backdrop?.classList.contains('open');
 
   if (isOpen) {
     backdrop?.classList.remove('open');
     modal?.classList.remove('open');
+    hamburger?.classList.remove('open');
   } else {
     backdrop?.classList.add('open');
     modal?.classList.add('open');
+    hamburger?.classList.add('open');
   }
 }
 
 function closeMobileMenu() {
-  const backdrop = document.getElementById('mobileMenuBackdrop');
-  const modal = document.getElementById('mobileMenuModal');
+  const backdrop  = document.getElementById('mobileMenuBackdrop');
+  const modal     = document.getElementById('mobileMenuModal');
+  const hamburger = document.querySelector('.hamburger');
   backdrop?.classList.remove('open');
   modal?.classList.remove('open');
+  hamburger?.classList.remove('open');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
