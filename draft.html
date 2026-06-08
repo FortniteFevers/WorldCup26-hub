@@ -628,6 +628,45 @@
       pointer-events: none;
     }
 
+    /* Formation picker */
+    .d-form-picker {
+      margin: 0 auto 1.5rem;
+      max-width: 480px;
+      text-align: center;
+    }
+    .d-form-picker-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+    .d-form-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      justify-content: center;
+    }
+    .d-form-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-muted);
+      border-radius: 100px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .d-form-pill:hover { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+    .d-form-pill.active {
+      background: rgba(74,222,128,0.14);
+      border-color: rgba(74,222,128,0.45);
+      color: #4ade80;
+    }
+
     /* Screen transitions */
     .d-screen { display: none; }
     .d-screen.active { display: block; }
@@ -650,7 +689,8 @@
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
-      <li><a href="/my-team" class="active">My Team</a></li>
+      <li><a href="/players">Players</a></li>
+        <li><a href="/my-team" class="active">My Team</a></li>
       <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
@@ -670,6 +710,7 @@
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/players" onclick="closeMobileMenu()">Players</a>
     <a href="/my-team" class="active" onclick="closeMobileMenu()">My Team</a>
     <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
@@ -683,6 +724,13 @@
         <div class="d-tagline">Draft 11 players. Win the World Cup.</div>
         <div class="d-sub">104 games. One tournament. Can you go undefeated?</div>
       </div>
+
+      <!-- Formation picker -->
+      <div class="d-form-picker">
+        <div class="d-form-picker-label">Formation</div>
+        <div class="d-form-pills" id="formationPills"></div>
+      </div>
+
       <div class="d-mode-grid">
         <div class="d-mode-card" onclick="startDraft('classic')">
           <div class="d-mode-icon">💯</div>
@@ -755,28 +803,10 @@
         <div class="d-players-grid" id="dPlayersGrid"></div>
       </div>
 
-      <!-- Lineup formation display -->
+      <!-- Lineup formation display (built dynamically by renderFormationLayout) -->
       <div class="d-formation" id="dFormation">
         <div class="d-form-label" id="dFormLabel">4-3-3 · tap a filled slot to swap</div>
-        <div class="d-form-row d-form-fwd">
-          <div class="d-lineup-slot" id="ls8"  onclick="handleSlotClick(8)"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls9"  onclick="handleSlotClick(9)"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls10" onclick="handleSlotClick(10)"><div class="d-ls-label">FWD</div><div class="d-ls-empty">·</div></div>
-        </div>
-        <div class="d-form-row d-form-mid">
-          <div class="d-lineup-slot" id="ls5" onclick="handleSlotClick(5)"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls6" onclick="handleSlotClick(6)"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls7" onclick="handleSlotClick(7)"><div class="d-ls-label">MID</div><div class="d-ls-empty">·</div></div>
-        </div>
-        <div class="d-form-row d-form-def">
-          <div class="d-lineup-slot" id="ls1" onclick="handleSlotClick(1)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls2" onclick="handleSlotClick(2)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls3" onclick="handleSlotClick(3)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
-          <div class="d-lineup-slot" id="ls4" onclick="handleSlotClick(4)"><div class="d-ls-label">DEF</div><div class="d-ls-empty">·</div></div>
-        </div>
-        <div class="d-form-row d-form-gk">
-          <div class="d-lineup-slot" id="ls0" onclick="handleSlotClick(0)"><div class="d-ls-label">GK</div><div class="d-ls-empty">·</div></div>
-        </div>
+        <!-- rows injected here -->
       </div>
 
       <!-- Simulate CTA (shown after all 11 picks) -->
@@ -860,8 +890,18 @@
       Object.entries(TEAM_JSON_NAME).map(([k,v]) => [v, k])
     );
 
-    // ── Slot definitions (fixed: GK/DEF/MID/FWD labels per slot) ──
-    const SLOT_POSITIONS = ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','FWD','FWD','FWD'];
+    // ── Formations ────────────────────────────────
+    const FORMATIONS = {
+      '4-3-3':   { slots: ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','FWD','FWD','FWD'], rows: [['GK'],['DEF','DEF','DEF','DEF'],['MID','MID','MID'],['FWD','FWD','FWD']] },
+      '4-4-2':   { slots: ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','MID','FWD','FWD'], rows: [['GK'],['DEF','DEF','DEF','DEF'],['MID','MID','MID','MID'],['FWD','FWD']] },
+      '4-2-3-1': { slots: ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','FWD'], rows: [['GK'],['DEF','DEF','DEF','DEF'],['MID','MID'],['MID','MID','MID'],['FWD']] },
+      '3-5-2':   { slots: ['GK','DEF','DEF','DEF','MID','MID','MID','MID','MID','FWD','FWD'], rows: [['GK'],['DEF','DEF','DEF'],['MID','MID','MID','MID','MID'],['FWD','FWD']] },
+      '5-3-2':   { slots: ['GK','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','FWD','FWD'], rows: [['GK'],['DEF','DEF','DEF','DEF','DEF'],['MID','MID','MID'],['FWD','FWD']] },
+    };
+    let selectedFormation = '4-3-3';
+    function getSlotPositions() { return FORMATIONS[selectedFormation].slots; }
+
+    // ── Slot style maps ───────────────────────────
     const SLOT_COLORS    = { GK:'#a78bfa', DEF:'#60a5fa', MID:'#4ade80', FWD:'#fb923c' };
     const SLOT_PIP_CLASS = { GK:'filled-gk', DEF:'filled-def', MID:'filled-mid', FWD:'filled-fwd' };
 
@@ -906,6 +946,7 @@
     // Start once DOM + data.js are both guaranteed ready
     document.addEventListener('DOMContentLoaded', () => {
       loadPlayers();
+      renderFormationPicker();
     });
 
     // ── Helpers ───────────────────────────────────
@@ -1011,8 +1052,9 @@
 
     // ── Helpers ───────────────────────────────────
     function getRemainingNeeds() {
-      const needs = { GK:1, DEF:4, MID:3, FWD:3 };
-      lineup.forEach((p, i) => { if (p) needs[SLOT_POSITIONS[i]]--; });
+      const slotPos = getSlotPositions();
+      const needs = slotPos.reduce((acc, pos) => { acc[pos] = (acc[pos]||0)+1; return acc; }, {});
+      lineup.forEach((p, i) => { if (p) needs[slotPos[i]]--; });
       return Object.entries(needs).filter(([,v]) => v > 0).map(([k,v]) => `${v} ${k}`).join(' · ');
     }
 
@@ -1030,6 +1072,7 @@
       allTeamNames = Object.values(GROUPS).flat();
       teamPool     = [...allTeamNames].sort(() => Math.random() - 0.5);
 
+      renderFormationLayout(); // build formation grid for selected formation
       resetDraftUI();
       showScreen('screenDraft');
     }
@@ -1247,16 +1290,76 @@
       }, 80);
     }
 
+    // ── Formation picker (mode screen) ───────────
+    function renderFormationPicker() {
+      const container = document.getElementById('formationPills');
+      if (!container) return;
+      container.innerHTML = Object.keys(FORMATIONS).map(key =>
+        `<button class="d-form-pill${key === selectedFormation ? ' active' : ''}"
+                 onclick="selectFormation('${key}')">${key}</button>`
+      ).join('');
+    }
+
+    function selectFormation(key) {
+      selectedFormation = key;
+      renderFormationPicker();
+    }
+
+    // ── Formation layout builder ──────────────────
+    function renderFormationLayout() {
+      const formation = FORMATIONS[selectedFormation];
+      const formEl    = document.getElementById('dFormation');
+
+      // Keep the label, rebuild everything after it
+      const label = formEl.querySelector('#dFormLabel');
+      formEl.innerHTML = '';
+      if (label) formEl.appendChild(label);
+
+      // Build rows top-to-bottom: FWD → MID → DEF → GK (visually on pitch)
+      const rowsReversed = [...formation.rows].reverse();
+      let slotIndex = formation.slots.length; // start from end, step back row-by-row
+
+      // We need to map slot indices correctly: rows are in order [GK, DEF, MID, FWD]
+      // reversed for display = [FWD, MID, DEF, GK]
+      // slot index assignment: slot 0 = GK row[0], slots 1..N = DEF row[1], etc.
+      let slotCursor = 0;
+      const rowSlots = formation.rows.map(row => {
+        const indices = row.map(() => slotCursor++);
+        return indices;
+      });
+
+      // Display reversed (FWD on top, GK at bottom)
+      const displayRows = [...rowSlots].reverse();
+      const displayRowDefs = [...formation.rows].reverse();
+
+      displayRows.forEach((slots, rowIdx) => {
+        const pos = displayRowDefs[rowIdx][0]; // GK / DEF / MID / FWD
+        const rowEl = document.createElement('div');
+        rowEl.className = `d-form-row d-form-${pos.toLowerCase()}`;
+        slots.forEach(i => {
+          const slotPos = formation.slots[i];
+          const div = document.createElement('div');
+          div.className = 'd-lineup-slot';
+          div.id = 'ls' + i;
+          div.onclick = () => handleSlotClick(i);
+          div.innerHTML = `<div class="d-ls-label">${slotPos}</div><div class="d-ls-empty">·</div>`;
+          rowEl.appendChild(div);
+        });
+        formEl.appendChild(rowEl);
+      });
+    }
+
     // ── Formation render ──────────────────────────
     function renderFormation() {
       const isSwapping = swapSlotA !== null;
       const isPlacing  = pendingPlayer !== null;
+      const slotPos    = getSlotPositions();
 
       for (let i = 0; i < 11; i++) {
         const el  = document.getElementById('ls' + i);
         if (!el) continue;
         const p   = lineup[i];
-        const pos = SLOT_POSITIONS[i];
+        const pos = slotPos[i];
         const col = SLOT_COLORS[pos];
 
         el.className = 'd-lineup-slot';
@@ -1286,7 +1389,7 @@
       if (lbl) {
         if (isPlacing)      lbl.textContent = '👇 Tap any slot to place your player';
         else if (isSwapping) lbl.textContent = '↔ Now tap another slot to swap';
-        else                 lbl.textContent = '4-3-3 · tap a filled slot to swap';
+        else                 lbl.textContent = `${selectedFormation} · tap a filled slot to swap`;
       }
     }
 
@@ -1326,7 +1429,7 @@
 
       // Update pip
       const pip = document.getElementById('pip' + draftRound);
-      if (pip) pip.className = 'd-slot-pip ' + SLOT_PIP_CLASS[SLOT_POSITIONS[slotIdx]];
+      if (pip) pip.className = 'd-slot-pip ' + SLOT_PIP_CLASS[getSlotPositions()[slotIdx]];
 
       draftRound++;
       renderFormation();
@@ -1338,7 +1441,7 @@
         document.getElementById('dSimulateCta').style.display = 'block';
         document.getElementById('dSpinBtn').disabled          = true;
         document.getElementById('dSwitchBtn').disabled        = true;
-        document.getElementById('dFormLabel').textContent     = '4-3-3 · tap two slots to swap before simulating';
+        document.getElementById('dFormLabel').textContent     = `${selectedFormation} · tap two slots to swap before simulating`;
       } else {
         // Next round — reset spin area after brief pause
         setTimeout(() => {
@@ -1353,11 +1456,12 @@
     }
 
     function updatePips() {
+      const slotPos = getSlotPositions();
       for (let i = 0; i < 11; i++) {
         const pip = document.getElementById('pip' + i);
         if (!pip) continue;
         if (lineup[i]) {
-          pip.className = 'd-slot-pip ' + SLOT_PIP_CLASS[SLOT_POSITIONS[i]];
+          pip.className = 'd-slot-pip ' + SLOT_PIP_CLASS[slotPos[i]];
         } else if (i === draftRound) {
           pip.className = 'd-slot-pip active';
         } else {
@@ -1547,14 +1651,14 @@
           `Knocked out in ${rd[elimRound] || elimRound}. So close.`;
       }
 
-      // Squad display — grouped by line
+      // Squad display — grouped by formation rows (reversed: FWD top, GK bottom)
       const squadEl = document.getElementById('rSquad');
-      const rows = [
-        { label: 'FWD', slots: [8,9,10] },
-        { label: 'MID', slots: [5,6,7] },
-        { label: 'DEF', slots: [1,2,3,4] },
-        { label: 'GK',  slots: [0] },
-      ];
+      const formation = FORMATIONS[selectedFormation];
+      let _slotIdx = 0;
+      const rows = formation.rows.map(row => {
+        const slots = row.map(() => _slotIdx++);
+        return { label: row[0], slots };
+      }).reverse();
       squadEl.innerHTML = rows.map(row =>
         `<div class="d-fs-row">` +
         row.slots.map(i => {
@@ -1668,7 +1772,7 @@
 
       // ── Player rows (11 players) ──
       const BADGE_SZ = 36;
-      const POS_KEYS  = ['GK','DEF','DEF','DEF','DEF','MID','MID','MID','FWD','FWD','FWD'];
+      const POS_KEYS  = getSlotPositions();
       const POS_COLORS = { GK:'#7c3aed', DEF:'#1d4ed8', MID:'#15803d', FWD:'#b91c1c' };
 
       lineup.forEach((p, i) => {

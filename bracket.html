@@ -646,7 +646,9 @@
         <div class="champ-name" id="champName"></div>
         <div class="champ-path" id="champPath"></div>
         <div class="champ-btns">
-          <button class="btn" onclick="saveBracketImage()" id="shareBtn">📸 Save Bracket Image</button>
+          <button class="btn" onclick="shareBracket()" id="shareBtn">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share My Bracket
+          </button>
           <button class="btn btn-outline" onclick="resetAll()">↺ New Bracket</button>
           <button class="btn btn-outline" onclick="goPhase('bracket')">← View Bracket</button>
         </div>
@@ -1432,6 +1434,181 @@
     currentRound = 'r32';
     renderGroupsView();
     goPhase('groups');
+  }
+
+  // ── Bracket share card (canvas) ──────────────────
+  function drawBracketShareCanvas() {
+    const W = 560, DPR = 2, PAD = 36;
+    const champ = brackets.final?.[0]?.winner || '';
+    const path  = champHistory[champ] || [];
+
+    // Build round results for the path rows
+    const rounds = ['r32','r16','qf','sf','final'];
+    const ROUND_LABELS = {
+      r32:   'Round of 32', r16: 'Round of 16',
+      qf:    'Quarter-Final', sf: 'Semi-Final', final: 'Final'
+    };
+    const results = [];
+    rounds.forEach(r => {
+      const match = (brackets[r] || []).find(m => m.winner === champ);
+      if (!match) return;
+      const opp = match.t1 === champ ? match.t2 : match.t1;
+      const gs  = match.t1 === champ ? match.g1 : match.g2;
+      const go  = match.t1 === champ ? match.g2 : match.g1;
+      results.push({ round: ROUND_LABELS[r], opp, gs, go, pen: match.pen });
+    });
+
+    const ROW_H  = 56;
+    const ROW_Y0 = 220;
+    const H = ROW_Y0 + results.length * ROW_H + 100;
+
+    const canvas = document.createElement('canvas');
+    canvas.width  = W * DPR;
+    canvas.height = H * DPR;
+    const c = canvas.getContext('2d');
+    c.scale(DPR, DPR);
+
+    // ── Background ──
+    c.fillStyle = '#0d1117';
+    c.fillRect(0, 0, W, H);
+
+    // Gold top glow
+    const topGlow = c.createLinearGradient(0, 0, 0, 180);
+    topGlow.addColorStop(0, 'rgba(245,200,66,0.1)');
+    topGlow.addColorStop(1, 'rgba(245,200,66,0)');
+    c.fillStyle = topGlow;
+    c.fillRect(0, 0, W, 180);
+
+    // ── Trophy + header ──
+    c.font = '56px serif';
+    c.textAlign = 'center';
+    c.fillText('🏆', W / 2, 68);
+
+    c.font = '700 11px "Inter", Arial, sans-serif';
+    c.fillStyle = '#6b7280';
+    c.fillText('2026 FIFA WORLD CUP · BRACKET SIMULATION', W / 2, 98);
+
+    // ── Champion name ──
+    c.font = '900 52px "Inter", Arial Black, sans-serif';
+    c.fillStyle = '#f5c842';
+    // Truncate if too long
+    let champDisplay = champ;
+    while (c.measureText(champDisplay).width > W - PAD * 2 && champDisplay.length > 4) {
+      champDisplay = champDisplay.slice(0, -1);
+    }
+    if (champDisplay !== champ) champDisplay += '…';
+    c.fillText(champDisplay, W / 2, 158);
+
+    c.font = '600 14px "Inter", Arial, sans-serif';
+    c.fillStyle = '#4b5563';
+    c.fillText('WORLD CHAMPION', W / 2, 186);
+    c.textAlign = 'left';
+
+    // ── Divider ──
+    c.fillStyle = '#1f2937';
+    c.fillRect(PAD, 200, W - PAD * 2, 1);
+
+    // ── Path rows ──
+    const ACCENT_COLORS = ['#7c3aed','#1d4ed8','#0e7490','#15803d','#f5c842'];
+    results.forEach((res, i) => {
+      const y      = ROW_Y0 + i * ROW_H;
+      const accent = ACCENT_COLORS[i] || '#f5c842';
+
+      // Alternating row bg
+      c.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent';
+      c.fillRect(0, y, W, ROW_H);
+
+      // Left accent bar
+      c.fillStyle = accent;
+      c.fillRect(0, y + 4, 4, ROW_H - 8);
+
+      // Round label
+      c.font = '700 10px "Inter", Arial, sans-serif';
+      c.fillStyle = '#6b7280';
+      c.fillText(res.round.toUpperCase(), PAD, y + 18);
+
+      // Opponent + flag
+      const flagChar = res.opp ? getFlag(res.opp) : '';
+      c.font = '600 15px "Inter", Arial, sans-serif';
+      c.fillStyle = '#e5e7eb';
+      let oppDisplay = `${flagChar}  vs ${res.opp || 'TBD'}`;
+      while (c.measureText(oppDisplay).width > 280 && oppDisplay.length > 8) {
+        oppDisplay = oppDisplay.slice(0, -1);
+      }
+      c.fillText(oppDisplay, PAD, y + 40);
+
+      // Score (right-aligned)
+      const scoreStr = res.pen
+        ? `${res.gs}–${res.go} (Pens)`
+        : `${res.gs}–${res.go}`;
+      c.font = '800 17px "Inter", Arial, sans-serif';
+      c.fillStyle = accent;
+      c.textAlign = 'right';
+      c.fillText(scoreStr, W - PAD, y + 40);
+      c.textAlign = 'left';
+    });
+
+    // ── Bottom divider ──
+    const divY = ROW_Y0 + results.length * ROW_H + 10;
+    c.fillStyle = '#1f2937';
+    c.fillRect(PAD, divY, W - PAD * 2, 1);
+
+    // ── Bottom call-to-action ──
+    const botY = divY + 46;
+    c.font = '700 17px "Inter", Arial, sans-serif';
+    c.fillStyle = '#f9fafb';
+    c.fillText('Can you predict the champion? 🌍', PAD, botY);
+    c.font = '600 17px "Inter", Arial, sans-serif';
+    c.fillStyle = '#f5c842';
+    c.textAlign = 'right';
+    c.fillText('worldcupfieldguide.com', W - PAD, botY);
+    c.textAlign = 'left';
+
+    return canvas;
+  }
+
+  async function shareBracket() {
+    const btn = document.getElementById('shareBtn');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Generating…</span>`;
+
+    await new Promise(r => setTimeout(r, 60));
+
+    const champ = brackets.final?.[0]?.winner || 'Unknown';
+    const canvas = drawBracketShareCanvas();
+    const shareText = `I simulated the 2026 World Cup and ${champ} won it all! 🏆 Try it yourself ↓`;
+
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'wc2026-bracket.png', { type: 'image/png' });
+      let shared = false;
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            text: shareText,
+            url: 'https://worldcupfieldguide.com',
+          });
+          shared = true;
+        } catch (e) {
+          if (e.name === 'AbortError') shared = true; // user cancelled = still ok
+        }
+      }
+
+      if (!shared) {
+        // Fallback: download the image
+        const url  = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href     = url;
+        link.download = 'wc2026-bracket.png';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    }, 'image/png');
   }
 
   // ── Init ─────────────────────────────────────────

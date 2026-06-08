@@ -478,6 +478,47 @@
       color: var(--text-secondary);
     }
 
+    /* Stats section row (2-col desktop, 1-col mobile) */
+    .pl-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 540px) {
+      .pl-stats-row { grid-template-columns: 1fr; }
+      .pl-modal-attrs { grid-template-columns: 1fr 1fr; gap: 0.2rem 0.75rem; }
+      .pl-attr-row { font-size: 0.72rem; }
+      .pl-modal-6stats { gap: 0.4rem; }
+      .pl-stat-block { padding: 0.5rem 0.35rem 0.4rem; }
+      .pl-stat-block-val { font-size: 1.25rem; }
+    }
+
+    /* Modal footer — save card button */
+    .pl-modal-footer {
+      padding: 0.75rem 1.5rem 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .pl-save-btn {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.15s;
+    }
+    .pl-save-btn:hover { border-color: var(--border-bright); color: var(--text-primary); background: var(--bg-card-hover); }
+    .pl-save-btn.loading { opacity: 0.6; pointer-events: none; }
+
     /* No results */
     .pl-empty {
       text-align: center;
@@ -622,10 +663,11 @@
 
   <!-- Player Modal -->
   <div class="pl-modal-overlay" id="plModalOverlay" onclick="closeModal(event)">
-    <div class="pl-modal" id="plModal">
+    <div class="pl-modal" id="plModal" data-lenis-prevent>
       <button class="pl-modal-close" onclick="closeModalDirect()">✕</button>
       <div class="pl-modal-header" id="plModalHeader"></div>
       <div class="pl-modal-body" id="plModalBody"></div>
+      <div class="pl-modal-footer" id="plModalFooter"></div>
     </div>
   </div>
 
@@ -633,6 +675,7 @@
   <script>
     let ALL_PLAYERS = [];
     let activePos = '';
+    let _modalPlayer = null; // current player open in modal
 
     // Position mapping
     const POS_MAP = {
@@ -923,9 +966,9 @@
           ]},
         ];
 
-        // Render 2 sections per row
+        // Render 2 sections per row (2-col desktop, 1-col mobile via .pl-stats-row)
         for (let i = 0; i < sections.length; i += 2) {
-          bodyHtml += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem">`;
+          bodyHtml += `<div class="pl-stats-row">`;
           for (let j = i; j < Math.min(i+2, sections.length); j++) {
             const sec = sections[j];
             bodyHtml += `<div>
@@ -950,7 +993,13 @@
         </div>`;
       }
 
+      _modalPlayer = p;
       document.getElementById('plModalBody').innerHTML = bodyHtml;
+      document.getElementById('plModalFooter').innerHTML = hasFC26 ? `
+        <button class="pl-save-btn" id="plSaveBtn" onclick="savePlayerCard()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Save Player Card
+        </button>` : '';
       document.getElementById('plModalOverlay').classList.add('open');
       document.body.style.overflow = 'hidden';
       lenis.stop();
@@ -965,6 +1014,246 @@
       lenis.start();
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+    // ── Player Card Canvas ────────────────────────────────────────────────────
+    function drawRoundedRect(c, x, y, w, h, r, fill) {
+      c.beginPath();
+      c.moveTo(x+r,y); c.lineTo(x+w-r,y); c.quadraticCurveTo(x+w,y,x+w,y+r);
+      c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r);
+      c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y);
+      c.closePath();
+      c.fillStyle = fill; c.fill();
+    }
+
+    function tryLoadImage(url) {
+      if (!url) return Promise.resolve(null);
+
+      const load = (src) => new Promise(resolve => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload  = () => resolve(img);
+        img.onerror = () => resolve(null);
+        setTimeout(() => resolve(null), 4000);
+        img.src = src;
+      });
+
+      // Try direct first; if CORS blocks it fall back to weserv.nl proxy
+      return load(url).then(img => {
+        if (img) return img;
+        const proxy = 'https://images.weserv.nl/?url=' + url.replace(/^https?:\/\//, '');
+        return load(proxy);
+      });
+    }
+
+    async function drawPlayerCard() {
+      const p = _modalPlayer;
+      if (!p) return null;
+
+      const W = 560, H = 310, DPR = 2, PAD = 26;
+      const canvas = document.createElement('canvas');
+      canvas.width  = W * DPR;
+      canvas.height = H * DPR;
+      const c = canvas.getContext('2d');
+      c.scale(DPR, DPR);
+
+      const POS_COLORS = { GK:'#a78bfa', DEF:'#60a5fa', MID:'#4ade80', FWD:'#fb923c' };
+      const pos      = POS_MAP[p.position] || 'MID';
+      const posColor = POS_COLORS[pos] || '#f5c842';
+      const POS_FULL = { GK:'Goalkeeper', DEF:'Defender', MID:'Midfielder', FWD:'Forward' };
+
+      // ── Background ──
+      c.fillStyle = '#0d1117';
+      c.fillRect(0, 0, W, H);
+
+      // Pos-colored top strip
+      c.fillStyle = posColor;
+      c.fillRect(0, 0, W, 5);
+
+      // Face glow behind the circle
+      const FCX = 74, FCY = 105, FR = 52;
+      const faceGlow = c.createRadialGradient(FCX, FCY, 0, FCX, FCY, FR + 60);
+      faceGlow.addColorStop(0, posColor + '28');
+      faceGlow.addColorStop(1, 'transparent');
+      c.fillStyle = faceGlow;
+      c.fillRect(0, 0, W, H);
+
+      // ── Face circle ──
+      const faceImg = await tryLoadImage(p.faceUrl);
+
+      c.save();
+      c.beginPath();
+      c.arc(FCX, FCY, FR, 0, Math.PI * 2);
+      c.fillStyle = posColor + '22';
+      c.fill();
+      c.clip();
+
+      if (faceImg) {
+        // Draw image — will succeed only if server sends CORS headers
+        try { c.drawImage(faceImg, FCX - FR, FCY - FR, FR * 2, FR * 2); }
+        catch (_) { /* tainted — draw initials below after restore */ }
+      }
+      c.restore();
+
+      // If no face loaded, draw styled initial over the circle
+      if (!faceImg) {
+        c.font = `900 ${FR * 0.9}px "Inter", Arial Black, sans-serif`;
+        c.fillStyle = posColor;
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText((p.name || '?')[0].toUpperCase(), FCX, FCY + 2);
+        c.textBaseline = 'alphabetic';
+      }
+
+      // Circle border
+      c.beginPath();
+      c.arc(FCX, FCY, FR, 0, Math.PI * 2);
+      c.strokeStyle = posColor + '55';
+      c.lineWidth = 2;
+      c.stroke();
+
+      // ── OVR + pos badge below face ──
+      c.textAlign = 'center';
+      c.font = '900 28px "Inter", Arial Black, sans-serif';
+      c.fillStyle = posColor;
+      c.fillText(p.overall || '—', FCX, FCY + FR + 26);
+
+      c.font = '700 9px "Inter", Arial, sans-serif';
+      c.fillStyle = '#6b7280';
+      c.fillText('OVR', FCX, FCY + FR + 38);
+
+      drawRoundedRect(c, FCX - 20, FCY + FR + 44, 40, 18, 5, posColor + '22');
+      c.font = '800 10px "Inter", Arial, sans-serif';
+      c.fillStyle = posColor;
+      c.fillText(pos, FCX, FCY + FR + 57);
+
+      // ── Right side: name + meta ──
+      const NX = FCX + FR + 22;
+      c.textAlign = 'left';
+
+      // Player name
+      c.font = '900 24px "Inter", Arial Black, sans-serif';
+      c.fillStyle = '#f9fafb';
+      let name = p.name || '';
+      while (c.measureText(name).width > W - NX - PAD && name.length > 4) name = name.slice(0,-1);
+      if (name !== p.name) name += '…';
+      c.fillText(name, NX, 52);
+
+      // Position · Team
+      c.font = '500 13px "Inter", Arial, sans-serif';
+      c.fillStyle = '#9ca3af';
+      const teamStr = `${POS_FULL[pos] || pos}  ·  ${p.team || ''}`;
+      c.fillText(teamStr, NX, 72);
+
+      // Nationality · Age
+      const nat = p.nationality || '';
+      const age = p.age ? `${p.age} yrs` : '';
+      c.font = '500 12px "Inter", Arial, sans-serif';
+      c.fillStyle = '#6b7280';
+      c.fillText([nat, age].filter(Boolean).join('  ·  '), NX, 90);
+
+      // Foot · Potential
+      const extra = [
+        p.foot ? `${p.foot} foot` : null,
+        p.potential && p.potential !== p.overall ? `↑${p.potential} POT` : null,
+      ].filter(Boolean).join('  ·  ');
+      if (extra) {
+        c.font = '500 11px "Inter", Arial, sans-serif';
+        c.fillStyle = '#4b5563';
+        c.fillText(extra, NX, 106);
+      }
+
+      // ── Divider ──
+      c.fillStyle = '#1f2937';
+      c.fillRect(NX, 116, W - NX - PAD, 1);
+
+      // ── 6 Main stats (right side bottom) ──
+      const SIX = [
+        { key:'pace',      lbl:'PAC', color:'#f5c842' },
+        { key:'shooting',  lbl:'SHO', color:'#ef4444' },
+        { key:'passing',   lbl:'PAS', color:'#22c55e' },
+        { key:'dribbling', lbl:'DRI', color:'#a855f7' },
+        { key:'defending', lbl:'DEF', color:'#3b82f6' },
+        { key:'physic',    lbl:'PHY', color:'#f97316' },
+      ];
+
+      const statAreaW = W - NX - PAD;
+      const statW = statAreaW / 6;
+      SIX.forEach((s, i) => {
+        const sx  = NX + i * statW + statW / 2;
+        const val = p[s.key];
+
+        c.font = '900 19px "Inter", Arial Black, sans-serif';
+        c.fillStyle = val >= 85 ? s.color : '#f9fafb';
+        c.textAlign = 'center';
+        c.fillText(val != null ? val : '—', sx, 148);
+
+        c.font = '700 9px "Inter", Arial, sans-serif';
+        c.fillStyle = '#6b7280';
+        c.fillText(s.lbl, sx, 161);
+
+        const barW = statW - 8, barH = 3;
+        const bx = sx - barW/2, by = 166;
+        c.fillStyle = '#1f2937';
+        c.fillRect(bx, by, barW, barH);
+        if (val) {
+          c.fillStyle = s.color;
+          c.fillRect(bx, by, barW * Math.min(val/99, 1), barH);
+        }
+      });
+
+      // ── Full-width bottom divider + watermark ──
+      c.fillStyle = '#1f2937';
+      c.fillRect(PAD, H - 46, W - PAD*2, 1);
+
+      c.font = '600 12px "Inter", Arial, sans-serif';
+      c.fillStyle = '#f5c842';
+      c.textAlign = 'left';
+      c.fillText('⚽ worldcupfieldguide.com', PAD, H - 22);
+
+      c.font = '500 11px "Inter", Arial, sans-serif';
+      c.fillStyle = '#4b5563';
+      c.textAlign = 'right';
+      c.fillText('🎮 EA Sports FC 26', W - PAD, H - 22);
+
+      return canvas;
+    }
+
+    async function savePlayerCard() {
+      const btn = document.getElementById('plSaveBtn');
+      if (btn) { btn.classList.add('loading'); btn.innerHTML = '⏳ Generating…'; }
+
+      await new Promise(r => setTimeout(r, 40));
+      let canvas;
+      try { canvas = await drawPlayerCard(); } catch(e) { console.warn(e); }
+      if (!canvas) { if (btn) { btn.classList.remove('loading'); btn.innerHTML = 'Error — try again'; } return; }
+
+      canvas.toBlob(async (blob) => {
+        const fname = `${(_modalPlayer?.name||'player').replace(/\s+/g,'-')}-fc26.png`;
+        const file  = new File([blob], fname, { type:'image/png' });
+        const text  = `${_modalPlayer?.name} · ${_modalPlayer?.overall} OVR on EA Sports FC 26 — worldcupfieldguide.com`;
+
+        let shared = false;
+        if (navigator.canShare && navigator.canShare({ files:[file] })) {
+          try {
+            await navigator.share({ files:[file], text, url:'https://worldcupfieldguide.com' });
+            shared = true;
+          } catch(e) { if (e.name === 'AbortError') shared = true; }
+        }
+
+        if (!shared) {
+          const url  = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url; link.download = fname; link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        if (btn) {
+          btn.classList.remove('loading');
+          btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Save Player Card`;
+        }
+      }, 'image/png');
+    }
 
     // ── Load data ────────────────────────────────────────────────────────────
     const lenis = new Lenis();
