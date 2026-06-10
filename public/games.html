@@ -215,11 +215,99 @@
       display: grid; grid-template-columns: repeat(7,1fr); gap: 2px;
     }
     .demo-cal-cell {
-      min-height: 80px; padding: 0.4rem;
+      min-height: 110px; padding: 0.4rem;
       border-radius: 8px; transition: background 0.15s;
       position: relative;
     }
-    @media (max-width: 600px) { .demo-cal-cell { min-height: 56px; padding: 0.25rem; } }
+    @media (max-width: 600px) {
+      .demo-cal-cell { min-height: 70px; padding: 0.25rem; }
+    }
+
+    /* ── Monthly/Weekly toggle ────────────────────── */
+    .cal-view-toggle {
+      display: flex; gap: 0; background: var(--input-bg);
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    }
+    .cal-view-btn {
+      padding: 0.3rem 0.75rem; border: none; cursor: pointer;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+      background: none; transition: all 0.15s; white-space: nowrap;
+    }
+    .cal-view-btn.active {
+      background: var(--bg-card); color: var(--text-primary);
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+
+    /* ── GCal-style weekly grid ───────────────────── */
+    .week-grid-outer { position: relative; }
+    .week-grid-scroll {
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      border-radius: 12px;
+      scroll-snap-type: x mandatory;
+    }
+    .week-grid-scroll::-webkit-scrollbar { height: 4px; }
+    .week-grid-scroll::-webkit-scrollbar-track { background: transparent; }
+    .week-grid-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .week-grid {
+      display: grid; grid-template-columns: repeat(7, minmax(95px, 1fr));
+      min-width: 665px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .week-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); scroll-snap-align: start; }
+    .week-col:last-child { border-right: none; }
+    .week-col-head {
+      padding: 0.65rem 0.5rem 0.5rem; text-align: center;
+      background: var(--bg-surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 1;
+    }
+    .week-col-day-name {
+      font-size: 0.6rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .week-col-date-num {
+      font-size: 1.35rem; font-weight: 800; color: var(--text-secondary);
+      line-height: 1; margin-top: 0.2rem;
+    }
+    .week-col.today .week-col-date-num {
+      background: var(--gold); color: #0a0a0a;
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0.2rem auto 0; font-size: 1.1rem;
+    }
+    .week-col-body { padding: 0.5rem; flex: 1; background: var(--bg-card); }
+    .week-match-card {
+      border-radius: 8px; padding: 0.5rem 0.6rem; margin-bottom: 0.4rem;
+      cursor: pointer; background: var(--bg-surface);
+      border: 1px solid var(--border);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      position: relative; overflow: hidden;
+    }
+    .week-match-card:last-child { margin-bottom: 0; }
+    .week-match-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      border-color: var(--border-bright);
+    }
+    .week-match-card:active { transform: translateY(0); box-shadow: none; }
+    .week-match-card.knockout {
+      background: var(--gold-dim);
+      border-color: rgba(212,175,55,0.25);
+    }
+    .week-match-card.knockout:hover { border-color: var(--gold); box-shadow: 0 6px 20px rgba(212,175,55,0.2); }
+    .week-match-card.final {
+      background: rgba(232,64,64,0.07);
+      border-color: rgba(232,64,64,0.2);
+    }
+    .week-match-card.final:hover { border-color: #e84040; box-shadow: 0 6px 20px rgba(232,64,64,0.2); }
+    .week-match-time {
+      font-size: 0.6rem; font-weight: 700; color: var(--text-muted);
+      margin-bottom: 0.25rem; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .week-match-card.knockout .week-match-time { color: var(--gold); }
+    .week-match-card.final    .week-match-time { color: #e84040; }
+    .week-match-teams {
+      font-size: 0.74rem; font-weight: 600; color: var(--text-primary); line-height: 1.5;
+    }
+    .week-empty-day { font-size: 0.68rem; color: var(--text-muted); text-align: center; padding: 0.75rem 0; }
     .demo-cal-cell.has-games:hover { background: var(--bg-base); }
     .demo-cal-cell.today .demo-cal-day-num {
       background: var(--gold); color: #0a0a0a;
@@ -231,14 +319,24 @@
       margin-bottom: 0.25rem;
     }
     .game-chip {
-      font-size: 0.6rem; font-weight: 600; border-radius: 4px;
-      padding: 0.15rem 0.35rem; margin-bottom: 0.15rem;
+      font-size: 0.62rem; font-weight: 600; border-radius: 6px;
+      padding: 0.25rem 0.4rem; margin-bottom: 0.2rem;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      display: block;
+      display: block; cursor: pointer;
+      border: 1px solid var(--border);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     }
-    .chip-group { background: var(--input-bg); color: var(--text-secondary); border-left: 2px solid var(--text-muted); }
-    .chip-knockout { background: var(--gold-dim); color: var(--gold); border-left: 2px solid var(--gold); }
-    .chip-final { background: var(--red-dim, rgba(232,64,64,0.12)); color: var(--red, #e84040); border-left: 2px solid var(--red, #e84040); }
+    .game-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .game-chip:active { transform: translateY(0); box-shadow: none; }
+    .chip-group  { background: var(--bg-surface); color: var(--text-secondary); }
+    .chip-group:hover  { border-color: var(--border-bright); }
+    .chip-knockout { background: var(--gold-dim); color: var(--gold); border-color: rgba(212,175,55,0.25); }
+    .chip-knockout:hover { border-color: var(--gold); box-shadow: 0 4px 12px rgba(212,175,55,0.2); }
+    .chip-final { background: rgba(232,64,64,0.07); color: #e84040; border-color: rgba(232,64,64,0.2); }
+    .chip-final:hover { border-color: #e84040; box-shadow: 0 4px 12px rgba(232,64,64,0.2); }
     .chip-more {
       font-size: 0.58rem; color: var(--text-muted); cursor: pointer;
       padding: 0.1rem 0.3rem; margin-top: 0.1rem;
@@ -279,6 +377,12 @@
     }
     .game-select-teams { font-size: 0.84rem; font-weight: 600; margin-bottom: 0.15rem; }
     .game-select-meta { font-size: 0.72rem; color: var(--text-muted); }
+    .game-date-separator {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted);
+      padding: 1rem 0 0.4rem; margin-top: 0.25rem;
+    }
+    .game-date-separator:first-child { padding-top: 0.25rem; }
 
     .cal-sidebar { position: sticky; top: 80px; }
     .cal-summary-box {
@@ -389,18 +493,23 @@
     <div id="viewCalendar" style="display:none">
 
       <!-- Visual calendar -->
-      <div class="section-header" style="margin-bottom:1rem;">
+      <div class="section-header" style="margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem;">
         <div>
           <div class="section-title">📅 Visual Schedule</div>
           <div class="section-sub">Full tournament at a glance — all 104 matches</div>
         </div>
-        <div style="display:flex;gap:0.4rem;align-items:center;">
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+          <div class="cal-view-toggle">
+            <button class="cal-view-btn active" id="btnViewMonth" onclick="setCalViewMode('month')">Monthly</button>
+            <button class="cal-view-btn" id="btnViewWeek" onclick="setCalViewMode('week')">Weekly</button>
+          </div>
           <button class="demo-cal-nav" onclick="changeViewMonth(-1)" id="prevMonthBtn">◀</button>
-          <span id="viewMonthLabel" style="font-size:0.9rem;font-weight:700;min-width:100px;text-align:center;"></span>
+          <span id="viewMonthLabel" style="font-size:0.9rem;font-weight:700;min-width:110px;text-align:center;"></span>
           <button class="demo-cal-nav" onclick="changeViewMonth(1)" id="nextMonthBtn">▶</button>
         </div>
       </div>
-      <div class="demo-cal-wrap" style="padding:1.25rem 1rem;">
+      <!-- Monthly grid -->
+      <div id="calMonthWrap" class="demo-cal-wrap" style="padding:1.25rem 1rem;">
         <div class="demo-cal-weekdays">
           <div class="demo-cal-weekday">Sun</div><div class="demo-cal-weekday">Mon</div>
           <div class="demo-cal-weekday">Tue</div><div class="demo-cal-weekday">Wed</div>
@@ -408,6 +517,12 @@
           <div class="demo-cal-weekday">Sat</div>
         </div>
         <div class="demo-cal-grid" id="demoCal"></div>
+      </div>
+      <!-- Weekly GCal-style grid -->
+      <div id="calWeekWrap" class="week-grid-outer" style="display:none;margin-bottom:1.5rem;">
+        <div class="week-grid-scroll">
+          <div class="week-grid" id="weekCal"></div>
+        </div>
       </div>
 
       <div class="cal-legend">
@@ -424,8 +539,8 @@
         </div>
       </div>
       <div class="cal-page-filters">
-        <input type="text" id="calSearchInput" class="filter-input" placeholder="🔍  Search by team…" style="flex:1;min-width:160px;">
-        <select id="calTypeFilter" class="filter-select">
+        <input type="text" id="calSearchInput" class="filter-input" placeholder="🔍  Search by team…" style="flex:1;min-width:180px;" oninput="renderList()">
+        <select id="calTypeFilter" class="filter-select" onchange="renderList()">
           <option value="">All Stages</option>
           <option value="Group">Group Stage</option>
           <option value="Round of 32">Round of 32</option>
@@ -433,6 +548,12 @@
           <option value="Quarter-final">Quarter-final</option>
           <option value="Semi-final">Semi-final</option>
           <option value="Final">Final</option>
+        </select>
+        <select id="calStadiumFilter" class="filter-select" onchange="renderList()">
+          <option value="">All Stadiums</option>
+        </select>
+        <select id="calDateFilter" class="filter-select" onchange="renderList()">
+          <option value="">All Dates</option>
         </select>
         <button class="btn btn-outline btn-sm" onclick="selectAll()">Select All</button>
         <button class="btn btn-outline btn-sm" onclick="selectNone()">Clear All</button>
@@ -571,7 +692,7 @@
       document.getElementById('tabBrowse').classList.toggle('active',   v === 'browse');
       document.getElementById('tabCalendar').classList.toggle('active', v === 'calendar');
       document.getElementById('tabVenues').classList.toggle('active',   v === 'venues');
-      if (v === 'calendar') renderDemoCal();
+      if (v === 'calendar') { setCalViewMode(calViewMode); initCalFilters(); renderList(); }
       if (v === 'venues')   initVenueMap();
       // Update URL without reload
       const url = new URL(window.location);
@@ -778,6 +899,74 @@
 
     let viewYear = 2026, viewMonth = 5;
 
+    // Week view state
+    function getWeekSunday(date) {
+      const d = new Date(date);
+      d.setDate(d.getDate() - d.getDay());
+      return d;
+    }
+    const _tournamentOpen = new Date('2026-06-11');
+    const _now = new Date();
+    let weekStartDate = getWeekSunday(_now < _tournamentOpen ? _tournamentOpen : _now);
+
+    // View mode: 'month' | 'week' — default weekly on mobile
+    let calViewMode = window.innerWidth <= 700 ? 'week' : 'month';
+
+    function setCalViewMode(mode) {
+      calViewMode = mode;
+      document.getElementById('btnViewMonth').classList.toggle('active', mode === 'month');
+      document.getElementById('btnViewWeek').classList.toggle('active', mode === 'week');
+      document.getElementById('calMonthWrap').style.display = mode === 'month' ? '' : 'none';
+      document.getElementById('calWeekWrap').style.display  = mode === 'week'  ? '' : 'none';
+      renderDemoCal();
+    }
+
+    function renderWeekView() {
+      const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const monNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const weekEnd  = new Date(weekStartDate);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      document.getElementById('viewMonthLabel').textContent =
+        `${monNames[weekStartDate.getMonth()]} ${weekStartDate.getDate()} – ${monNames[weekEnd.getMonth()]} ${weekEnd.getDate()}`;
+      document.getElementById('prevMonthBtn').disabled = weekStartDate <= new Date('2026-06-07');
+      document.getElementById('nextMonthBtn').disabled = weekStartDate >= new Date('2026-07-14');
+
+      const today = new Date();
+      let html = '';
+      for (let i = 0; i < 7; i++) {
+        const day      = new Date(weekStartDate);
+        day.setDate(day.getDate() + i);
+        const dateStr  = `${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`;
+        const dayGames = gamesByDate[dateStr] || [];
+        const isToday  = today.toDateString() === day.toDateString();
+
+        let cardsHtml = '';
+        if (dayGames.length > 0) {
+          dayGames.forEach(g => {
+            const isTBD = g.team1 === 'TBD';
+            const cls   = g.type === 'Final' || g.type === 'Third Place' ? 'final' : g.type === 'Group' ? 'group' : 'knockout';
+            const teams = isTBD ? g.type : `${getFlag(g.team1)} ${g.team1}<br>${getFlag(g.team2)} ${g.team2}`;
+            cardsHtml += `<div class="week-match-card ${cls}" onclick="openGameDetail(${g.id})">
+              <div class="week-match-time">${g.time}</div>
+              <div class="week-match-teams">${teams}</div>
+            </div>`;
+          });
+        } else {
+          cardsHtml = `<div class="week-empty-day">—</div>`;
+        }
+
+        html += `<div class="week-col${isToday ? ' today' : ''}">
+          <div class="week-col-head">
+            <div class="week-col-day-name">${dayNames[day.getDay()]}</div>
+            <div class="week-col-date-num">${day.getDate()}</div>
+          </div>
+          <div class="week-col-body">${cardsHtml}</div>
+        </div>`;
+      }
+      document.getElementById('weekCal').innerHTML = html;
+    }
+
     function chipClass(type) {
       if (type === 'Final' || type === 'Third Place') return 'chip-final';
       if (type === 'Group') return 'chip-group';
@@ -785,6 +974,7 @@
     }
 
     function renderDemoCal() {
+      if (calViewMode === 'week') { renderWeekView(); return; }
       const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       document.getElementById('viewMonthLabel').textContent = `${monthNames[viewMonth]} ${viewYear}`;
       document.getElementById('prevMonthBtn').disabled = (viewYear === 2026 && viewMonth <= 5);
@@ -822,6 +1012,11 @@
     }
 
     function changeViewMonth(dir) {
+      if (calViewMode === 'week') {
+        weekStartDate.setDate(weekStartDate.getDate() + dir * 7);
+        renderWeekView();
+        return;
+      }
       viewMonth += dir;
       if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
       if (viewMonth > 11) { viewMonth = 0;  viewYear++; }
@@ -966,30 +1161,70 @@
       }
     }
 
+    // ── Populate filter dropdowns ──────────────────
+    let _calFiltersInit = false;
+    function initCalFilters() {
+      if (_calFiltersInit) return;
+      _calFiltersInit = true;
+      const stadiums = [...new Set(GAMES.map(g => g.stadium))].sort();
+      const stadSel  = document.getElementById('calStadiumFilter');
+      stadiums.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; stadSel.appendChild(o); });
+
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const mons = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const dates = [...new Set(GAMES.map(g => g.date))].sort();
+      const dateSel = document.getElementById('calDateFilter');
+      dates.forEach(d => {
+        const dt = new Date(d + 'T12:00:00');
+        const o  = document.createElement('option');
+        o.value  = d;
+        o.textContent = `${days[dt.getDay()]} ${dt.getDate()} ${mons[dt.getMonth()]}`;
+        dateSel.appendChild(o);
+      });
+    }
+
     // ── Select & Export list ───────────────────────
     function renderList() {
-      const search = document.getElementById('calSearchInput').value.toLowerCase();
-      const type   = document.getElementById('calTypeFilter').value;
+      const search  = document.getElementById('calSearchInput').value.toLowerCase();
+      const type    = document.getElementById('calTypeFilter').value;
+      const stadium = document.getElementById('calStadiumFilter').value;
+      const date    = document.getElementById('calDateFilter').value;
       const filtered = GAMES.filter(g =>
-        (!search || g.team1.toLowerCase().includes(search) || g.team2.toLowerCase().includes(search)) &&
-        (!type   || g.type === type)
+        (!search  || g.team1.toLowerCase().includes(search) || g.team2.toLowerCase().includes(search)) &&
+        (!type    || g.type === type) &&
+        (!stadium || g.stadium === stadium) &&
+        (!date    || g.date === date)
       );
       filteredIds = filtered.map(g => g.id);
 
-      document.getElementById('gamesList').innerHTML = filtered.map(game => {
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      function sepLabel(dateStr) {
+        const d = new Date(dateStr + 'T12:00:00');
+        return `${days[d.getDay()].toUpperCase()} ${d.getDate()} ${months[d.getMonth()].toUpperCase()}`;
+      }
+
+      let html = '';
+      let lastDate = null;
+      filtered.forEach(game => {
+        if (game.date !== lastDate) {
+          html += `<div class="game-date-separator">${sepLabel(game.date)}</div>`;
+          lastDate = game.date;
+        }
         const isSel = selected.has(game.id);
-        return `<div class="game-select-card ${isSel ? 'selected' : ''}" onclick="toggleGame(${game.id})">
+        html += `<div class="game-select-card ${isSel ? 'selected' : ''}" onclick="toggleGame(${game.id})">
           <div class="game-checkbox">${isSel ? '✓' : ''}</div>
           <div class="game-select-info" style="flex:1;min-width:0;">
             <div class="game-select-teams">${getFlag(game.team1)} ${game.team1} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${game.team2} ${getFlag(game.team2)}</div>
-            <div class="game-select-meta">${formatDate(game.date)} · ${game.time} ET · ${game.stadium}</div>
+            <div class="game-select-meta">${game.time} ET · ${game.stadium}</div>
           </div>
           <a href="${toGoogleCalURL(game)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
             style="font-size:0.72rem;color:var(--gold);text-decoration:none;font-weight:600;white-space:nowrap;flex-shrink:0;padding:0.3rem 0.5rem;border-radius:6px;border:1px solid var(--gold-dim);">
             Google Cal
           </a>
         </div>`;
-      }).join('');
+      });
+      document.getElementById('gamesList').innerHTML = html;
       updateSidebar();
       updateExportBadge();
     }
