@@ -10,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
   <script src="theme.js"></script>
   <script src="auth.js" defer></script>
+  <script src="data.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
   <style>
@@ -92,22 +93,51 @@
       text-align: center;
     }
 
+    /* Next match banner */
+    .nm-banner {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.5rem 1.25rem 1.75rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .nm-label {
+      font-size: 0.65rem; font-weight: 800; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.25rem;
+    }
+    .nm-teams {
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .nm-team {
+      display: flex; flex-direction: column; align-items: center; gap: 0.45rem;
+      flex: 1; max-width: 130px;
+    }
+    .nm-team img {
+      width: 52px; height: 52px; object-fit: contain;
+    }
+    .nm-team-name {
+      font-size: 0.82rem; font-weight: 700; color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .nm-vs {
+      font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em;
+      color: var(--text-muted); flex-shrink: 0;
+      background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.2rem 0.5rem;
+    }
+    .nm-meta {
+      font-size: 0.72rem; color: var(--text-muted); margin-top: 0.9rem;
+    }
+    .live-card.is-post {
+      opacity: 0.45;
+    }
+    .live-card.is-post:hover {
+      opacity: 0.7;
+    }
+
     /* Countdown / empty states */
-    .live-countdown-box {
-      text-align: center; padding: 3rem 1.5rem;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 18px; margin-top: 1.5rem;
-    }
-    .live-countdown-label {
-      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;
-    }
-    .live-countdown {
-      font-size: clamp(1.8rem, 6vw, 2.8rem); font-weight: 900;
-      letter-spacing: 0.02em; color: var(--text-primary);
-      font-variant-numeric: tabular-nums;
-    }
-    .live-countdown em { color: var(--gold); font-style: normal; }
     .live-countdown-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem; }
 
     .live-error {
@@ -371,6 +401,7 @@
       </div>
 
       <div id="viewScores">
+        <div id="nextMatchBanner"></div>
         <div id="liveContent"></div>
       </div>
 
@@ -464,7 +495,7 @@
       const venue = comp.venue?.fullName ? `${comp.venue.fullName}${comp.venue.address?.city ? ' · ' + comp.venue.address.city : ''}` : '';
 
       const canOpen = isLive || isPost;
-      return `<div class="live-card ${isLive ? 'is-live' : ''} ${canOpen ? 'clickable' : ''}"
+      return `<div class="live-card ${isLive ? 'is-live' : ''} ${isPost ? 'is-post' : ''} ${canOpen ? 'clickable' : ''}"
         ${canOpen ? `onclick="openMatchModal('${event.id}')"` : ''}>
         <div class="live-card-top">
           <span class="live-stage">${stage}</span>
@@ -486,26 +517,53 @@
       </div>` + events.map(matchCard).join('');
     }
 
-    // ── Countdown (before the opener) ──────────────
+    // ── Next-match banner ──────────────────────────
     let countdownTimer = null;
-    function renderCountdown(nextEvents) {
-      const target = new Date(nextEvents?.[0]?.date || OPENER_UTC);
-      const el = document.getElementById('liveContent');
 
+    function parseGameDate(g) {
+      const [timePart, ampm] = g.time.split(' ');
+      let [h, m] = timePart.split(':').map(Number);
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      // Times in GAMES are ET (EDT = UTC-4 during tournament)
+      return new Date(`${g.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00-04:00`);
+    }
+
+    function findNextMatchFromData() {
+      const now = new Date();
+      return GAMES
+        .map(g => ({ ...g, dt: parseGameDate(g) }))
+        .filter(g => g.dt > now)
+        .sort((a, b) => a.dt - b.dt)[0] || null;
+    }
+
+    function renderNextMatchBanner(g) {
+      const banner = document.getElementById('nextMatchBanner');
+      if (!banner) return;
+      clearInterval(countdownTimer);
+
+      if (!g) { banner.innerHTML = ''; return; }
+
+      const stad = STADIUMS[g.stadium] || {};
+      const city = stad.city || g.stadium;
+      const dateStr = g.dt.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+      const timeStr = g.dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const pad = n => String(n).padStart(2, '0');
-      function tick() {
-        const diff = target - new Date();
-        if (diff <= 0) { clearInterval(countdownTimer); refresh(); return; }
-        const set = (id, v) => { const x = document.getElementById(id); if (x) x.textContent = v; };
-        set('cdDays',    pad(Math.floor(diff / 86400000)));
-        set('cdHours',   pad(Math.floor(diff % 86400000 / 3600000)));
-        set('cdMinutes', pad(Math.floor(diff % 3600000 / 60000)));
-        set('cdSeconds', pad(Math.floor(diff % 60000 / 1000)));
-      }
 
-      el.innerHTML = `
-        <div class="live-countdown-box">
-          <div class="live-countdown-label">⚽ Time until kickoff — Mexico vs South Africa, June 11</div>
+      banner.innerHTML = `
+        <div class="nm-banner">
+          <div class="nm-label">⏱ Countdown Until Next Match</div>
+          <div class="nm-teams">
+            <div class="nm-team">
+              <span style="font-size:2.8rem;line-height:1">${getFlag(g.team1)}</span>
+              <span class="nm-team-name">${g.team1}</span>
+            </div>
+            <div class="nm-vs">VS</div>
+            <div class="nm-team">
+              <span style="font-size:2.8rem;line-height:1">${getFlag(g.team2)}</span>
+              <span class="nm-team-name">${g.team2}</span>
+            </div>
+          </div>
           <div class="countdown-units">
             <div class="countdown-unit"><div class="countdown-num" id="cdDays">--</div><div class="countdown-unit-label">Days</div></div>
             <div class="countdown-sep">:</div>
@@ -515,11 +573,18 @@
             <div class="countdown-sep">:</div>
             <div class="countdown-unit"><div class="countdown-num" id="cdSeconds">--</div><div class="countdown-unit-label">Seconds</div></div>
           </div>
-          <div class="live-countdown-sub">Live scores activate the moment the first whistle blows in Mexico City.</div>
-        </div>
-        ${nextEvents?.length ? `<div class="live-section-title">📅 Opening matches · ${localDate(nextEvents[0].date)}</div>` + nextEvents.map(matchCard).join('') : ''}`;
+          <div class="nm-meta">${dateStr} · ${timeStr} · ${g.stadium}${city ? ', ' + city : ''}</div>
+        </div>`;
 
-      clearInterval(countdownTimer);
+      function tick() {
+        const diff = g.dt - new Date();
+        if (diff <= 0) { clearInterval(countdownTimer); renderNextMatchBanner(findNextMatchFromData()); return; }
+        const set = (id, v) => { const x = document.getElementById(id); if (x) x.textContent = v; };
+        set('cdDays',    pad(Math.floor(diff / 86400000)));
+        set('cdHours',   pad(Math.floor(diff % 86400000 / 3600000)));
+        set('cdMinutes', pad(Math.floor(diff % 3600000 / 60000)));
+        set('cdSeconds', pad(Math.floor(diff % 60000 / 1000)));
+      }
       countdownTimer = setInterval(tick, 1000);
       tick();
     }
@@ -537,29 +602,25 @@
       updated.classList.add('refreshing');
       try {
         const today = new Date();
-        let events = await fetchDay(today);
+        const events = await fetchDay(today);
 
-        // Nothing today? Look ahead for the next match day (max 7 days)
-        if (!events.length) {
-          let ahead = [];
-          for (let i = 1; i <= 7 && !ahead.length; i++) {
-            const d = new Date(today);
-            d.setDate(d.getDate() + i);
-            ahead = await fetchDay(d);
-          }
-          renderCountdown(ahead);
-        } else {
-          clearInterval(countdownTimer);
-          const live     = events.filter(e => e.status?.type?.state === 'in');
-          const upcoming = events.filter(e => e.status?.type?.state === 'pre');
-          const done     = events.filter(e => e.status?.type?.state === 'post');
+        // Always show next-match banner from local data (no extra API call)
+        renderNextMatchBanner(findNextMatchFromData());
 
-          document.getElementById('liveContent').innerHTML =
-            section('Live now', live, true) +
-            section('Upcoming today', upcoming, false) +
-            section('Full time', done, false) ||
-            '<div class="live-error">No matches today.</div>';
-        }
+        // Show today's match list (or nothing if no matches today)
+        const live     = events.filter(e => e.status?.type?.state === 'in');
+        const upcoming = events.filter(e => e.status?.type?.state === 'pre');
+        const done     = events.filter(e => e.status?.type?.state === 'post');
+        const known    = live.length + upcoming.length + done.length;
+
+        document.getElementById('liveContent').innerHTML = events.length
+          ? (known > 0
+              ? section('Live now', live, true) +
+                section('Upcoming today', upcoming, false) +
+                section('Full time', done, false)
+              : section("Today's matches", events, false)) ||
+            '<div class="live-error">No matches today.</div>'
+          : '';
 
         document.getElementById('liveUpdatedText').textContent =
           'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
