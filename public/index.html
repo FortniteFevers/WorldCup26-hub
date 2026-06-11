@@ -499,11 +499,21 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
 </head>
 <body>
+  <!-- Announce bar -->
+  <div class="announce-bar" id="announceBar">
+    <span class="announce-bar-dot"></span>
+    <span>Live World Cup scores are now available — real-time goals, stats &amp; bracket</span>
+    <a href="/live">Watch Live →</a>
+    <button class="announce-bar-dismiss" onclick="dismissAnnounce()" aria-label="Dismiss">×</button>
+  </div>
+  <script>if(localStorage.getItem('announceDismissed')){document.getElementById('announceBar').style.display='none';}function dismissAnnounce(){localStorage.setItem('announceDismissed','1');document.getElementById('announceBar').style.display='none';}</script>
+
   <!-- Navigation -->
   <nav>
     <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
       <li><a href="/" class="active">Home</a></li>
+      <li><a href="/live" class="nav-live">LIVE <span class="nav-live-dot"></span></a></li>
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
@@ -525,6 +535,7 @@
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
     <a href="/" class="active" onclick="closeMobileMenu()">Home</a>
+    <a href="/live" class="nav-live" onclick="closeMobileMenu()">LIVE <span class="nav-live-dot"></span></a>
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
@@ -560,9 +571,9 @@
       <p class="lp-sub">Your ratings-powered field guide to the 2026 World Cup. Explore teams, players, matches, and groups — all through FC 26-style squad ratings.</p>
 
       <div class="lp-ctas">
-        <a href="/games" class="lp-cta-primary">Browse Matches →</a>
+        <a href="/live" class="lp-cta-primary" style="background:linear-gradient(135deg,#dc2626,#b91c1c);border-color:#dc2626;box-shadow:0 0 24px rgba(220,38,38,0.35)">🔴 Watch Live</a>
+        <a href="/games" class="lp-cta-secondary">Browse Matches</a>
         <a href="/teams" class="lp-cta-secondary">Explore Ratings</a>
-        <a href="/my-team" class="lp-cta-secondary">My Team</a>
       </div>
 
       <div class="lp-hosts">

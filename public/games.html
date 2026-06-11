@@ -63,6 +63,20 @@
       margin-bottom: 1.25rem;
       align-items: center;
     }
+    @media (max-width: 600px) {
+      .filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .filters .filter-input { grid-column: 1 / -1; min-width: 0; width: 100%; }
+      .filters .filter-select,
+      .filters .date-btn {
+        min-width: 0; width: 100%;
+        text-align: left;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .filters .filter-select:last-child { grid-column: 1 / -1; }
+    }
     .date-btn {
       padding: 0.55rem 1rem;
       border-radius: 10px;
@@ -80,10 +94,89 @@
 
     /* FIFA-style game cards */
     .games-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
       margin-bottom: 2rem;
+    }
+    .browse-date-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1.5rem 0 0.85rem;
+    }
+    .browse-date-header:first-child { padding-top: 0.25rem; }
+    .browse-date-label {
+      font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .browse-date-count {
+      font-size: 0.68rem; font-weight: 600; color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .browse-date-header::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .browse-day-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .fc-tv-row {
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+    .fc-tv {
+      font-size: 0.56rem; font-weight: 800; letter-spacing: 0.06em;
+      color: var(--text-muted); border: 1px solid var(--border);
+      border-radius: 4px; padding: 0.14rem 0.4rem;
+      text-transform: uppercase; white-space: nowrap;
+    }
+    .fc-pick-row {
+      display: flex; align-items: center; gap: 0.85rem;
+      padding: 0.55rem 0.9rem;
+      border-top: 1px solid var(--border);
+      background: var(--bg-base);
+    }
+    .fc-pick-label {
+      font-size: 0.6rem; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .fc-pick-signin {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.78rem; color: var(--text-secondary);
+      padding: 0; font-weight: 500;
+      transition: color 0.15s;
+    }
+    .fc-pick-signin:hover { color: var(--gold); }
+    .fc-pick-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .fc-pick-btn {
+      background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: 100px; cursor: pointer;
+      font-size: 0.7rem; font-weight: 600; color: var(--text-secondary);
+      padding: 0.25rem 0.7rem;
+      transition: all 0.15s;
+    }
+    .fc-pick-btn:hover { border-color: var(--border-bright); color: var(--text-primary); }
+    .fc-pick-btn.picked {
+      background: var(--gold-dim); color: var(--gold);
+      border-color: rgba(245,200,66,0.45);
+    }
+    .fc-pick-share {
+      margin-left: auto;
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: var(--gold-dim); border: 1px solid rgba(245,200,66,0.35);
+      border-radius: 100px; cursor: pointer;
+      font-size: 0.7rem; font-weight: 700; color: var(--gold);
+      padding: 0.25rem 0.7rem;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .fc-pick-share:hover {
+      border-color: var(--gold);
+      box-shadow: 0 2px 10px rgba(245,200,66,0.2);
+      transform: translateY(-1px);
+    }
+    @media (max-width: 480px) {
+      .fc-tv:nth-child(n+3) { display: none; }
     }
     .game-card {
       background: var(--bg-card);
@@ -120,6 +213,13 @@
     .fc-flag-emoji { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
     .fc-team-name { font-size: 0.82rem; font-weight: 700; line-height: 1.2; }
     .fc-team-left .fc-team-name { text-align: right; }
+    @media (max-width: 600px) {
+      .fc-team-name { font-size: 0.68rem; }
+      .fc-flag { width: 26px; height: 18px; }
+      .fc-flag-emoji { font-size: 1.2rem; }
+      .fc-team { gap: 0.4rem; }
+      .fc-match-body { gap: 0.4rem; padding: 0.5rem 0.7rem 0.7rem; }
+    }
     .fc-v {
       font-size: 0.6rem; font-weight: 900; letter-spacing: 0.12em;
       color: var(--text-muted); background: var(--input-bg);
@@ -348,6 +448,21 @@
       display: flex; gap: 0.5rem; flex-wrap: wrap;
       align-items: center; margin-bottom: 1.25rem;
     }
+    @media (max-width: 600px) {
+      .cal-page-filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      .cal-page-filters .filter-input { grid-column: 1 / -1; min-width: 0; width: 100%; }
+      .cal-page-filters .filter-select,
+      .cal-page-filters .btn {
+        min-width: 0; width: 100%;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      /* date select spans full row so the two buttons pair up below it */
+      .cal-page-filters #calDateFilter { grid-column: 1 / -1; }
+    }
     .cal-page-grid {
       display: grid;
       grid-template-columns: 1fr 280px;
@@ -414,10 +529,20 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
 </head>
 <body>
+  <!-- Announce bar -->
+  <div class="announce-bar" id="announceBar">
+    <span class="announce-bar-dot"></span>
+    <span>Live World Cup scores are now available — real-time goals, stats &amp; bracket</span>
+    <a href="/live">Watch Live →</a>
+    <button class="announce-bar-dismiss" onclick="dismissAnnounce()" aria-label="Dismiss">×</button>
+  </div>
+  <script>if(localStorage.getItem('announceDismissed')){document.getElementById('announceBar').style.display='none';}function dismissAnnounce(){localStorage.setItem('announceDismissed','1');document.getElementById('announceBar').style.display='none';}</script>
+
   <nav>
     <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
       <li><a href="/">Home</a></li>
+      <li><a href="/live" class="nav-live">LIVE <span class="nav-live-dot"></span></a></li>
       <li><a href="/games" class="active">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
@@ -439,6 +564,7 @@
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
     <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/live" class="nav-live" onclick="closeMobileMenu()">LIVE <span class="nav-live-dot"></span></a>
     <a href="/games" class="active" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
@@ -632,6 +758,17 @@
     </div>
   </div>
 
+  <!-- ── Stadium detail modal (mobile) ── -->
+  <div class="modal-backdrop" id="stadiumBackdrop" onclick="if(event.target===this)closeStadiumModal()">
+    <div class="modal" id="stadiumModal" data-lenis-prevent style="max-width:520px;">
+      <div class="modal-header">
+        <div class="modal-title" id="stadiumModalTitle"></div>
+        <button class="modal-close" onclick="closeStadiumModal()">✕</button>
+      </div>
+      <div class="modal-body" id="stadiumModalBody"></div>
+    </div>
+  </div>
+
   <!-- ── Game detail modal ── -->
   <div class="modal-backdrop" id="gameDetailBackdrop" onclick="handleGameModalBackdrop(event)">
     <div class="modal" id="gameDetailModal" data-lenis-prevent>
@@ -764,6 +901,204 @@
       </div>`;
     }
 
+    // ── Your pick ──────────────────────────────────
+    function isSignedIn() { return !!(window.Clerk && window.Clerk.user); }
+    function loadPicks() {
+      try { return JSON.parse(localStorage.getItem('wcPicks2026')) || {}; } catch { return {}; }
+    }
+    function setPick(gameId, team) {
+      const picks = loadPicks();
+      if (picks[gameId] === team) delete picks[gameId];
+      else picks[gameId] = team;
+      localStorage.setItem('wcPicks2026', JSON.stringify(picks));
+      applyFilters();
+    }
+    function promptSignIn() {
+      if (window.Clerk) window.Clerk.openSignIn();
+    }
+    function pickRowHtml(game) {
+      const isTBD = game.team1 === 'TBD';
+      if (isTBD) return '';
+      if (!isSignedIn()) {
+        return `<div class="fc-pick-row">
+          <span class="fc-pick-label">Your pick</span>
+          <button class="fc-pick-signin" onclick="promptSignIn()">Sign in to pick</button>
+        </div>`;
+      }
+      const pick = loadPicks()[game.id];
+      const shareBtn = pick
+        ? `<button class="fc-pick-share" id="shareBtn${game.id}" onclick="sharePickCard(${game.id})">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Share
+          </button>`
+        : '';
+      return `<div class="fc-pick-row">
+        <span class="fc-pick-label">Your pick</span>
+        <div class="fc-pick-btns">
+          <button class="fc-pick-btn ${pick === game.team1 ? 'picked' : ''}" onclick="setPick(${game.id}, '${game.team1.replace(/'/g, "\\'")}')">${getFlag(game.team1)} ${game.team1}</button>
+          <button class="fc-pick-btn ${pick === game.team2 ? 'picked' : ''}" onclick="setPick(${game.id}, '${game.team2.replace(/'/g, "\\'")}')">${getFlag(game.team2)} ${game.team2}</button>
+        </div>
+        ${shareBtn}
+      </div>`;
+    }
+
+    function drawRoundedRectPick(c, x, y, w, h, r, fill) {
+      c.beginPath();
+      c.moveTo(x + r, y);
+      c.arcTo(x + w, y, x + w, y + h, r);
+      c.arcTo(x + w, y + h, x, y + h, r);
+      c.arcTo(x, y + h, x, y, r);
+      c.arcTo(x, y, x + w, y, r);
+      c.closePath();
+      c.fillStyle = fill;
+      c.fill();
+    }
+
+    function drawPickCard(game, pick) {
+      const W = 560, H = 310, DPR = 2;
+      const canvas = document.createElement('canvas');
+      canvas.width  = W * DPR;
+      canvas.height = H * DPR;
+      const c = canvas.getContext('2d');
+      c.scale(DPR, DPR);
+
+      const GOLD = '#f5c842';
+
+      // Background
+      c.fillStyle = '#0d1117';
+      c.fillRect(0, 0, W, H);
+      c.fillStyle = GOLD;
+      c.fillRect(0, 0, W, 5);
+
+      // Gold glow behind the picked side
+      const pickIsLeft = pick === game.team1;
+      const GX = pickIsLeft ? 150 : 410;
+      const glow = c.createRadialGradient(GX, 140, 0, GX, 140, 130);
+      glow.addColorStop(0, GOLD + '20');
+      glow.addColorStop(1, 'transparent');
+      c.fillStyle = glow;
+      c.fillRect(0, 0, W, H);
+
+      // Eyebrow
+      c.textAlign = 'center';
+      c.font = '800 12px "Inter", Arial, sans-serif';
+      c.fillStyle = GOLD;
+      c.fillText('🏆  M Y   P I C K', W / 2, 38);
+
+      // Teams
+      const drawTeam = (team, x, isPicked) => {
+        c.textAlign = 'center';
+        c.font = '52px "Inter", Arial, sans-serif';
+        c.globalAlpha = isPicked ? 1 : 0.35;
+        c.fillText(getFlag(team), x, 140);
+
+        c.font = `${isPicked ? '900' : '700'} ${isPicked ? 22 : 18}px "Inter", Arial Black, sans-serif`;
+        c.fillStyle = isPicked ? '#f9fafb' : '#6b7280';
+        c.fillText(team, x, 180);
+        c.globalAlpha = 1;
+
+        if (isPicked) {
+          const bw = 96;
+          drawRoundedRectPick(c, x - bw/2, 194, bw, 24, 12, GOLD + '26');
+          c.font = '800 11px "Inter", Arial, sans-serif';
+          c.fillStyle = GOLD;
+          c.fillText('✓ TO WIN', x, 210);
+        }
+      };
+      drawTeam(game.team1, 150, pickIsLeft);
+      drawTeam(game.team2, 410, !pickIsLeft);
+
+      // VS
+      c.font = '900 16px "Inter", Arial Black, sans-serif';
+      c.fillStyle = '#374151';
+      c.fillText('VS', W / 2, 150);
+
+      // Match info
+      const ko = game.type !== 'Group';
+      const stageLabel = ko ? game.type : 'Group Stage';
+      c.font = '600 12px "Inter", Arial, sans-serif';
+      c.fillStyle = '#9ca3af';
+      c.fillText(`${stageLabel} · ${formatFIFADate(game.date)} · ${game.time} ET · ${game.stadium}`, W / 2, 252);
+
+      // Divider + watermark
+      c.strokeStyle = '#1f2937';
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(26, 270); c.lineTo(W - 26, 270);
+      c.stroke();
+
+      c.font = '700 12px "Inter", Arial, sans-serif';
+      c.fillStyle = GOLD;
+      c.textAlign = 'left';
+      c.fillText('⚽ worldcupfieldguide.com', 26, 292);
+
+      c.font = '500 11px "Inter", Arial, sans-serif';
+      c.fillStyle = '#4b5563';
+      c.textAlign = 'right';
+      c.fillText('World Cup 2026', W - 26, 292);
+
+      return canvas;
+    }
+
+    function downloadBlobPick(blob, fname) {
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href     = url;
+      link.download = fname;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+
+    async function sharePickCard(gameId) {
+      const game = GAMES.find(g => g.id === gameId);
+      const pick = loadPicks()[gameId];
+      if (!game || !pick) return;
+
+      const btn = document.getElementById('shareBtn' + gameId);
+      if (btn) btn.innerHTML = '⏳';
+
+      await new Promise(r => setTimeout(r, 40));
+
+      const canvas = drawPickCard(game, pick);
+      const other  = pick === game.team1 ? game.team2 : game.team1;
+      const fname  = `my-pick-${pick.replace(/\s+/g,'-')}.png`;
+      const text   = `I've got ${pick} beating ${other} 🏆 Make your picks at worldcupfieldguide.com`;
+
+      let blob;
+      try {
+        blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob failed')), 'image/png'));
+      } catch(e) { applyFilters(); return; }
+
+      // Mobile: share sheet with image + text
+      if (navigator.canShare && navigator.canShare({ files: [new File([blob], fname, { type:'image/png' })] })) {
+        try {
+          await navigator.share({
+            files: [new File([blob], fname, { type:'image/png' })],
+            text, url: 'https://worldcupfieldguide.com'
+          });
+          applyFilters(); return;
+        } catch(e) {
+          if (e.name === 'AbortError') { applyFilters(); return; }
+        }
+      }
+
+      // Desktop: download PNG
+      downloadBlobPick(blob, fname);
+      applyFilters();
+    }
+
+    // Re-render when Clerk auth state changes (it loads async)
+    let _lastAuthState = null;
+    setInterval(() => {
+      const s = isSignedIn();
+      if (s !== _lastAuthState) {
+        _lastAuthState = s;
+        applyFilters();
+      }
+    }, 1500);
+
     function createGameCard(game) {
       const ko = game.type !== 'Group';
       const stageClass = ko ? 'knockout' : '';
@@ -774,6 +1109,11 @@
       return `<div class="game-card">
         <div class="fc-top">
           <span class="fc-stage ${stageClass}">${stageLabel}</span>
+          <div class="fc-tv-row">
+            <span class="fc-tv">FOX</span>
+            <span class="fc-tv">FS1</span>
+            <span class="fc-tv">Telemundo</span>
+          </div>
         </div>
         <div class="fc-match-body">
           <div class="fc-team fc-team-left">
@@ -789,11 +1129,11 @@
         ${strengthBarHtml(game.team1, game.team2)}
         <div class="fc-banner">
           <div class="fc-banner-left">
-            <span class="fc-banner-time">${formatFIFADate(game.date)} · ${game.time} ET</span>
+            <span class="fc-banner-time">${game.time} ET</span>
             <span class="fc-banner-venue">${venue}</span>
           </div>
-          <a href="${toGoogleCalURL(game)}" target="_blank" rel="noopener" class="fc-banner-cal">+ Calendar</a>
         </div>
+        ${pickRowHtml(game)}
       </div>`;
     }
 
@@ -818,7 +1158,32 @@
         noResults.style.display = 'block';
         count.textContent = '';
       } else {
-        container.innerHTML = filtered.map(createGameCard).join('');
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const mons = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        let html = '';
+        let lastDate = null;
+        let dayCards = [];
+
+        function flushDay() {
+          if (!lastDate) return;
+          const dt = new Date(lastDate + 'T12:00:00');
+          const label = `${days[dt.getDay()]}, ${mons[dt.getMonth()]} ${dt.getDate()}`;
+          const n = dayCards.length;
+          html += `<div class="browse-date-header">
+            <span class="browse-date-label">${label}</span>
+            <span class="browse-date-count">${n} match${n > 1 ? 'es' : ''}</span>
+          </div>
+          <div class="browse-day-grid">${dayCards.join('')}</div>`;
+          dayCards = [];
+        }
+
+        filtered.forEach(g => {
+          if (g.date !== lastDate) { flushDay(); lastDate = g.date; }
+          dayCards.push(createGameCard(g));
+        });
+        flushDay();
+
+        container.innerHTML = html;
         noResults.style.display = 'none';
         count.textContent = `Showing ${filtered.length} of ${GAMES.length} matches`;
       }
@@ -1369,6 +1734,10 @@
               <div class="stadium-meta-item"><div class="stadium-meta-label">Matches</div><div class="stadium-meta-value">${gamesCount}</div></div>
             </div>`;
           card.addEventListener('click', () => {
+            if (window.innerWidth <= 700) {
+              openStadiumModal(name);
+              return;
+            }
             venueMap.setView([stadium.lat, stadium.lng], 10, { animate: true });
             venueMarkers[name].openPopup();
             document.getElementById('venueMap').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1380,10 +1749,73 @@
       setTimeout(() => venueMap.invalidateSize(), 100);
     }
 
+    // ── Stadium detail modal (mobile) ──────────────
+    function openStadiumModal(name) {
+      const stadium = STADIUMS[name];
+      if (!stadium) return;
+      const games = GAMES.filter(g => g.stadium === name);
+
+      document.getElementById('stadiumModalTitle').innerHTML =
+        `<span style="font-size:0.95rem;">🏟️</span> ${name}`;
+
+      const matchRows = games.map(g => {
+        const ko = g.type !== 'Group';
+        const isFinal = g.type === 'Final';
+        const stageColor  = isFinal ? 'var(--red,#e84040)' : ko ? 'var(--gold)' : 'var(--text-muted)';
+        const stageBg     = isFinal ? 'rgba(232,64,64,0.1)' : ko ? 'var(--gold-dim)' : 'var(--input-bg)';
+        const stageBorder = isFinal ? 'rgba(232,64,64,0.2)' : ko ? 'rgba(245,200,66,0.2)' : 'var(--border)';
+        const isTBD = g.team1 === 'TBD';
+        const teams = isTBD
+          ? `<span style="font-size:0.85rem;font-weight:700;color:var(--text-muted);">Teams TBD</span>`
+          : `<span style="font-size:1.2rem;line-height:1;">${getFlag(g.team1)}</span>
+             <span style="font-size:0.8rem;font-weight:700;">${g.team1}</span>
+             <span style="font-size:0.68rem;color:var(--text-muted);font-weight:600;">vs</span>
+             <span style="font-size:0.8rem;font-weight:700;">${g.team2}</span>
+             <span style="font-size:1.2rem;line-height:1;">${getFlag(g.team2)}</span>`;
+        return `<div onclick="closeStadiumModal();openGameDetail(${g.id})" style="
+            display:flex;align-items:center;gap:0.75rem;
+            padding:0.8rem 0.9rem;border-radius:12px;
+            border:1px solid var(--border);background:var(--bg-base);
+            cursor:pointer;margin-bottom:0.55rem;">
+          <div style="display:flex;align-items:center;gap:0.35rem;flex:1;min-width:0;flex-wrap:wrap;">${teams}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.25rem;flex-shrink:0;">
+            <span style="font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+              padding:0.15rem 0.5rem;border-radius:100px;
+              background:${stageBg};color:${stageColor};border:1px solid ${stageBorder};">${g.type}</span>
+            <span style="font-size:0.68rem;color:var(--text-muted);">${formatDate(g.date)} · ${g.time} ET</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('stadiumModalBody').innerHTML = `
+        <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">${stadium.city} ${stadium.country}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1.25rem;">
+          <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:12px;padding:0.75rem;text-align:center;">
+            <div style="font-size:1.15rem;font-weight:800;color:var(--gold);">${stadium.capacity.toLocaleString()}</div>
+            <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-top:0.2rem;">Capacity</div>
+          </div>
+          <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:12px;padding:0.75rem;text-align:center;">
+            <div style="font-size:1.15rem;font-weight:800;color:var(--gold);">${games.length}</div>
+            <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-top:0.2rem;">Matches</div>
+          </div>
+        </div>
+        <div style="font-size:0.68rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;">All matches here</div>
+        ${matchRows || '<div style="color:var(--text-muted);font-size:0.8rem;">No matches scheduled.</div>'}`;
+
+      document.getElementById('stadiumBackdrop').classList.add('open');
+      lenis.stop();
+    }
+
+    function closeStadiumModal() {
+      document.getElementById('stadiumBackdrop').classList.remove('open');
+      lenis.start();
+    }
+
     // ── Keyboard escape ────────────────────────────
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
       if (document.getElementById('gameDetailBackdrop').classList.contains('open')) closeGameDetail();
+      else if (document.getElementById('stadiumBackdrop').classList.contains('open')) closeStadiumModal();
       else if (document.getElementById('dayGamesBackdrop').classList.contains('open')) closeDayModal();
       else if (document.getElementById('calBackdrop').classList.contains('open')) closeCalPopup();
     });

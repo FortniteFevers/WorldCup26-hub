@@ -190,10 +190,20 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
 </head>
 <body>
+  <!-- Announce bar -->
+  <div class="announce-bar" id="announceBar">
+    <span class="announce-bar-dot"></span>
+    <span>Live World Cup scores are now available — real-time goals, stats &amp; bracket</span>
+    <a href="/live">Watch Live →</a>
+    <button class="announce-bar-dismiss" onclick="dismissAnnounce()" aria-label="Dismiss">×</button>
+  </div>
+  <script>if(localStorage.getItem('announceDismissed')){document.getElementById('announceBar').style.display='none';}function dismissAnnounce(){localStorage.setItem('announceDismissed','1');document.getElementById('announceBar').style.display='none';}</script>
+
   <nav>
     <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
       <li><a href="/">Home</a></li>
+      <li><a href="/live" class="nav-live">LIVE <span class="nav-live-dot"></span></a></li>
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
@@ -215,6 +225,7 @@
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
     <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/live" class="nav-live" onclick="closeMobileMenu()">LIVE <span class="nav-live-dot"></span></a>
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
