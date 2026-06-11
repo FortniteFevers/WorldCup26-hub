@@ -488,6 +488,46 @@
     [data-theme="light"] .lp-host-sep {
       color: rgba(15,23,42,0.16);
     }
+    /* ── Mobile hero fixes ──────────────────────── */
+    @media (max-width: 600px) {
+      .lp-hero {
+        min-height: auto;
+        align-items: flex-start;
+        padding: 1.5rem 0 2.5rem;
+      }
+      .lp-hero-inner {
+        padding: 0 1.25rem;
+      }
+      .lp-badge {
+        margin-bottom: 1rem;
+        font-size: 0.65rem;
+      }
+      .lp-headline {
+        margin-bottom: 0.75rem;
+      }
+      .lp-headline-year {
+        font-size: clamp(5rem, 24vw, 7rem);
+      }
+      .lp-sub {
+        margin-bottom: 1.5rem;
+        font-size: 0.7rem;
+      }
+      .lp-ctas {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6rem;
+        margin-bottom: 1.5rem;
+      }
+      .lp-cta-primary, .lp-cta-secondary {
+        justify-content: center;
+        padding: 0.75rem 1rem;
+      }
+      .lp-hosts {
+        font-size: 0.75rem;
+        gap: 0.6rem;
+      }
+    }
+
     [data-theme="light"] .lp-fade-top {
       background: linear-gradient(to bottom, #f8fafc, transparent);
     }
