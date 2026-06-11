@@ -11,6 +11,7 @@ const nextConfig = {
       { source: '/guide',   destination: '/guide.html'   },
       { source: '/bracket', destination: '/bracket.html' },
       { source: '/104-0',   destination: '/draft.html'   },
+      { source: '/live',    destination: '/live.html'    },
     ];
   },
 };
