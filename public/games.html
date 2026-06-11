@@ -91,6 +91,47 @@
     }
     .date-btn:hover { border-color: var(--border-bright); color: var(--text-primary); }
     .date-btn.active { border-color: rgba(245,200,66,0.5); color: var(--gold); background: var(--gold-dim); }
+    .browse-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .past-games-jump {
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text-secondary);
+      border-radius: 999px;
+      padding: 0.36rem 0.72rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.16s;
+      white-space: nowrap;
+    }
+    .past-games-jump:hover {
+      border-color: var(--border-bright);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+    .past-games-jump span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.35rem;
+      height: 1.15rem;
+      padding: 0 0.38rem;
+      border-radius: 999px;
+      background: var(--bg-base);
+      color: var(--text-muted);
+      font-size: 0.62rem;
+      font-weight: 900;
+    }
 
     /* FIFA-style game cards */
     .games-container {
@@ -115,6 +156,13 @@
     }
     .browse-date-header::after {
       content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .past-games-anchor {
+      scroll-margin-top: 110px;
+      margin-top: 1.75rem;
+    }
+    .past-games-anchor .browse-date-label {
+      color: var(--text-muted);
     }
     .browse-day-grid {
       display: flex;
@@ -186,6 +234,21 @@
       transition: border-color 0.2s, transform 0.2s;
     }
     .game-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+    .game-card.is-final {
+      opacity: 0.48;
+      filter: grayscale(0.35);
+    }
+    .game-card.is-final:hover {
+      opacity: 0.72;
+      filter: grayscale(0.2);
+    }
+    .game-card.is-live {
+      border-color: rgba(239,68,68,0.5);
+      box-shadow: 0 0 0 1px rgba(239,68,68,0.14), 0 10px 28px rgba(239,68,68,0.08);
+    }
+    .game-card.is-live:hover {
+      border-color: rgba(239,68,68,0.75);
+    }
     .fc-top {
       display: flex;
       align-items: center;
@@ -226,6 +289,64 @@
       border: 1px solid var(--border); border-radius: 6px;
       padding: 0.3rem 0.5rem; flex-shrink: 0;
     }
+    .fc-score {
+      min-width: 4.4rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.28rem;
+      padding: 0.34rem 0.55rem;
+      border-radius: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-size: 1.02rem;
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .fc-score.live {
+      background: rgba(239,68,68,0.1);
+      border-color: rgba(239,68,68,0.34);
+      color: #ff565c;
+    }
+    .fc-live-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #ff565c;
+      text-decoration: none;
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.32);
+      border-radius: 999px;
+      padding: 0.28rem 0.62rem;
+      white-space: nowrap;
+    }
+    .fc-live-link:hover {
+      background: rgba(239,68,68,0.16);
+      border-color: rgba(239,68,68,0.58);
+    }
+    .fc-live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.16);
+      flex-shrink: 0;
+    }
+    .fc-final-label {
+      font-size: 0.66rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
     .fc-banner {
       display: flex; align-items: center; justify-content: space-between;
       background: var(--bg-base); border-top: 1px solid var(--border);
@@ -242,6 +363,10 @@
       background: var(--gold-dim); transition: all 0.15s;
     }
     .fc-banner-cal:hover { background: rgba(245,200,66,0.18); }
+    .game-card.is-final .fc-pick-row,
+    .game-card.is-final .fc-banner-cal {
+      display: none;
+    }
 
     #noResults {
       display: none;
@@ -606,7 +731,12 @@
           <option value="Final">Final</option>
         </select>
       </div>
-      <div id="resultsCount" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1rem;"></div>
+      <div class="browse-status-row">
+        <div id="resultsCount" style="font-size:0.78rem;color:var(--text-muted);"></div>
+        <button type="button" class="past-games-jump" id="pastGamesJump" onclick="scrollToPastGames()">
+          Past games <span id="pastGamesCount">0</span>
+        </button>
+      </div>
       <div class="games-container" id="gamesContainer"></div>
       <div id="noResults">
         <div style="font-size:2rem;margin-bottom:0.5rem;">🔍</div>
@@ -820,6 +950,115 @@
     // ── Shared state ───────────────────────────────
     let selected   = new Set();   // game IDs for export
     let filteredIds = GAMES.map(g => g.id);
+    const SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+    let liveScoreByGameId = {};
+    let liveScoresLoaded = false;
+
+    function parseGameDateTime(game) {
+      const clean = game.time.split('(')[0].trim();
+      const match = clean.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!match) return new Date(game.date + 'T12:00:00-04:00');
+      let h = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10);
+      const mer = match[3].toUpperCase();
+      if (mer === 'PM' && h !== 12) h += 12;
+      if (mer === 'AM' && h === 12) h = 0;
+      return new Date(`${game.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00-04:00`);
+    }
+
+    function dateCompact(dateStr) {
+      return dateStr.replace(/-/g, '');
+    }
+
+    function normalizeTeamName(name) {
+      return String(name || '')
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, 'and')
+        .replace(/\./g, '')
+        .replace(/\busa\b/g, 'united states')
+        .replace(/\bturkiye\b/g, 'turkey')
+        .replace(/\bbosnia and herz\b/g, 'bosnia and herzegovina')
+        .replace(/\bcape verde islands\b/g, 'cape verde')
+        .replace(/\bcote d ivoire\b/g, 'ivory coast')
+        .replace(/\bcongo dr\b/g, 'dr congo')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function eventTeams(event) {
+      const comp = event.competitions?.[0] || {};
+      const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
+      const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
+      return { comp, home, away };
+    }
+
+    function eventMatchesGame(event, game) {
+      const { home, away } = eventTeams(event);
+      const names = [
+        normalizeTeamName(home.team?.displayName),
+        normalizeTeamName(home.team?.shortDisplayName),
+        normalizeTeamName(home.team?.name),
+        normalizeTeamName(away.team?.displayName),
+        normalizeTeamName(away.team?.shortDisplayName),
+        normalizeTeamName(away.team?.name),
+      ].filter(Boolean);
+      const t1 = normalizeTeamName(game.team1);
+      const t2 = normalizeTeamName(game.team2);
+      return names.includes(t1) && names.includes(t2);
+    }
+
+    function competitorMatchesTeam(comp, team) {
+      const t = normalizeTeamName(team);
+      return [
+        comp?.team?.displayName,
+        comp?.team?.shortDisplayName,
+        comp?.team?.name,
+        comp?.team?.abbreviation,
+      ].map(normalizeTeamName).includes(t);
+    }
+
+    function scoreStateFor(game) {
+      return liveScoreByGameId[game.id] || null;
+    }
+
+    async function refreshBrowseScores() {
+      try {
+        const start = selectedDate || GAMES[0].date;
+        const end = selectedDate || GAMES[GAMES.length - 1].date;
+        const res = await fetch(`${SCOREBOARD}?dates=${dateCompact(start)}-${dateCompact(end)}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        const events = json.events || [];
+        const next = {};
+        events.forEach(event => {
+          const st = event.status?.type || {};
+          if (st.state !== 'in' && st.state !== 'post') return;
+          const eventTime = event.date ? new Date(event.date) : null;
+          const game = GAMES.find(g => {
+            if (!eventMatchesGame(event, g)) return false;
+            if (!eventTime || Number.isNaN(eventTime.getTime())) return true;
+            return Math.abs(eventTime - parseGameDateTime(g)) < 12 * 60 * 60 * 1000;
+          });
+          if (!game) return;
+          const { home, away } = eventTeams(event);
+          const team1IsHome = competitorMatchesTeam(home, game.team1);
+          next[game.id] = {
+            state: st.state,
+            displayClock: event.status?.displayClock || '',
+            shortDetail: st.shortDetail || st.description || '',
+            team1Score: team1IsHome ? home.score : away.score,
+            team2Score: team1IsHome ? away.score : home.score,
+          };
+        });
+        liveScoreByGameId = next;
+        liveScoresLoaded = true;
+        applyFilters();
+      } catch (err) {
+        console.warn('Browse score fetch failed:', err);
+        liveScoresLoaded = true;
+      }
+    }
 
     // ── View switching ─────────────────────────────
     function setView(v) {
@@ -1106,7 +1345,18 @@
       const stageLabel = ko ? game.type : `Group ${grp}`;
       const stadiumInfo = STADIUMS[game.stadium];
       const venue = stadiumInfo ? `${game.stadium} · ${stadiumInfo.city}` : game.stadium;
-      return `<div class="game-card">
+      const score = scoreStateFor(game);
+      const isLive = score?.state === 'in';
+      const isFinal = score?.state === 'post';
+      const scoreCenter = score
+        ? `<div class="fc-score ${isLive ? 'live' : ''}"><span>${score.team1Score ?? 0}</span><span>–</span><span>${score.team2Score ?? 0}</span></div>`
+        : '<div class="fc-v">V</div>';
+      const rightMeta = isLive
+        ? `<a class="fc-live-link" href="/live" onclick="event.stopPropagation()"><span class="fc-live-dot"></span>${score.displayClock || 'Live'}</a>`
+        : isFinal
+          ? `<span class="fc-final-label">${score.shortDetail || 'Final'}</span>`
+          : '';
+      return `<div class="game-card ${isLive ? 'is-live' : ''} ${isFinal ? 'is-final' : ''}">
         <div class="fc-top">
           <span class="fc-stage ${stageClass}">${stageLabel}</span>
           <div class="fc-tv-row">
@@ -1120,21 +1370,27 @@
             <span class="fc-team-name">${game.team1}</span>
             ${getFlagImg(game.team1)}
           </div>
-          <div class="fc-v">V</div>
+          ${scoreCenter}
           <div class="fc-team fc-team-right">
             ${getFlagImg(game.team2)}
             <span class="fc-team-name">${game.team2}</span>
           </div>
         </div>
-        ${strengthBarHtml(game.team1, game.team2)}
+        ${isFinal ? '' : strengthBarHtml(game.team1, game.team2)}
         <div class="fc-banner">
           <div class="fc-banner-left">
             <span class="fc-banner-time">${game.time} ET</span>
             <span class="fc-banner-venue">${venue}</span>
           </div>
+          ${rightMeta}
         </div>
-        ${pickRowHtml(game)}
+        ${isFinal ? '' : pickRowHtml(game)}
       </div>`;
+    }
+
+    function scrollToPastGames() {
+      const anchor = document.getElementById('pastGamesSection');
+      if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function applyFilters() {
@@ -1147,22 +1403,34 @@
         (!selectedDate || g.date === selectedDate) &&
         (!stadium || g.stadium === stadium) &&
         (!type    || g.type === type)
-      );
+      ).sort((a, b) => {
+        const sa = scoreStateFor(a);
+        const sb = scoreStateFor(b);
+        const rank = s => s?.state === 'in' ? 0 : s?.state === 'post' ? 2 : 1;
+        const r = rank(sa) - rank(sb);
+        if (r) return r;
+        return parseGameDateTime(a) - parseGameDateTime(b);
+      });
 
       const container = document.getElementById('gamesContainer');
       const noResults = document.getElementById('noResults');
       const count     = document.getElementById('resultsCount');
+      const pastJump  = document.getElementById('pastGamesJump');
+      const pastCount = document.getElementById('pastGamesCount');
+      const doneCount = filtered.filter(g => scoreStateFor(g)?.state === 'post').length;
 
       if (filtered.length === 0) {
         container.innerHTML = '';
         noResults.style.display = 'block';
         count.textContent = '';
+        if (pastJump) pastJump.style.display = 'none';
       } else {
         const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
         const mons = ['January','February','March','April','May','June','July','August','September','October','November','December'];
         let html = '';
         let lastDate = null;
         let dayCards = [];
+        let pastInserted = false;
 
         function flushDay() {
           if (!lastDate) return;
@@ -1178,6 +1446,15 @@
         }
 
         filtered.forEach(g => {
+          if (!pastInserted && scoreStateFor(g)?.state === 'post') {
+            flushDay();
+            lastDate = null;
+            html += `<div class="browse-date-header past-games-anchor" id="pastGamesSection">
+              <span class="browse-date-label">Past games</span>
+              <span class="browse-date-count">${doneCount} final result${doneCount > 1 ? 's' : ''}</span>
+            </div>`;
+            pastInserted = true;
+          }
           if (g.date !== lastDate) { flushDay(); lastDate = g.date; }
           dayCards.push(createGameCard(g));
         });
@@ -1186,6 +1463,10 @@
         container.innerHTML = html;
         noResults.style.display = 'none';
         count.textContent = `Showing ${filtered.length} of ${GAMES.length} matches`;
+        if (pastJump && pastCount) {
+          pastCount.textContent = doneCount;
+          pastJump.style.display = doneCount ? 'inline-flex' : 'none';
+        }
       }
     }
 
@@ -1201,6 +1482,11 @@
     document.getElementById('typeFilter').addEventListener('change', applyFilters);
 
     applyFilters();
+    refreshBrowseScores();
+    setInterval(refreshBrowseScores, 45000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshBrowseScores();
+    });
 
     // ── Small calendar popup (date filter) ────────
     function openCalPopup()  { renderCalPopup(); document.getElementById('calBackdrop').classList.add('open'); }

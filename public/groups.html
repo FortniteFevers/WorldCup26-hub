@@ -54,15 +54,48 @@
       color: var(--text-muted);
       font-weight: 500;
     }
+    .group-dates.live {
+      color: #ef4444;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.16);
+      flex-shrink: 0;
+      animation: livePulse 1.4s ease-in-out infinite;
+    }
+    @keyframes livePulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.72); opacity: 0.72; }
+    }
 
     /* Standings table */
+    .standings-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .standings-scroll::-webkit-scrollbar { height: 4px; }
+    .standings-scroll::-webkit-scrollbar-track { background: transparent; }
+    .standings-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
     .standings-tbl {
       width: 100%;
+      min-width: 430px;
       border-collapse: collapse;
       font-size: 0.82rem;
+      table-layout: fixed;
     }
+    .standings-tbl th:first-child,
+    .standings-tbl td:first-child { width: 42%; }
+    .standings-tbl th:not(:first-child),
+    .standings-tbl td:not(:first-child) { width: 8.3%; }
     .standings-tbl th {
-      padding: 0.45rem 0.6rem;
+      padding: 0.45rem 0.35rem;
       font-size: 0.6rem;
       font-weight: 700;
       text-transform: uppercase;
@@ -73,7 +106,7 @@
     }
     .standings-tbl th:first-child { text-align: left; padding-left: 1rem; }
     .standings-tbl td {
-      padding: 0.6rem 0.6rem;
+      padding: 0.6rem 0.35rem;
       text-align: center;
       color: var(--text-secondary);
       border-top: 1px solid var(--border);
@@ -100,12 +133,29 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      min-width: 0;
+    }
+    .team-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .team-pos {
       font-size: 0.62rem;
       color: var(--text-muted);
       font-weight: 500;
       min-width: 12px;
+      flex-shrink: 0;
+    }
+    @media (max-width: 420px) {
+      .standings-tbl { min-width: 390px; font-size: 0.78rem; }
+      .standings-tbl th:first-child,
+      .standings-tbl td:first-child { width: 39%; }
+      .standings-tbl th:not(:first-child),
+      .standings-tbl td:not(:first-child) { width: 8.7%; }
+      .standings-tbl th:first-child,
+      .standings-tbl td:first-child { padding-left: 0.75rem; }
+      .team-cell { gap: 0.35rem; }
     }
 
     /* Group matches section */
@@ -131,6 +181,18 @@
       font-size: 0.75rem;
     }
     .group-match-row:last-child { border-bottom: none; }
+    .group-match-row.is-live {
+      margin: 0.2rem -0.35rem;
+      padding: 0.45rem 0.35rem;
+      border-radius: 10px;
+      border-bottom: 0;
+      background: rgba(239,68,68,0.08);
+      box-shadow: inset 0 0 0 1px rgba(239,68,68,0.18);
+    }
+    .group-match-row.is-final {
+      opacity: 0.55;
+      filter: grayscale(0.25);
+    }
     .group-match-teams {
       flex: 1;
       font-weight: 600;
@@ -142,6 +204,31 @@
       font-size: 0.65rem;
       color: var(--text-muted);
       white-space: nowrap;
+    }
+    .group-match-score {
+      font-size: 0.78rem;
+      font-weight: 900;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .group-match-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.28rem;
+      font-size: 0.62rem;
+      font-weight: 850;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .group-match-status.live {
+      color: #ef4444;
+      text-decoration: none;
+    }
+    .group-match-status.live:hover {
+      color: #ff6b6f;
     }
 
     /* Pre-tournament notice */
@@ -158,6 +245,11 @@
       color: var(--text-secondary);
     }
     .pre-tournament-banner strong { color: var(--gold); }
+    .pre-tournament-banner.live {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.24);
+    }
+    .pre-tournament-banner.live strong { color: #ef4444; }
 
     /* Advance key */
     .advance-key {
@@ -280,7 +372,7 @@
 
     <!-- Group filter -->
     <div class="group-filters" id="groupFilters">
-      <button class="group-filter-btn active" onclick="filterGroup('all', this)">All Groups</button>
+      <button class="group-filter-btn active" data-group="all" onclick="filterGroup('all', this)">All Groups</button>
     </div>
 
     <!-- Groups grid -->
@@ -319,6 +411,173 @@
       renderAll(); // re-render once ratings are loaded
     }).catch(()=>{});
 
+    // ── ESPN live data ───────────────────────────────────
+    const STANDINGS_URL = 'https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026';
+    const SCOREBOARD_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+    let ESPN_STANDINGS = {};
+    let LIVE_MATCHES = {};
+    let currentGroupFilter = 'all';
+
+    function dateCompact(dateStr) {
+      return dateStr.replace(/-/g, '');
+    }
+
+    function parseGameDateTime(game) {
+      const clean = game.time.split('(')[0].trim();
+      const match = clean.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!match) return new Date(game.date + 'T12:00:00-04:00');
+      let h = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10);
+      const mer = match[3].toUpperCase();
+      if (mer === 'PM' && h !== 12) h += 12;
+      if (mer === 'AM' && h === 12) h = 0;
+      return new Date(`${game.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00-04:00`);
+    }
+
+    function normalizeTeamName(name) {
+      return String(name || '')
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, 'and')
+        .replace(/\./g, '')
+        .replace(/\busa\b/g, 'united states')
+        .replace(/\bturkiye\b/g, 'turkey')
+        .replace(/\bbosnia and herz\b/g, 'bosnia and herzegovina')
+        .replace(/\bcape verde islands\b/g, 'cape verde')
+        .replace(/\bcote d ivoire\b/g, 'ivory coast')
+        .replace(/\bcongo dr\b/g, 'dr congo')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function localTeamName(name) {
+      const n = normalizeTeamName(name);
+      const map = {
+        'united states': 'USA',
+        'turkey': 'Türkiye',
+        'bosnia and herzegovina': 'Bosnia & Herz.',
+        'cape verde': 'Cape Verde',
+        'cape verde islands': 'Cape Verde',
+        'cote d ivoire': 'Ivory Coast',
+        'ivory coast': 'Ivory Coast',
+        'curacao': 'Curaçao',
+        'dr congo': 'DR Congo',
+        'congo dr': 'DR Congo',
+      };
+      if (map[n]) return map[n];
+      return Object.values(GROUPS).flat().find(t => normalizeTeamName(t) === n) || name;
+    }
+
+    function eventTeams(event) {
+      const comp = event.competitions?.[0] || {};
+      const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
+      const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
+      return { home, away };
+    }
+
+    function competitorNames(comp) {
+      return [
+        comp?.team?.displayName,
+        comp?.team?.shortDisplayName,
+        comp?.team?.name,
+        comp?.team?.abbreviation,
+      ].map(normalizeTeamName).filter(Boolean);
+    }
+
+    function eventMatchesGame(event, game) {
+      const { home, away } = eventTeams(event);
+      const names = [...competitorNames(home), ...competitorNames(away)];
+      return names.includes(normalizeTeamName(game.team1)) && names.includes(normalizeTeamName(game.team2));
+    }
+
+    function competitorMatchesTeam(comp, team) {
+      return competitorNames(comp).includes(normalizeTeamName(team));
+    }
+
+    function getGroupMatchState(game) {
+      return LIVE_MATCHES[game.id] || null;
+    }
+
+    async function fetchEspnStandings() {
+      const json = await fetch(STANDINGS_URL).then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      });
+      const next = {};
+      (json.children || []).forEach(group => {
+        const letter = (group.name || '').match(/group\s+([a-l])/i)?.[1]?.toUpperCase();
+        if (!letter) return;
+        next[letter] = (group.standings?.entries || []).map((entry, i) => {
+          const stats = {};
+          (entry.stats || []).forEach(s => stats[s.name] = s.displayValue);
+          const name = localTeamName(entry.team?.displayName || entry.team?.shortDisplayName || entry.team?.name);
+          return {
+            name,
+            gp: stats.gamesPlayed ?? 0,
+            w: stats.wins ?? 0,
+            d: stats.ties ?? 0,
+            l: stats.losses ?? 0,
+            gf: stats.pointsFor ?? 0,
+            ga: stats.pointsAgainst ?? 0,
+            gd: stats.pointDifferential ?? 0,
+            pts: stats.points ?? 0,
+            rank: i + 1,
+          };
+        });
+      });
+      ESPN_STANDINGS = next;
+    }
+
+    async function fetchEspnMatches() {
+      const groupGames = GAMES.filter(g => g.type === 'Group');
+      const start = groupGames[0].date;
+      const end = groupGames[groupGames.length - 1].date;
+      const json = await fetch(`${SCOREBOARD_URL}?dates=${dateCompact(start)}-${dateCompact(end)}`).then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      });
+      const next = {};
+      (json.events || []).forEach(event => {
+        const st = event.status?.type || {};
+        const eventTime = event.date ? new Date(event.date) : null;
+        const game = groupGames.find(g => {
+          if (!eventMatchesGame(event, g)) return false;
+          if (!eventTime || Number.isNaN(eventTime.getTime())) return true;
+          return Math.abs(eventTime - parseGameDateTime(g)) < 12 * 60 * 60 * 1000;
+        });
+        if (!game) return;
+        const { home, away } = eventTeams(event);
+        const team1IsHome = competitorMatchesTeam(home, game.team1);
+        next[game.id] = {
+          state: st.state,
+          displayClock: event.status?.displayClock || '',
+          shortDetail: st.shortDetail || st.description || '',
+          team1Score: team1IsHome ? home.score : away.score,
+          team2Score: team1IsHome ? away.score : home.score,
+        };
+      });
+      LIVE_MATCHES = next;
+    }
+
+    async function refreshGroupsData() {
+      const banner = document.getElementById('tournamentBanner');
+      if (banner) {
+        banner.classList.add('live');
+        banner.innerHTML = '<span class="live-dot"></span><div><strong>Loading live group data...</strong> Standings and match results update automatically.</div>';
+      }
+      const results = await Promise.allSettled([fetchEspnStandings(), fetchEspnMatches()]);
+      const ok = results.some(r => r.status === 'fulfilled');
+      renderAll();
+      filterGroup(currentGroupFilter, document.querySelector(`.group-filter-btn[data-group="${currentGroupFilter}"]`) || document.querySelector('.group-filter-btn'));
+      if (banner) {
+        const updated = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        banner.classList.toggle('live', ok);
+        banner.innerHTML = ok
+          ? `<span class="live-dot"></span><div><strong>Live group data active.</strong> Standings and match results update automatically. Updated ${updated}.</div>`
+          : '<span style="font-size:1.3rem;">⏳</span><div><strong>Using local group data.</strong> Live standings could not be reached; retrying automatically.</div>';
+      }
+    }
+
     // ── Get group stage matches only ──────────────────────
     function getGroupMatches(group) {
       return GAMES.filter(g => g.type === 'Group' && getTeamGroup(g.team1) === group);
@@ -327,13 +586,28 @@
     // ── Compute standings from match results ──────────────
     // For now all are 0 (pre-tournament). Structure is ready for real data.
     function computeStandings(group) {
+      if (ESPN_STANDINGS[group]?.length) return ESPN_STANDINGS[group];
+
       const teams = GROUPS[group];
       const matches = getGroupMatches(group);
       const table = {};
       teams.forEach(t => { table[t] = { gp:0, w:0, d:0, l:0, gf:0, ga:0, pts:0 }; });
 
-      // In a live site you'd parse actual scores here.
-      // For now all start at 0.
+      matches.forEach(match => {
+        const state = getGroupMatchState(match);
+        if (!state || state.state !== 'post') return;
+        const s1 = Number(state.team1Score);
+        const s2 = Number(state.team2Score);
+        if (!Number.isFinite(s1) || !Number.isFinite(s2)) return;
+        const a = table[match.team1], b = table[match.team2];
+        if (!a || !b) return;
+        a.gp++; b.gp++;
+        a.gf += s1; a.ga += s2;
+        b.gf += s2; b.ga += s1;
+        if (s1 > s2) { a.w++; b.l++; a.pts += 3; }
+        else if (s2 > s1) { b.w++; a.l++; b.pts += 3; }
+        else { a.d++; b.d++; a.pts++; b.pts++; }
+      });
 
       return teams.map(t => ({ name: t, ...table[t], gd: table[t].gf - table[t].ga }))
         .sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name));
@@ -352,6 +626,7 @@
     function renderGroup(group) {
       const standings = computeStandings(group);
       const matches = getGroupMatches(group);
+      const hasLive = matches.some(g => getGroupMatchState(g)?.state === 'in');
 
       const rows = standings.map((team, i) => {
         const cls = i < 2 ? 'advance' : i === 2 ? 'third-place' : '';
@@ -364,7 +639,7 @@
             <div class="team-cell">
               <span class="team-pos">${i+1}</span>
               <span>${getFlag(team.name)}</span>
-              <span>${team.name}</span>
+              <span class="team-name" title="${team.name}">${team.name}</span>
             </div>
           </td>
           <td>${team.gp}</td>
@@ -377,13 +652,23 @@
         </tr>`;
       }).join('');
 
-      const matchRows = matches.slice(0, 3).map(g => `
-        <div class="group-match-row">
-          <div class="group-match-teams">${getFlag(g.team1)} ${g.team1} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${g.team2} ${getFlag(g.team2)}</div>
-          <div class="group-match-date">${formatDate(g.date)} · ${g.time} ET</div>
-        </div>`).join('');
-
-      const extra = matches.length - 3;
+      const matchRows = matches.map(g => {
+        const state = getGroupMatchState(g);
+        const isLive = state?.state === 'in';
+        const isFinal = state?.state === 'post';
+        const middle = state && (isLive || isFinal)
+          ? `<span class="group-match-score">${state.team1Score ?? 0}–${state.team2Score ?? 0}</span>`
+          : '<span style="color:var(--text-muted);font-weight:400;">vs</span>';
+        const status = isLive
+          ? `<a class="group-match-status live" href="/live"><span class="live-dot"></span>${state.displayClock || 'Live'}</a>`
+          : isFinal
+            ? `<span class="group-match-status">${state.shortDetail || 'Final'}</span>`
+            : `<span class="group-match-date">${formatDate(g.date)} · ${g.time} ET</span>`;
+        return `<div class="group-match-row ${isLive ? 'is-live' : ''} ${isFinal ? 'is-final' : ''}">
+          <div class="group-match-teams">${getFlag(g.team1)} ${g.team1} ${middle} ${g.team2} ${getFlag(g.team2)}</div>
+          ${status}
+        </div>`;
+      }).join('');
 
       return `<div class="group-card" data-group="${group}">
         <div class="group-card-header">
@@ -391,27 +676,28 @@
             <div class="group-label">Group</div>
             <div class="group-letter">${group}</div>
           </div>
-          <div class="group-dates">${groupDateRange(group)}</div>
+          <div class="group-dates ${hasLive ? 'live' : ''}">${hasLive ? '<span class="live-dot"></span>Live now' : groupDateRange(group)}</div>
         </div>
-        <table class="standings-tbl">
-          <thead>
-            <tr>
-              <th>Team</th>
-              <th title="Games Played">GP</th>
-              <th title="Wins">W</th>
-              <th title="Draws">D</th>
-              <th title="Losses">L</th>
-              <th title="Goal Difference">GD</th>
-              <th title="Points">Pts</th>
-              <th title="FC26 Average Overall Rating">OVR</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
+        <div class="standings-scroll">
+          <table class="standings-tbl">
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th title="Games Played">GP</th>
+                <th title="Wins">W</th>
+                <th title="Draws">D</th>
+                <th title="Losses">L</th>
+                <th title="Goal Difference">GD</th>
+                <th title="Points">Pts</th>
+                <th title="FC26 Average Overall Rating">OVR</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
         <div class="group-matches">
           <div class="group-matches-title">Matchday schedule</div>
           ${matchRows}
-          ${extra > 0 ? `<div style="font-size:0.68rem;color:var(--text-muted);padding-top:0.35rem;">+ ${extra} more match${extra>1?'es':''} · <a href="/games" style="color:var(--gold);text-decoration:none;">see full schedule →</a></div>` : ''}
         </div>
       </div>`;
     }
@@ -421,6 +707,7 @@
     Object.keys(GROUPS).forEach(g => {
       const btn = document.createElement('button');
       btn.className = 'group-filter-btn';
+      btn.dataset.group = g;
       btn.textContent = `Group ${g}`;
       btn.onclick = () => filterGroup(g, btn);
       filterContainer.appendChild(btn);
@@ -435,18 +722,19 @@
 
     // ── Filter function ───────────────────────────────────
     function filterGroup(group, btn) {
+      currentGroupFilter = group;
       document.querySelectorAll('.group-filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      if (btn) btn.classList.add('active');
       document.querySelectorAll('.group-card').forEach(card => {
         card.style.display = (group === 'all' || card.dataset.group === group) ? '' : 'none';
       });
     }
 
-    // ── Hide pre-tournament banner after tourney starts ───
-    const TOURNEY_START = new Date('2026-06-11T19:00:00Z');
-    if (Date.now() >= TOURNEY_START) {
-      document.getElementById('tournamentBanner').style.display = 'none';
-    }
+    refreshGroupsData();
+    setInterval(refreshGroupsData, 45000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshGroupsData();
+    });
   </script>
 </body>
 </html>

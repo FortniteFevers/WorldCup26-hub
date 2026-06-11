@@ -12,6 +12,74 @@
   <script src="auth.js" defer></script>
   <script defer src="/_vercel/insights/script.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3163564306385316" crossorigin="anonymous"></script>
+  <style>
+    .live-data-banner {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.24);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: -0.75rem 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .live-data-banner strong { color: #ef4444; }
+    .live-data-banner.loading {
+      background: var(--gold-dim);
+      border-color: rgba(245,200,66,0.25);
+    }
+    .live-data-banner.loading strong { color: var(--gold); }
+    .live-data-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.16);
+      flex-shrink: 0;
+      animation: liveDataPulse 1.4s ease-in-out infinite;
+    }
+    .live-data-banner.loading .live-data-dot {
+      background: var(--gold);
+      box-shadow: 0 0 0 4px rgba(245,200,66,0.14);
+    }
+    @keyframes liveDataPulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.72); opacity: 0.72; }
+    }
+    .team-match-row {
+      background: var(--input-bg);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.82rem;
+      border: 1px solid var(--border);
+    }
+    .team-match-row.is-live {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.26);
+    }
+    .team-match-row.is-final {
+      opacity: 0.62;
+      filter: grayscale(0.25);
+    }
+    .team-match-meta {
+      color: var(--gold);
+      font-weight: 600;
+      font-size: 0.72rem;
+    }
+    .team-match-meta.live {
+      color: #ef4444;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .team-match-score {
+      font-weight: 900;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
 </head>
 <body>
   <!-- Announce bar -->
@@ -75,6 +143,11 @@
       <div class="api-status ok" id="apiStatus" style="min-width:220px;text-align:right;"></div>
     </div>
 
+    <div class="live-data-banner loading" id="liveDataBanner">
+      <span class="live-data-dot"></span>
+      <div><strong>Loading live team data...</strong> Match results and team schedules update automatically.</div>
+    </div>
+
     <!-- Filters -->
     <div class="filters" style="margin-bottom:1.5rem;">
       <input type="text" id="searchTeam" class="filter-input" placeholder="🔍  Search teams…">
@@ -125,9 +198,11 @@
     requestAnimationFrame(raf);
 
     const BUNDLED_SQUADS_URL = 'football-data/wc-2026-teams.json';
+    const SCOREBOARD_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
 
     let teamsData = {};   // teamName → { squad:[], apiId }
     let wcTeams   = [];   // raw API team objects
+    let liveMatchByGameId = {};
 
     // ── FC26 data ────────────────────────────────────
     let FC26_TEAM_STATS = {};
@@ -158,6 +233,114 @@
 
     // ── Helpers ─────────────────────────────────────────
     function normName(s) { return (s||'').toLowerCase().replace(/[^a-z]/g,''); }
+    function dateCompact(dateStr) { return dateStr.replace(/-/g, ''); }
+
+    function parseGameDateTime(game) {
+      const clean = game.time.split('(')[0].trim();
+      const match = clean.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!match) return new Date(game.date + 'T12:00:00-04:00');
+      let h = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10);
+      const mer = match[3].toUpperCase();
+      if (mer === 'PM' && h !== 12) h += 12;
+      if (mer === 'AM' && h === 12) h = 0;
+      return new Date(`${game.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00-04:00`);
+    }
+
+    function normalizeTeamName(name) {
+      return String(name || '')
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, 'and')
+        .replace(/\./g, '')
+        .replace(/\busa\b/g, 'united states')
+        .replace(/\bturkiye\b/g, 'turkey')
+        .replace(/\bbosnia and herz\b/g, 'bosnia and herzegovina')
+        .replace(/\bcape verde islands\b/g, 'cape verde')
+        .replace(/\bcote d ivoire\b/g, 'ivory coast')
+        .replace(/\bcongo dr\b/g, 'dr congo')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function eventTeams(event) {
+      const comp = event.competitions?.[0] || {};
+      const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
+      const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
+      return { home, away };
+    }
+
+    function competitorNames(comp) {
+      return [
+        comp?.team?.displayName,
+        comp?.team?.shortDisplayName,
+        comp?.team?.name,
+        comp?.team?.abbreviation,
+      ].map(normalizeTeamName).filter(Boolean);
+    }
+
+    function eventMatchesGame(event, game) {
+      const { home, away } = eventTeams(event);
+      const names = [...competitorNames(home), ...competitorNames(away)];
+      return names.includes(normalizeTeamName(game.team1)) && names.includes(normalizeTeamName(game.team2));
+    }
+
+    function competitorMatchesTeam(comp, team) {
+      return competitorNames(comp).includes(normalizeTeamName(team));
+    }
+
+    function getTeamMatchState(game) {
+      return liveMatchByGameId[game.id] || null;
+    }
+
+    function setLiveDataBanner(ok, loading = false) {
+      const banner = document.getElementById('liveDataBanner');
+      if (!banner) return;
+      const updated = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      banner.classList.toggle('loading', loading);
+      banner.innerHTML = loading
+        ? '<span class="live-data-dot"></span><div><strong>Loading live team data...</strong> Match results and team schedules update automatically.</div>'
+        : ok
+          ? `<span class="live-data-dot"></span><div><strong>Live team data active.</strong> Match results and team schedules update automatically. Updated ${updated}.</div>`
+          : '<span class="live-data-dot"></span><div><strong>Using local team data.</strong> Live match results could not be reached; retrying automatically.</div>';
+    }
+
+    async function refreshTeamLiveData() {
+      try {
+        setLiveDataBanner(false, true);
+        const start = GAMES[0].date;
+        const end = GAMES[GAMES.length - 1].date;
+        const res = await fetch(`${SCOREBOARD_URL}?dates=${dateCompact(start)}-${dateCompact(end)}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        const next = {};
+        (json.events || []).forEach(event => {
+          const st = event.status?.type || {};
+          if (st.state !== 'in' && st.state !== 'post') return;
+          const eventTime = event.date ? new Date(event.date) : null;
+          const game = GAMES.find(g => {
+            if (!eventMatchesGame(event, g)) return false;
+            if (!eventTime || Number.isNaN(eventTime.getTime())) return true;
+            return Math.abs(eventTime - parseGameDateTime(g)) < 12 * 60 * 60 * 1000;
+          });
+          if (!game) return;
+          const { home, away } = eventTeams(event);
+          const team1IsHome = competitorMatchesTeam(home, game.team1);
+          next[game.id] = {
+            state: st.state,
+            displayClock: event.status?.displayClock || '',
+            shortDetail: st.shortDetail || st.description || '',
+            team1Score: team1IsHome ? home.score : away.score,
+            team2Score: team1IsHome ? away.score : home.score,
+          };
+        });
+        liveMatchByGameId = next;
+        setLiveDataBanner(true);
+      } catch (err) {
+        console.warn('Team live data fetch failed:', err);
+        setLiveDataBanner(false);
+      }
+    }
 
     // Map API team object → our internal team name
     function matchName(apiTeam) {
@@ -340,9 +523,20 @@
           <div style="display:flex;flex-direction:column;gap:0.5rem;">
             ${teamGames.map(g => {
               const opp = g.team1 === teamName ? g.team2 : g.team1;
-              return `<div style="background:var(--input-bg);border-radius:8px;padding:0.6rem 0.85rem;font-size:0.82rem;border:1px solid var(--border);">
-                <span style="color:var(--gold);font-weight:600;font-size:0.72rem;">${formatDate(g.date)} · ${g.time} ET</span>
-                <div style="margin-top:0.2rem;font-weight:500;">vs ${getFlag(opp)} ${opp} &nbsp;·&nbsp; <span style="color:var(--text-muted);">${g.stadium}</span></div>
+              const state = getTeamMatchState(g);
+              const isLive = state?.state === 'in';
+              const isFinal = state?.state === 'post';
+              const score = state && (isLive || isFinal)
+                ? `<span class="team-match-score">${state.team1Score ?? 0}–${state.team2Score ?? 0}</span>`
+                : 'vs';
+              const meta = isLive
+                ? `<a class="team-match-meta live" href="/live"><span class="live-data-dot"></span>${state.displayClock || 'Live'}</a>`
+                : isFinal
+                  ? `<span class="team-match-meta">${state.shortDetail || 'Final'}</span>`
+                  : `<span class="team-match-meta">${formatDate(g.date)} · ${g.time} ET</span>`;
+              return `<div class="team-match-row ${isLive ? 'is-live' : ''} ${isFinal ? 'is-final' : ''}">
+                ${meta}
+                <div style="margin-top:0.2rem;font-weight:500;">${getFlag(g.team1)} ${g.team1} ${score} ${g.team2} ${getFlag(g.team2)} &nbsp;·&nbsp; <span style="color:var(--text-muted);">${g.stadium}</span></div>
               </div>`;
             }).join('')}
           </div>
@@ -493,6 +687,11 @@
         setStatus('Roster data unavailable', 'err');
       }
       renderTeams();
+      refreshTeamLiveData();
+      setInterval(refreshTeamLiveData, 45000);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) refreshTeamLiveData();
+      });
     }
 
     initTeamsPage();
