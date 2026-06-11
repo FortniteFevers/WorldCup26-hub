@@ -91,6 +91,51 @@
     }
     .date-btn:hover { border-color: var(--border-bright); color: var(--text-primary); }
     .date-btn.active { border-color: rgba(245,200,66,0.5); color: var(--gold); background: var(--gold-dim); }
+    .live-data-banner {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.24);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: -0.6rem 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .live-data-banner strong { color: #ef4444; }
+    .live-data-banner.loading {
+      background: var(--gold-dim);
+      border-color: rgba(245,200,66,0.25);
+    }
+    .live-data-banner.loading strong { color: var(--gold); }
+    .live-data-banner.unavailable {
+      background: var(--bg-card);
+      border-color: var(--border);
+    }
+    .live-data-banner.unavailable strong { color: var(--text-muted); }
+    .live-data-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.16);
+      flex-shrink: 0;
+      animation: liveDataPulse 1.4s ease-in-out infinite;
+    }
+    .live-data-banner.loading .live-data-dot {
+      background: var(--gold);
+      box-shadow: 0 0 0 4px rgba(245,200,66,0.14);
+    }
+    .live-data-banner.unavailable .live-data-dot {
+      background: var(--text-muted);
+      box-shadow: 0 0 0 4px rgba(148,163,184,0.12);
+      animation: none;
+    }
+    @keyframes liveDataPulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.72); opacity: 0.72; }
+    }
     .browse-status-row {
       display: flex;
       align-items: center;
@@ -712,6 +757,11 @@
       <button class="view-tab" id="tabVenues" onclick="setView('venues')">📍 Venues</button>
     </div>
 
+    <div class="live-data-banner loading" id="browseLiveDataBanner">
+      <span class="live-data-dot"></span>
+      <div><strong>Checking live match data.</strong> Scores and match statuses update automatically.</div>
+    </div>
+
     <!-- ══════════ BROWSE VIEW ══════════ -->
     <div id="viewBrowse">
       <div class="filters">
@@ -1022,6 +1072,22 @@
       return liveScoreByGameId[game.id] || null;
     }
 
+    function setBrowseLiveBanner(status) {
+      const banner = document.getElementById('browseLiveDataBanner');
+      if (!banner) return;
+      const updated = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      if (status === 'active') {
+        banner.className = 'live-data-banner';
+        banner.innerHTML = `<span class="live-data-dot"></span><div><strong>Live match data active.</strong> Scores and match statuses update automatically. Updated ${updated}.</div>`;
+      } else if (status === 'unavailable') {
+        banner.className = 'live-data-banner unavailable';
+        banner.innerHTML = `<span class="live-data-dot"></span><div><strong>Live match data unavailable.</strong> Showing the saved tournament schedule.</div>`;
+      } else {
+        banner.className = 'live-data-banner loading';
+        banner.innerHTML = `<span class="live-data-dot"></span><div><strong>Checking live match data.</strong> Scores and match statuses update automatically.</div>`;
+      }
+    }
+
     async function refreshBrowseScores() {
       try {
         const start = selectedDate || GAMES[0].date;
@@ -1053,10 +1119,12 @@
         });
         liveScoreByGameId = next;
         liveScoresLoaded = true;
+        setBrowseLiveBanner('active');
         applyFilters();
       } catch (err) {
         console.warn('Browse score fetch failed:', err);
         liveScoresLoaded = true;
+        setBrowseLiveBanner('unavailable');
       }
     }
 

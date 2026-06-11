@@ -57,131 +57,176 @@ function getTeamGroup(team) {
 
 const GAMES = [
   // ── June 11 ──
-  { id: 1,  date: '2026-06-11', time: '3:00 PM',  team1: 'Mexico',      team2: 'South Africa', stadium: 'Estadio Azteca',                type: 'Group' },
-  { id: 2,  date: '2026-06-11', time: '10:00 PM', team1: 'South Korea', team2: 'Czechia',       stadium: 'Estadio Guadalajara',           type: 'Group' },
+  { id: 1 , date: '2026-06-11', time: '3:00 PM' , team1: 'Mexico'        , team2: 'South Africa'  , stadium: 'Estadio Azteca'                   , type: 'Group' },
+  { id: 2 , date: '2026-06-11', time: '10:00 PM', team1: 'South Korea'   , team2: 'Czechia'       , stadium: 'Estadio Guadalajara'              , type: 'Group' },
+
   // ── June 12 ──
-  { id: 3,  date: '2026-06-12', time: '3:00 PM',  team1: 'Canada',      team2: 'Bosnia & Herz.',stadium: 'BMO Field',                     type: 'Group' },
-  { id: 4,  date: '2026-06-12', time: '9:00 PM',  team1: 'USA',         team2: 'Paraguay',      stadium: 'Los Angeles Stadium',           type: 'Group' },
+  { id: 3 , date: '2026-06-12', time: '3:00 PM' , team1: 'Canada'        , team2: 'Bosnia & Herz.', stadium: 'BMO Field'                        , type: 'Group' },
+  { id: 4 , date: '2026-06-12', time: '9:00 PM' , team1: 'USA'           , team2: 'Paraguay'      , stadium: 'Los Angeles Stadium'              , type: 'Group' },
+
   // ── June 13 ──
-  { id: 5,  date: '2026-06-13', time: '3:00 PM',  team1: 'Qatar',       team2: 'Switzerland',   stadium: 'San Francisco Bay Area Stadium',type: 'Group' },
-  { id: 6,  date: '2026-06-13', time: '6:00 PM',  team1: 'Brazil',      team2: 'Morocco',       stadium: 'MetLife Stadium',               type: 'Group' },
-  { id: 7,  date: '2026-06-13', time: '9:00 PM',  team1: 'Haiti',       team2: 'Scotland',      stadium: 'Boston Stadium',                type: 'Group' },
-  { id: 8,  date: '2026-06-14', time: '12:00 AM', team1: 'Australia',   team2: 'Türkiye',       stadium: 'BC Place',                      type: 'Group' },
+  { id: 5 , date: '2026-06-13', time: '3:00 PM' , team1: 'Qatar'         , team2: 'Switzerland'   , stadium: 'San Francisco Bay Area Stadium'   , type: 'Group' },
+  { id: 6 , date: '2026-06-13', time: '6:00 PM' , team1: 'Brazil'        , team2: 'Morocco'       , stadium: 'MetLife Stadium'                  , type: 'Group' },
+  { id: 7 , date: '2026-06-13', time: '9:00 PM' , team1: 'Haiti'         , team2: 'Scotland'      , stadium: 'Boston Stadium'                   , type: 'Group' },
+
   // ── June 14 ──
-  { id: 9,  date: '2026-06-14', time: '1:00 PM',  team1: 'Germany',     team2: 'Curaçao',       stadium: 'Houston Stadium',               type: 'Group' },
-  { id: 10, date: '2026-06-14', time: '4:00 PM',  team1: 'Netherlands', team2: 'Japan',         stadium: 'Dallas Stadium',                type: 'Group' },
-  { id: 11, date: '2026-06-14', time: '7:00 PM',  team1: 'Ivory Coast', team2: 'Ecuador',       stadium: 'Lincoln Financial Field',       type: 'Group' },
-  { id: 12, date: '2026-06-14', time: '10:00 PM', team1: 'Sweden',      team2: 'Tunisia',       stadium: 'Estadio Monterrey',             type: 'Group' },
+  { id: 8 , date: '2026-06-14', time: '12:00 AM', team1: 'Australia'     , team2: 'Türkiye'       , stadium: 'BC Place'                         , type: 'Group' },
+  { id: 9 , date: '2026-06-14', time: '1:00 PM' , team1: 'Germany'       , team2: 'Curaçao'       , stadium: 'Houston Stadium'                  , type: 'Group' },
+  { id: 10, date: '2026-06-14', time: '4:00 PM' , team1: 'Netherlands'   , team2: 'Japan'         , stadium: 'Dallas Stadium'                   , type: 'Group' },
+  { id: 11, date: '2026-06-14', time: '7:00 PM' , team1: 'Ivory Coast'   , team2: 'Ecuador'       , stadium: 'Lincoln Financial Field'          , type: 'Group' },
+  { id: 12, date: '2026-06-14', time: '10:00 PM', team1: 'Sweden'        , team2: 'Tunisia'       , stadium: 'Estadio Monterrey'                , type: 'Group' },
+
   // ── June 15 ──
-  { id: 13, date: '2026-06-15', time: '12:00 PM', team1: 'Spain',       team2: 'Cape Verde',    stadium: 'Atlanta Stadium',               type: 'Group' },
-  { id: 14, date: '2026-06-15', time: '3:00 PM',  team1: 'Belgium',     team2: 'Egypt',         stadium: 'Seattle Stadium',               type: 'Group' },
-  { id: 15, date: '2026-06-15', time: '6:00 PM',  team1: 'Saudi Arabia',team2: 'Uruguay',       stadium: 'Miami Stadium',                 type: 'Group' },
-  { id: 16, date: '2026-06-15', time: '9:00 PM',  team1: 'Iran',        team2: 'New Zealand',   stadium: 'Los Angeles Stadium',           type: 'Group' },
+  { id: 13, date: '2026-06-15', time: '12:00 PM', team1: 'Spain'         , team2: 'Cape Verde'    , stadium: 'Atlanta Stadium'                  , type: 'Group' },
+  { id: 14, date: '2026-06-15', time: '3:00 PM' , team1: 'Belgium'       , team2: 'Egypt'         , stadium: 'Seattle Stadium'                  , type: 'Group' },
+  { id: 15, date: '2026-06-15', time: '6:00 PM' , team1: 'Saudi Arabia'  , team2: 'Uruguay'       , stadium: 'Miami Stadium'                    , type: 'Group' },
+  { id: 16, date: '2026-06-15', time: '9:00 PM' , team1: 'Iran'          , team2: 'New Zealand'   , stadium: 'Los Angeles Stadium'              , type: 'Group' },
+
   // ── June 16 ──
-  { id: 17, date: '2026-06-16', time: '3:00 PM',  team1: 'France',      team2: 'Senegal',       stadium: 'MetLife Stadium',               type: 'Group' },
-  { id: 18, date: '2026-06-16', time: '6:00 PM',  team1: 'Iraq',        team2: 'Norway',        stadium: 'Boston Stadium',                type: 'Group' },
-  { id: 19, date: '2026-06-16', time: '9:00 PM',  team1: 'Argentina',   team2: 'Algeria',       stadium: 'Kansas City Stadium',           type: 'Group' },
-  { id: 20, date: '2026-06-17', time: '12:00 AM', team1: 'Austria',     team2: 'Jordan',        stadium: 'San Francisco Bay Area Stadium',type: 'Group' },
+  { id: 17, date: '2026-06-16', time: '3:00 PM' , team1: 'France'        , team2: 'Senegal'       , stadium: 'MetLife Stadium'                  , type: 'Group' },
+  { id: 18, date: '2026-06-16', time: '6:00 PM' , team1: 'Iraq'          , team2: 'Norway'        , stadium: 'Boston Stadium'                   , type: 'Group' },
+  { id: 19, date: '2026-06-16', time: '9:00 PM' , team1: 'Argentina'     , team2: 'Algeria'       , stadium: 'Kansas City Stadium'              , type: 'Group' },
+
   // ── June 17 ──
-  { id: 21, date: '2026-06-17', time: '1:00 PM',  team1: 'Portugal',    team2: 'DR Congo',      stadium: 'Houston Stadium',               type: 'Group' },
-  { id: 22, date: '2026-06-17', time: '4:00 PM',  team1: 'England',     team2: 'Croatia',       stadium: 'Dallas Stadium',                type: 'Group' },
-  { id: 23, date: '2026-06-17', time: '7:00 PM',  team1: 'Ghana',       team2: 'Panama',        stadium: 'BMO Field',                     type: 'Group' },
-  { id: 24, date: '2026-06-17', time: '10:00 PM', team1: 'Uzbekistan',  team2: 'Colombia',      stadium: 'Estadio Azteca',                type: 'Group' },
+  { id: 20, date: '2026-06-17', time: '12:00 AM', team1: 'Austria'       , team2: 'Jordan'        , stadium: 'San Francisco Bay Area Stadium'   , type: 'Group' },
+  { id: 21, date: '2026-06-17', time: '1:00 PM' , team1: 'Portugal'      , team2: 'DR Congo'      , stadium: 'Houston Stadium'                  , type: 'Group' },
+  { id: 22, date: '2026-06-17', time: '4:00 PM' , team1: 'England'       , team2: 'Croatia'       , stadium: 'Dallas Stadium'                   , type: 'Group' },
+  { id: 23, date: '2026-06-17', time: '7:00 PM' , team1: 'Ghana'         , team2: 'Panama'        , stadium: 'BMO Field'                        , type: 'Group' },
+  { id: 24, date: '2026-06-17', time: '10:00 PM', team1: 'Uzbekistan'    , team2: 'Colombia'      , stadium: 'Estadio Azteca'                   , type: 'Group' },
+
   // ── June 18 ──
-  { id: 25, date: '2026-06-18', time: '12:00 PM', team1: 'Czechia',     team2: 'South Africa',  stadium: 'Atlanta Stadium',               type: 'Group' },
-  { id: 26, date: '2026-06-18', time: '3:00 PM',  team1: 'Switzerland', team2: 'Bosnia & Herz.',stadium: 'Los Angeles Stadium',           type: 'Group' },
-  { id: 27, date: '2026-06-18', time: '6:00 PM',  team1: 'Canada',      team2: 'Qatar',         stadium: 'BC Place',                      type: 'Group' },
-  { id: 28, date: '2026-06-18', time: '9:00 PM',  team1: 'Mexico',      team2: 'South Korea',   stadium: 'Estadio Guadalajara',           type: 'Group' },
+  { id: 25, date: '2026-06-18', time: '12:00 PM', team1: 'Czechia'       , team2: 'South Africa'  , stadium: 'Atlanta Stadium'                  , type: 'Group' },
+  { id: 26, date: '2026-06-18', time: '3:00 PM' , team1: 'Switzerland'   , team2: 'Bosnia & Herz.', stadium: 'Los Angeles Stadium'              , type: 'Group' },
+  { id: 27, date: '2026-06-18', time: '6:00 PM' , team1: 'Canada'        , team2: 'Qatar'         , stadium: 'BC Place'                         , type: 'Group' },
+  { id: 28, date: '2026-06-18', time: '9:00 PM' , team1: 'Mexico'        , team2: 'South Korea'   , stadium: 'Estadio Guadalajara'              , type: 'Group' },
+
   // ── June 19 ──
-  { id: 29, date: '2026-06-19', time: '3:00 PM',  team1: 'USA',         team2: 'Australia',     stadium: 'Seattle Stadium',               type: 'Group' },
-  { id: 30, date: '2026-06-19', time: '6:00 PM',  team1: 'Scotland',    team2: 'Morocco',       stadium: 'Boston Stadium',                type: 'Group' },
-  { id: 31, date: '2026-06-19', time: '8:30 PM',  team1: 'Brazil',      team2: 'Haiti',         stadium: 'Lincoln Financial Field',       type: 'Group' },
-  { id: 32, date: '2026-06-19', time: '11:00 PM', team1: 'Türkiye',     team2: 'Paraguay',      stadium: 'San Francisco Bay Area Stadium',type: 'Group' },
+  { id: 29, date: '2026-06-19', time: '3:00 PM' , team1: 'USA'           , team2: 'Australia'     , stadium: 'Seattle Stadium'                  , type: 'Group' },
+  { id: 30, date: '2026-06-19', time: '6:00 PM' , team1: 'Scotland'      , team2: 'Morocco'       , stadium: 'Boston Stadium'                   , type: 'Group' },
+  { id: 31, date: '2026-06-19', time: '8:30 PM' , team1: 'Brazil'        , team2: 'Haiti'         , stadium: 'Lincoln Financial Field'          , type: 'Group' },
+  { id: 32, date: '2026-06-19', time: '11:00 PM', team1: 'Türkiye'       , team2: 'Paraguay'      , stadium: 'San Francisco Bay Area Stadium'   , type: 'Group' },
+
   // ── June 20 ──
-  { id: 33, date: '2026-06-20', time: '1:00 PM',  team1: 'Netherlands', team2: 'Sweden',        stadium: 'Houston Stadium',               type: 'Group' },
-  { id: 34, date: '2026-06-20', time: '4:00 PM',  team1: 'Germany',     team2: 'Ivory Coast',   stadium: 'BMO Field',                     type: 'Group' },
-  { id: 35, date: '2026-06-20', time: '8:00 PM',  team1: 'Ecuador',     team2: 'Curaçao',       stadium: 'Kansas City Stadium',           type: 'Group' },
-  { id: 36, date: '2026-06-21', time: '12:00 AM', team1: 'Tunisia',     team2: 'Japan',         stadium: 'Estadio Monterrey',             type: 'Group' },
+  { id: 33, date: '2026-06-20', time: '1:00 PM' , team1: 'Netherlands'   , team2: 'Sweden'        , stadium: 'Houston Stadium'                  , type: 'Group' },
+  { id: 34, date: '2026-06-20', time: '4:00 PM' , team1: 'Germany'       , team2: 'Ivory Coast'   , stadium: 'BMO Field'                        , type: 'Group' },
+  { id: 35, date: '2026-06-20', time: '8:00 PM' , team1: 'Ecuador'       , team2: 'Curaçao'       , stadium: 'Kansas City Stadium'              , type: 'Group' },
+
   // ── June 21 ──
-  { id: 37, date: '2026-06-21', time: '12:00 PM', team1: 'Spain',       team2: 'Saudi Arabia',  stadium: 'Atlanta Stadium',               type: 'Group' },
-  { id: 38, date: '2026-06-21', time: '3:00 PM',  team1: 'Belgium',     team2: 'Iran',          stadium: 'Los Angeles Stadium',           type: 'Group' },
-  { id: 39, date: '2026-06-21', time: '6:00 PM',  team1: 'Uruguay',     team2: 'Cape Verde',    stadium: 'Miami Stadium',                 type: 'Group' },
-  { id: 40, date: '2026-06-21', time: '9:00 PM',  team1: 'New Zealand', team2: 'Egypt',         stadium: 'BC Place',                      type: 'Group' },
+  { id: 36, date: '2026-06-21', time: '12:00 AM', team1: 'Tunisia'       , team2: 'Japan'         , stadium: 'Estadio Monterrey'                , type: 'Group' },
+  { id: 37, date: '2026-06-21', time: '12:00 PM', team1: 'Spain'         , team2: 'Saudi Arabia'  , stadium: 'Atlanta Stadium'                  , type: 'Group' },
+  { id: 38, date: '2026-06-21', time: '3:00 PM' , team1: 'Belgium'       , team2: 'Iran'          , stadium: 'Los Angeles Stadium'              , type: 'Group' },
+  { id: 39, date: '2026-06-21', time: '6:00 PM' , team1: 'Uruguay'       , team2: 'Cape Verde'    , stadium: 'Miami Stadium'                    , type: 'Group' },
+  { id: 40, date: '2026-06-21', time: '9:00 PM' , team1: 'New Zealand'   , team2: 'Egypt'         , stadium: 'BC Place'                         , type: 'Group' },
+
   // ── June 22 ──
-  { id: 41, date: '2026-06-22', time: '1:00 PM',  team1: 'Argentina',   team2: 'Austria',       stadium: 'Dallas Stadium',                type: 'Group' },
-  { id: 42, date: '2026-06-22', time: '5:00 PM',  team1: 'France',      team2: 'Iraq',          stadium: 'Lincoln Financial Field',       type: 'Group' },
-  { id: 43, date: '2026-06-22', time: '8:00 PM',  team1: 'Norway',      team2: 'Senegal',       stadium: 'MetLife Stadium',               type: 'Group' },
-  { id: 44, date: '2026-06-22', time: '11:00 PM', team1: 'Jordan',      team2: 'Algeria',       stadium: 'San Francisco Bay Area Stadium',type: 'Group' },
+  { id: 41, date: '2026-06-22', time: '1:00 PM' , team1: 'Argentina'     , team2: 'Austria'       , stadium: 'Dallas Stadium'                   , type: 'Group' },
+  { id: 42, date: '2026-06-22', time: '5:00 PM' , team1: 'France'        , team2: 'Iraq'          , stadium: 'Lincoln Financial Field'          , type: 'Group' },
+  { id: 43, date: '2026-06-22', time: '8:00 PM' , team1: 'Norway'        , team2: 'Senegal'       , stadium: 'MetLife Stadium'                  , type: 'Group' },
+  { id: 44, date: '2026-06-22', time: '11:00 PM', team1: 'Jordan'        , team2: 'Algeria'       , stadium: 'San Francisco Bay Area Stadium'   , type: 'Group' },
+
   // ── June 23 ──
-  { id: 45, date: '2026-06-23', time: '1:00 PM',  team1: 'Portugal',    team2: 'Uzbekistan',    stadium: 'Houston Stadium',               type: 'Group' },
-  { id: 46, date: '2026-06-23', time: '4:00 PM',  team1: 'England',     team2: 'Ghana',         stadium: 'Boston Stadium',                type: 'Group' },
-  { id: 47, date: '2026-06-23', time: '7:00 PM',  team1: 'Panama',      team2: 'Croatia',       stadium: 'BMO Field',                     type: 'Group' },
-  { id: 48, date: '2026-06-23', time: '10:00 PM', team1: 'Colombia',    team2: 'DR Congo',      stadium: 'Estadio Guadalajara',           type: 'Group' },
-  // ── June 24 (simultaneous) ──
-  { id: 49, date: '2026-06-24', time: '6:00 PM',  team1: 'Scotland',    team2: 'Brazil',        stadium: 'Miami Stadium',                 type: 'Group' },
-  { id: 50, date: '2026-06-24', time: '6:00 PM',  team1: 'Morocco',     team2: 'Haiti',         stadium: 'Atlanta Stadium',               type: 'Group' },
-  { id: 51, date: '2026-06-24', time: '9:00 PM',  team1: 'Canada',      team2: 'Switzerland',   stadium: 'BC Place',                      type: 'Group' },
-  { id: 52, date: '2026-06-24', time: '9:00 PM',  team1: 'Bosnia & Herz.', team2: 'Qatar',      stadium: 'Seattle Stadium',               type: 'Group' },
-  { id: 53, date: '2026-06-24', time: '9:00 PM',  team1: 'Mexico',      team2: 'Czechia',       stadium: 'Estadio Azteca',                type: 'Group' },
-  { id: 54, date: '2026-06-24', time: '9:00 PM',  team1: 'South Korea', team2: 'South Africa',  stadium: 'Estadio Monterrey',             type: 'Group' },
-  // ── June 25 (simultaneous) ──
-  { id: 55, date: '2026-06-25', time: '4:00 PM',  team1: 'Ecuador',     team2: 'Germany',       stadium: 'MetLife Stadium',               type: 'Group' },
-  { id: 56, date: '2026-06-25', time: '4:00 PM',  team1: 'Curaçao',     team2: 'Ivory Coast',   stadium: 'Lincoln Financial Field',       type: 'Group' },
-  { id: 57, date: '2026-06-25', time: '7:00 PM',  team1: 'Tunisia',     team2: 'Netherlands',   stadium: 'Kansas City Stadium',           type: 'Group' },
-  { id: 58, date: '2026-06-25', time: '7:00 PM',  team1: 'Japan',       team2: 'Sweden',        stadium: 'Dallas Stadium',                type: 'Group' },
-  { id: 59, date: '2026-06-25', time: '9:00 PM',  team1: 'USA',         team2: 'Türkiye',       stadium: 'Los Angeles Stadium',           type: 'Group' },
-  { id: 60, date: '2026-06-25', time: '9:00 PM',  team1: 'Paraguay',    team2: 'Australia',     stadium: 'San Francisco Bay Area Stadium',type: 'Group' },
-  // ── June 26 (simultaneous) ──
-  { id: 61, date: '2026-06-26', time: '8:00 PM',  team1: 'Norway',      team2: 'France',        stadium: 'Boston Stadium',                type: 'Group' },
-  { id: 62, date: '2026-06-26', time: '8:00 PM',  team1: 'Senegal',     team2: 'Iraq',          stadium: 'BMO Field',                     type: 'Group' },
-  { id: 63, date: '2026-06-26', time: '8:00 PM',  team1: 'Uruguay',     team2: 'Spain',         stadium: 'Estadio Guadalajara',           type: 'Group' },
-  { id: 64, date: '2026-06-26', time: '8:00 PM',  team1: 'Cape Verde',  team2: 'Saudi Arabia',  stadium: 'Houston Stadium',               type: 'Group' },
-  { id: 65, date: '2026-06-26', time: '11:00 PM', team1: 'New Zealand', team2: 'Belgium',       stadium: 'BC Place',                      type: 'Group' },
-  { id: 66, date: '2026-06-26', time: '11:00 PM', team1: 'Egypt',       team2: 'Iran',          stadium: 'Seattle Stadium',               type: 'Group' },
-  // ── June 27 (simultaneous) ──
-  { id: 67, date: '2026-06-27', time: '7:00 PM',  team1: 'Panama',      team2: 'England',       stadium: 'MetLife Stadium',               type: 'Group' },
-  { id: 68, date: '2026-06-27', time: '7:00 PM',  team1: 'Croatia',     team2: 'Ghana',         stadium: 'Lincoln Financial Field',       type: 'Group' },
-  { id: 69, date: '2026-06-27', time: '7:30 PM',  team1: 'Colombia',    team2: 'Portugal',      stadium: 'Miami Stadium',                 type: 'Group' },
-  { id: 70, date: '2026-06-27', time: '7:30 PM',  team1: 'DR Congo',    team2: 'Uzbekistan',    stadium: 'Atlanta Stadium',               type: 'Group' },
-  { id: 71, date: '2026-06-27', time: '10:00 PM', team1: 'Jordan',      team2: 'Argentina',     stadium: 'Dallas Stadium',                type: 'Group' },
-  { id: 72, date: '2026-06-27', time: '10:00 PM', team1: 'Algeria',     team2: 'Austria',       stadium: 'Kansas City Stadium',           type: 'Group' },
-  // ── Round of 32 (June 28 – July 1, all 16 venues) ──
-  { id: 73,  date: '2026-06-28', time: '12:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'Dallas Stadium',                type: 'Round of 32' },
-  { id: 74,  date: '2026-06-28', time: '3:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Los Angeles Stadium',           type: 'Round of 32' },
-  { id: 75,  date: '2026-06-28', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'MetLife Stadium',               type: 'Round of 32' },
-  { id: 76,  date: '2026-06-28', time: '9:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Atlanta Stadium',               type: 'Round of 32' },
-  { id: 77,  date: '2026-06-29', time: '12:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'Miami Stadium',                 type: 'Round of 32' },
-  { id: 78,  date: '2026-06-29', time: '3:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Seattle Stadium',               type: 'Round of 32' },
-  { id: 79,  date: '2026-06-29', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Houston Stadium',               type: 'Round of 32' },
-  { id: 80,  date: '2026-06-29', time: '9:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Boston Stadium',                type: 'Round of 32' },
-  { id: 81,  date: '2026-06-30', time: '12:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'Lincoln Financial Field',       type: 'Round of 32' },
-  { id: 82,  date: '2026-06-30', time: '3:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Kansas City Stadium',           type: 'Round of 32' },
-  { id: 83,  date: '2026-06-30', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'San Francisco Bay Area Stadium',type: 'Round of 32' },
-  { id: 84,  date: '2026-06-30', time: '9:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'BC Place',                      type: 'Round of 32' },
-  { id: 85,  date: '2026-07-01', time: '12:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'Estadio Azteca',                type: 'Round of 32' },
-  { id: 86,  date: '2026-07-01', time: '3:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Estadio Guadalajara',           type: 'Round of 32' },
-  { id: 87,  date: '2026-07-01', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'BMO Field',                     type: 'Round of 32' },
-  { id: 88,  date: '2026-07-01', time: '9:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Estadio Monterrey',             type: 'Round of 32' },
+  { id: 45, date: '2026-06-23', time: '1:00 PM' , team1: 'Portugal'      , team2: 'Uzbekistan'    , stadium: 'Houston Stadium'                  , type: 'Group' },
+  { id: 46, date: '2026-06-23', time: '4:00 PM' , team1: 'England'       , team2: 'Ghana'         , stadium: 'Boston Stadium'                   , type: 'Group' },
+  { id: 47, date: '2026-06-23', time: '7:00 PM' , team1: 'Panama'        , team2: 'Croatia'       , stadium: 'BMO Field'                        , type: 'Group' },
+  { id: 48, date: '2026-06-23', time: '10:00 PM', team1: 'Colombia'      , team2: 'DR Congo'      , stadium: 'Estadio Guadalajara'              , type: 'Group' },
+
+  // ── June 24 ──
+  { id: 49, date: '2026-06-24', time: '6:00 PM' , team1: 'Scotland'      , team2: 'Brazil'        , stadium: 'Miami Stadium'                    , type: 'Group' },
+  { id: 50, date: '2026-06-24', time: '6:00 PM' , team1: 'Morocco'       , team2: 'Haiti'         , stadium: 'Atlanta Stadium'                  , type: 'Group' },
+  { id: 51, date: '2026-06-24', time: '3:00 PM' , team1: 'Canada'        , team2: 'Switzerland'   , stadium: 'BC Place'                         , type: 'Group' },
+  { id: 52, date: '2026-06-24', time: '3:00 PM' , team1: 'Bosnia & Herz.', team2: 'Qatar'         , stadium: 'Seattle Stadium'                  , type: 'Group' },
+  { id: 53, date: '2026-06-24', time: '9:00 PM' , team1: 'Mexico'        , team2: 'Czechia'       , stadium: 'Estadio Azteca'                   , type: 'Group' },
+  { id: 54, date: '2026-06-24', time: '9:00 PM' , team1: 'South Korea'   , team2: 'South Africa'  , stadium: 'Estadio Monterrey'                , type: 'Group' },
+
+  // ── June 25 ──
+  { id: 55, date: '2026-06-25', time: '4:00 PM' , team1: 'Ecuador'       , team2: 'Germany'       , stadium: 'MetLife Stadium'                  , type: 'Group' },
+  { id: 56, date: '2026-06-25', time: '4:00 PM' , team1: 'Curaçao'       , team2: 'Ivory Coast'   , stadium: 'Lincoln Financial Field'          , type: 'Group' },
+  { id: 57, date: '2026-06-25', time: '7:00 PM' , team1: 'Tunisia'       , team2: 'Netherlands'   , stadium: 'Kansas City Stadium'              , type: 'Group' },
+  { id: 58, date: '2026-06-25', time: '7:00 PM' , team1: 'Japan'         , team2: 'Sweden'        , stadium: 'Dallas Stadium'                   , type: 'Group' },
+  { id: 59, date: '2026-06-25', time: '10:00 PM', team1: 'USA'           , team2: 'Türkiye'       , stadium: 'Los Angeles Stadium'              , type: 'Group' },
+  { id: 60, date: '2026-06-25', time: '10:00 PM', team1: 'Paraguay'      , team2: 'Australia'     , stadium: 'San Francisco Bay Area Stadium'   , type: 'Group' },
+
+  // ── June 26 ──
+  { id: 61, date: '2026-06-26', time: '3:00 PM' , team1: 'Norway'        , team2: 'France'        , stadium: 'Boston Stadium'                   , type: 'Group' },
+  { id: 62, date: '2026-06-26', time: '3:00 PM' , team1: 'Senegal'       , team2: 'Iraq'          , stadium: 'BMO Field'                        , type: 'Group' },
+  { id: 63, date: '2026-06-26', time: '8:00 PM' , team1: 'Uruguay'       , team2: 'Spain'         , stadium: 'Estadio Guadalajara'              , type: 'Group' },
+  { id: 64, date: '2026-06-26', time: '8:00 PM' , team1: 'Cape Verde'    , team2: 'Saudi Arabia'  , stadium: 'Houston Stadium'                  , type: 'Group' },
+  { id: 65, date: '2026-06-26', time: '11:00 PM', team1: 'New Zealand'   , team2: 'Belgium'       , stadium: 'BC Place'                         , type: 'Group' },
+  { id: 66, date: '2026-06-26', time: '11:00 PM', team1: 'Egypt'         , team2: 'Iran'          , stadium: 'Seattle Stadium'                  , type: 'Group' },
+
+  // ── June 27 ──
+  { id: 67, date: '2026-06-27', time: '5:00 PM' , team1: 'Panama'        , team2: 'England'       , stadium: 'MetLife Stadium'                  , type: 'Group' },
+  { id: 68, date: '2026-06-27', time: '5:00 PM' , team1: 'Croatia'       , team2: 'Ghana'         , stadium: 'Lincoln Financial Field'          , type: 'Group' },
+  { id: 69, date: '2026-06-27', time: '7:30 PM' , team1: 'Colombia'      , team2: 'Portugal'      , stadium: 'Miami Stadium'                    , type: 'Group' },
+  { id: 70, date: '2026-06-27', time: '7:30 PM' , team1: 'DR Congo'      , team2: 'Uzbekistan'    , stadium: 'Atlanta Stadium'                  , type: 'Group' },
+  { id: 71, date: '2026-06-27', time: '10:00 PM', team1: 'Jordan'        , team2: 'Argentina'     , stadium: 'Dallas Stadium'                   , type: 'Group' },
+  { id: 72, date: '2026-06-27', time: '10:00 PM', team1: 'Algeria'       , team2: 'Austria'       , stadium: 'Kansas City Stadium'              , type: 'Group' },
+
+  // ── Round of 32 ──
+  { id: 73, date: '2026-06-28', time: '3:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Los Angeles Stadium'              , type: 'Round of 32' },
+
+  // ── Round of 32 ──
+  { id: 74, date: '2026-06-29', time: '1:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Houston Stadium'                  , type: 'Round of 32' },
+  { id: 75, date: '2026-06-29', time: '4:30 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Boston Stadium'                   , type: 'Round of 32' },
+  { id: 76, date: '2026-06-29', time: '9:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Estadio Monterrey'                , type: 'Round of 32' },
+
+  // ── Round of 32 ──
+  { id: 77, date: '2026-06-30', time: '1:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Dallas Stadium'                   , type: 'Round of 32' },
+  { id: 78, date: '2026-06-30', time: '5:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'MetLife Stadium'                  , type: 'Round of 32' },
+  { id: 79, date: '2026-06-30', time: '9:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Estadio Azteca'                   , type: 'Round of 32' },
+
+  // ── Round of 32 ──
+  { id: 80, date: '2026-07-01', time: '12:00 PM', team1: 'TBD'           , team2: 'TBD'           , stadium: 'Atlanta Stadium'                  , type: 'Round of 32' },
+  { id: 81, date: '2026-07-01', time: '4:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Seattle Stadium'                  , type: 'Round of 32' },
+  { id: 82, date: '2026-07-01', time: '8:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'San Francisco Bay Area Stadium'   , type: 'Round of 32' },
+
+  // ── Round of 32 ──
+  { id: 83, date: '2026-07-02', time: '3:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Los Angeles Stadium'              , type: 'Round of 32' },
+  { id: 84, date: '2026-07-02', time: '7:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'BMO Field'                        , type: 'Round of 32' },
+  { id: 85, date: '2026-07-02', time: '11:00 PM', team1: 'TBD'           , team2: 'TBD'           , stadium: 'BC Place'                         , type: 'Round of 32' },
+
+  // ── Round of 32 ──
+  { id: 86, date: '2026-07-03', time: '2:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Dallas Stadium'                   , type: 'Round of 32' },
+  { id: 87, date: '2026-07-03', time: '6:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Miami Stadium'                    , type: 'Round of 32' },
+  { id: 88, date: '2026-07-03', time: '9:30 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Kansas City Stadium'              , type: 'Round of 32' },
+
   // ── Round of 16 ──
-  { id: 89,  date: '2026-07-04', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Lincoln Financial Field',       type: 'Round of 16' },
-  { id: 90,  date: '2026-07-04', time: '9:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Houston Stadium',               type: 'Round of 16' },
-  { id: 91,  date: '2026-07-05', time: '3:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'MetLife Stadium',               type: 'Round of 16' },
-  { id: 92,  date: '2026-07-05', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Estadio Azteca',                type: 'Round of 16' },
-  { id: 93,  date: '2026-07-06', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'BC Place',                      type: 'Round of 16' },
-  { id: 94,  date: '2026-07-06', time: '9:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Dallas Stadium',                type: 'Round of 16' },
-  { id: 95,  date: '2026-07-07', time: '3:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Seattle Stadium',               type: 'Round of 16' },
-  { id: 96,  date: '2026-07-07', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Atlanta Stadium',               type: 'Round of 16' },
-  // ── Quarter-finals ──
-  { id: 97,  date: '2026-07-09', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Boston Stadium',      type: 'Quarter-final' },
-  { id: 98,  date: '2026-07-10', time: '9:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Los Angeles Stadium', type: 'Quarter-final' },
-  { id: 99,  date: '2026-07-11', time: '3:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Kansas City Stadium', type: 'Quarter-final' },
-  { id: 100, date: '2026-07-11', time: '6:00 PM',  team1: 'TBD', team2: 'TBD', stadium: 'Miami Stadium',       type: 'Quarter-final' },
-  // ── Semi-finals ──
-  { id: 101, date: '2026-07-14', time: '8:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'Dallas Stadium',  type: 'Semi-final' },
-  { id: 102, date: '2026-07-15', time: '8:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'Atlanta Stadium', type: 'Semi-final' },
-  // ── Third Place & Final ──
-  { id: 103, date: '2026-07-18', time: '4:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'Miami Stadium',   type: 'Third Place' },
-  { id: 104, date: '2026-07-19', time: '3:00 PM', team1: 'TBD', team2: 'TBD', stadium: 'MetLife Stadium', type: 'Final' },
+  { id: 89, date: '2026-07-04', time: '1:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Houston Stadium'                  , type: 'Round of 16' },
+  { id: 90, date: '2026-07-04', time: '5:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Lincoln Financial Field'          , type: 'Round of 16' },
+
+  // ── Round of 16 ──
+  { id: 91, date: '2026-07-05', time: '4:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'MetLife Stadium'                  , type: 'Round of 16' },
+  { id: 92, date: '2026-07-05', time: '8:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Estadio Azteca'                   , type: 'Round of 16' },
+
+  // ── Round of 16 ──
+  { id: 93, date: '2026-07-06', time: '3:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Dallas Stadium'                   , type: 'Round of 16' },
+  { id: 94, date: '2026-07-06', time: '8:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Seattle Stadium'                  , type: 'Round of 16' },
+
+  // ── Round of 16 ──
+  { id: 95, date: '2026-07-07', time: '12:00 PM', team1: 'TBD'           , team2: 'TBD'           , stadium: 'Atlanta Stadium'                  , type: 'Round of 16' },
+  { id: 96, date: '2026-07-07', time: '4:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'BC Place'                         , type: 'Round of 16' },
+
+  // ── Quarter-final ──
+  { id: 97, date: '2026-07-09', time: '4:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Boston Stadium'                   , type: 'Quarter-final' },
+
+  // ── Quarter-final ──
+  { id: 98, date: '2026-07-10', time: '3:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Los Angeles Stadium'              , type: 'Quarter-final' },
+
+  // ── Quarter-final ──
+  { id: 99, date: '2026-07-11', time: '5:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Miami Stadium'                    , type: 'Quarter-final' },
+  { id: 100, date: '2026-07-11', time: '9:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Kansas City Stadium'              , type: 'Quarter-final' },
+
+  // ── Semi-final ──
+  { id: 101, date: '2026-07-14', time: '3:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Dallas Stadium'                   , type: 'Semi-final' },
+
+  // ── Semi-final ──
+  { id: 102, date: '2026-07-15', time: '3:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Atlanta Stadium'                  , type: 'Semi-final' },
+
+  // ── Third Place ──
+  { id: 103, date: '2026-07-18', time: '5:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'Miami Stadium'                    , type: 'Third Place' },
+
+  // ── Final ──
+  { id: 104, date: '2026-07-19', time: '3:00 PM' , team1: 'TBD'           , team2: 'TBD'           , stadium: 'MetLife Stadium'                  , type: 'Final' },
 ];
 
 // Unique game dates (for calendar highlighting)

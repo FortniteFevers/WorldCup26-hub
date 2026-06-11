@@ -293,6 +293,88 @@
       .lp-stat:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
     }
 
+    /* Live snapshot */
+    .lp-live-snapshot {
+      margin-bottom: 5rem;
+    }
+    .lp-live-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+    .lp-live-card {
+      min-height: 132px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--bg-card);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.85rem;
+      text-decoration: none;
+      transition: transform 0.18s, border-color 0.18s, background 0.18s;
+    }
+    .lp-live-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-bright);
+      background: var(--bg-card-hover);
+    }
+    .lp-live-card.is-live {
+      border-color: rgba(239,68,68,0.45);
+      background: rgba(239,68,68,0.07);
+      box-shadow: 0 0 0 1px rgba(239,68,68,0.1);
+    }
+    .lp-live-label {
+      display: flex;
+      align-items: center;
+      gap: 0.42rem;
+      font-size: 0.62rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .lp-live-card.is-live .lp-live-label { color: #ef4444; }
+    .lp-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239,68,68,0.16);
+      flex-shrink: 0;
+      animation: lpLivePulse 1.4s ease-in-out infinite;
+    }
+    @keyframes lpLivePulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.72); opacity: 0.72; }
+    }
+    .lp-live-main {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 850;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .lp-live-score {
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+    .lp-live-card.is-live .lp-live-score { color: #ff686d; }
+    .lp-live-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+    .lp-live-card.is-empty {
+      opacity: 0.62;
+      pointer-events: none;
+    }
+    @media (max-width: 780px) {
+      .lp-live-grid { grid-template-columns: 1fr; }
+      .lp-live-card { min-height: 108px; }
+    }
+
     /* Section header */
     .lp-sec-hdr {
       display: flex; justify-content: space-between; align-items: flex-end;
@@ -308,20 +390,6 @@
       font-weight: 800; letter-spacing: -0.03em; color: var(--text-primary);
     }
     .lp-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem; }
-
-    /* Countdown */
-    .lp-countdown-card {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--bg-card);
-      padding: 2.5rem 2rem;
-      text-align: center;
-      margin-bottom: 5rem;
-    }
-    .lp-countdown-lbl {
-      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 1.5rem;
-    }
 
     /* Match list */
     .lp-match-list {
@@ -637,19 +705,32 @@
     <div class="lp-stat"><div class="lp-stat-n">39</div><div class="lp-stat-l">Days</div></div>
   </div>
 
-  <!-- ═══════════ COUNTDOWN ═══════════ -->
-  <div class="lp-wrap">
-    <div class="lp-countdown-card" id="countdownSection">
-      <div class="lp-countdown-lbl">⚽ Time until kickoff — Mexico vs South Africa, June 11</div>
-      <div class="countdown-units" id="countdownUnits">
-        <div class="countdown-unit"><div class="countdown-num" id="cdDays">--</div><div class="countdown-unit-label">Days</div></div>
-        <div class="countdown-sep">:</div>
-        <div class="countdown-unit"><div class="countdown-num" id="cdHours">--</div><div class="countdown-unit-label">Hours</div></div>
-        <div class="countdown-sep">:</div>
-        <div class="countdown-unit"><div class="countdown-num" id="cdMinutes">--</div><div class="countdown-unit-label">Minutes</div></div>
-        <div class="countdown-sep">:</div>
-        <div class="countdown-unit"><div class="countdown-num" id="cdSeconds">--</div><div class="countdown-unit-label">Seconds</div></div>
+  <!-- ═══════════ LIVE SNAPSHOT ═══════════ -->
+  <div class="lp-wrap lp-live-snapshot">
+    <div class="lp-sec-hdr">
+      <div>
+        <div class="lp-eyebrow">Live Tracker</div>
+        <div class="lp-title">Tournament Pulse</div>
+        <div class="lp-subtitle">Live games, latest results, and what is next</div>
       </div>
+      <a href="/live" class="btn btn-outline btn-sm">Live Center →</a>
+    </div>
+    <div class="lp-live-grid" id="liveSnapshot">
+      <a class="lp-live-card is-empty" href="/live">
+        <div class="lp-live-label"><span class="lp-live-dot"></span>Live now</div>
+        <div class="lp-live-main">Checking live scores…</div>
+        <div class="lp-live-meta">Updated automatically</div>
+      </a>
+      <a class="lp-live-card is-empty" href="/games">
+        <div class="lp-live-label">Latest result</div>
+        <div class="lp-live-main">Loading results…</div>
+        <div class="lp-live-meta">Final scores appear here</div>
+      </a>
+      <a class="lp-live-card is-empty" href="/games">
+        <div class="lp-live-label">Next up</div>
+        <div class="lp-live-main">Finding next match…</div>
+        <div class="lp-live-meta">All times Eastern</div>
+      </a>
     </div>
   </div>
 
@@ -756,6 +837,139 @@
       return `${days[dt.getDay()]}, ${months[dt.getMonth()]} ${dt.getDate()}`;
     }
 
+    const SCOREBOARD_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+    function dateCompact(dateStr) { return dateStr.replace(/-/g, ''); }
+
+    function parseGameDateTime(game) {
+      const clean = game.time.split('(')[0].trim();
+      const match = clean.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!match) return new Date(game.date + 'T12:00:00-04:00');
+      let h = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10);
+      const mer = match[3].toUpperCase();
+      if (mer === 'PM' && h !== 12) h += 12;
+      if (mer === 'AM' && h === 12) h = 0;
+      return new Date(`${game.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00-04:00`);
+    }
+
+    function findLocalNextGame() {
+      const now = new Date();
+      return GAMES
+        .map(g => ({ ...g, dt: parseGameDateTime(g) }))
+        .filter(g => g.dt > now)
+        .sort((a, b) => a.dt - b.dt)[0] || null;
+    }
+
+    function eventParts(event) {
+      const comp = event.competitions?.[0] || {};
+      const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
+      const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
+      return { comp, home, away, st: event.status?.type || {} };
+    }
+
+    function eventTeamName(c) {
+      return c?.team?.shortDisplayName || c?.team?.displayName || c?.team?.name || 'TBD';
+    }
+
+    function eventDateTime(event) {
+      const d = new Date(event.date || 0);
+      return Number.isNaN(d.getTime()) ? new Date(0) : d;
+    }
+
+    function renderLiveSnapshotCards({ live, latest, next }) {
+      const wrap = document.getElementById('liveSnapshot');
+      if (!wrap) return;
+
+      const liveCard = (() => {
+        if (!live) {
+          return `<a class="lp-live-card is-empty" href="/live">
+            <div class="lp-live-label"><span class="lp-live-dot"></span>Live now</div>
+            <div class="lp-live-main">No live match right now</div>
+            <div class="lp-live-meta">Check the Live Center for today’s slate</div>
+          </a>`;
+        }
+        const { home, away } = eventParts(live);
+        return `<a class="lp-live-card is-live" href="/live">
+          <div class="lp-live-label"><span class="lp-live-dot"></span>Live now</div>
+          <div class="lp-live-main">${eventTeamName(home)} <span class="lp-live-score">${home.score ?? 0}–${away.score ?? 0}</span> ${eventTeamName(away)}</div>
+          <div class="lp-live-meta">${live.status?.displayClock || 'Live'} · Tap for stats and events</div>
+        </a>`;
+      })();
+
+      const latestCard = (() => {
+        if (!latest) {
+          return `<a class="lp-live-card is-empty" href="/games">
+            <div class="lp-live-label">Latest result</div>
+            <div class="lp-live-main">No final results yet</div>
+            <div class="lp-live-meta">Final scores will appear here</div>
+          </a>`;
+        }
+        const { home, away, st } = eventParts(latest);
+        return `<a class="lp-live-card" href="/games">
+          <div class="lp-live-label">Latest result</div>
+          <div class="lp-live-main">${eventTeamName(home)} <span class="lp-live-score">${home.score ?? 0}–${away.score ?? 0}</span> ${eventTeamName(away)}</div>
+          <div class="lp-live-meta">${st.shortDetail || 'Final'} · ${eventDateTime(latest).toLocaleDateString([], { month:'short', day:'numeric' })}</div>
+        </a>`;
+      })();
+
+      const nextCard = (() => {
+        if (!next) {
+          return `<a class="lp-live-card is-empty" href="/games">
+            <div class="lp-live-label">Next up</div>
+            <div class="lp-live-main">No upcoming match found</div>
+            <div class="lp-live-meta">Browse the full schedule</div>
+          </a>`;
+        }
+        if (next.local) {
+          return `<a class="lp-live-card" href="/games">
+            <div class="lp-live-label">Next up</div>
+            <div class="lp-live-main">${getFlag(next.team1)} ${next.team1} <span class="lp-live-score">vs</span> ${next.team2} ${getFlag(next.team2)}</div>
+            <div class="lp-live-meta">${shortDate(next.date)} · ${next.time} ET · ${next.stadium}</div>
+          </a>`;
+        }
+        const { home, away } = eventParts(next);
+        return `<a class="lp-live-card" href="/games">
+          <div class="lp-live-label">Next up</div>
+          <div class="lp-live-main">${eventTeamName(home)} <span class="lp-live-score">vs</span> ${eventTeamName(away)}</div>
+          <div class="lp-live-meta">${eventDateTime(next).toLocaleDateString([], { month:'short', day:'numeric' })} · ${eventDateTime(next).toLocaleTimeString([], { hour:'numeric', minute:'2-digit' })}</div>
+        </a>`;
+      })();
+
+      wrap.innerHTML = liveCard + latestCard + nextCard;
+    }
+
+    async function refreshLiveSnapshot() {
+      try {
+        const start = GAMES[0].date;
+        const end = GAMES[GAMES.length - 1].date;
+        const res = await fetch(`${SCOREBOARD_URL}?dates=${dateCompact(start)}-${dateCompact(end)}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const events = ((await res.json()).events || []).sort((a, b) => eventDateTime(a) - eventDateTime(b));
+        const live = events.find(e => e.status?.type?.state === 'in') || null;
+        const latest = [...events].reverse().find(e => e.status?.type?.state === 'post') || null;
+        const upcoming = events.find(e => e.status?.type?.state === 'pre' && eventDateTime(e) > new Date()) || null;
+        const localNext = findLocalNextGame();
+        renderLiveSnapshotCards({
+          live,
+          latest,
+          next: upcoming || (localNext ? { ...localNext, local: true } : null),
+        });
+      } catch (err) {
+        console.warn('Home live snapshot failed:', err);
+        const localNext = findLocalNextGame();
+        renderLiveSnapshotCards({
+          live: null,
+          latest: null,
+          next: localNext ? { ...localNext, local: true } : null,
+        });
+      }
+    }
+    refreshLiveSnapshot();
+    setInterval(refreshLiveSnapshot, 45000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshLiveSnapshot();
+    });
+
     const list = document.getElementById('featuredGames');
     GAMES.slice(0, 8).forEach(g => {
       const row = document.createElement('div');
@@ -773,28 +987,6 @@
         </div>`;
       list.appendChild(row);
     });
-
-    // Countdown
-    const TARGET = new Date('2026-06-11T19:00:00Z');
-    function pad(n) { return String(n).padStart(2,'0'); }
-    function tick() {
-      const diff = TARGET - Date.now();
-      if (diff <= 0) {
-        document.getElementById('countdownUnits').innerHTML =
-          '<div class="countdown-started">🎉 The World Cup has kicked off!</div>';
-        return;
-      }
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      document.getElementById('cdDays').textContent    = pad(d);
-      document.getElementById('cdHours').textContent   = pad(h);
-      document.getElementById('cdMinutes').textContent = pad(m);
-      document.getElementById('cdSeconds').textContent = pad(s);
-    }
-    tick();
-    setInterval(tick, 1000);
 
     // ── Players to Watch ──────────────────────────
     function ovrColor(ovr) {
