@@ -1,106 +1,64 @@
 # World Cup Field Guide
 
-An interactive public field guide for following the 2026 FIFA World Cup. It brings the schedule, groups, stadiums, teams, calendar tools, roster data, and bracket simulations into one place for both casual fans and people who already follow the sport closely.
+An interactive field guide for following the 2026 FIFA World Cup.
 
-**Live Site:** [worldcupfieldguide.com](https://worldcupfieldguide.com)
+World Cup Field Guide brings the tournament schedule, groups, stadiums, teams, calendar tools, bracket simulations, and beginner-friendly explainers into one public site for casual fans and serious followers.
+
+**Live site:** [worldcupfieldguide.com](https://worldcupfieldguide.com)
 
 ## Features
 
-- **Full Match Schedule** - Browse all 104 matches from the group stage through the final, with kickoff times shown in Eastern Time.
-- **Search & Filters** - Find matches by team, stadium, date, or tournament stage.
-- **Groups View** - See all 12 groups, standings structure, matchday schedules, and advancement rules.
-- **Stadium Map** - Explore all 16 host venues on an interactive Leaflet map with venue cards and match counts.
-- **Calendar Export** - Select games and download an `.ics` file or add individual matches to Google Calendar.
-- **Teams Hub** - Browse all 48 qualified teams with bundled football-data.org squad data.
-- **My Team** - Pick a country, build a starting XI on a tactical pitch, choose formations, and simulate a match.
-- **Bracket Simulator** - Simulate the full tournament from groups through the final, including best third-place advancement.
-- **World Cup Guide** - Beginner-friendly explanations for how the tournament format works.
-- **Optional Accounts** - Clerk sign-in/sign-up is available for future saved data and paid features, but the site remains publicly browsable without an account.
-- **Dark/Light Mode** - Persistent theme toggle across pages.
-- **Mobile Responsive** - Compact navigation and responsive layouts for smaller screens.
-- **Vercel Analytics** - Basic traffic analytics through Vercel.
+- Full 104-match schedule for the 2026 FIFA World Cup
+- Search and filters by team, stadium, date, and tournament stage
+- Calendar export with `.ics` download and Google Calendar links
+- Visual schedule view for June and July 2026
+- Groups view with all 12 groups and advancement context
+- Interactive stadium map for all 16 host venues
+- Team hub with ratings and roster data
+- My Team squad builder and match simulator
+- Bracket simulator from groups through the final
+- Beginner-friendly World Cup guide
+- Dark and light theme support
+- Responsive layouts for desktop and mobile
 
 ## Tech Stack
 
-- **Core App:** HTML5, CSS3, vanilla JavaScript
-- **Deployment Wrapper:** Next.js App Router on Vercel
-- **Auth:** Clerk
-- **Analytics:** Vercel Analytics
-- **Maps:** Leaflet.js with CartoDB tiles
-- **Animations:** Lenis smooth scrolling
-- **Image Export:** html2canvas for bracket sharing
-- **API Data:** football-data.org for optional squad/player data
-- **Storage:** localStorage for theme and simulator data
+- HTML
+- CSS
+- Vanilla JavaScript
+- Next.js wrapper for Vercel deployment
+- Clerk for optional authentication
+- Vercel Analytics
+- Leaflet for maps
+- Lenis for smooth scrolling
+- Local JSON football data exports
 
 ## Project Structure
 
 ```text
 world-cup-2026/
-├── app/
-│   ├── layout.tsx        # ClerkProvider, Vercel Analytics, global app shell
-│   └── page.tsx          # Redirects / to the static landing page
-├── public/               # Static files served by the Next/Vercel app
-├── index.html            # Landing page with countdown, stats, and feature links
-├── games.html            # Full 104-match schedule with filters and modals
-├── groups.html           # Group standings and matchday overview
-├── locations.html        # Interactive stadium map
-├── calendar.html         # Calendar grid, .ics export, Google Calendar links
-├── teams.html            # Team cards and optional roster API integration
-├── myteam.html           # Squad builder and match simulator
-├── bracket.html          # Full World Cup bracket simulator
-├── guide.html            # Beginner-friendly World Cup guide
-├── data.js               # Matches, groups, stadiums, flags, helper data
-├── script.js             # Shared landing/schedule behavior
-├── auth.js               # Clerk JS integration for static pages
-├── theme.js              # Theme toggle and mobile nav behavior
-├── styles.css            # Global responsive styles and themes
-├── football-data/        # Local source copy of football-data.org exports
-├── scripts/
-│   └── export-football-data.mjs # Pulls football-data.org data into JSON files
-├── proxy.ts              # Clerk middleware for Next/Vercel
-├── proxy.py              # Optional local-only CORS helper for API testing
-├── package.json          # Next, React, Clerk, and Vercel dependencies
-└── README.md
+├── app/                    # Next.js wrapper
+├── public/                 # Static files served in production
+├── football-data/          # Local football data exports
+├── scripts/                # Data export scripts
+├── index.html              # Landing page
+├── games.html              # Schedule, filters, calendar export, venues
+├── groups.html             # Group stage overview
+├── locations.html          # Stadium map
+├── calendar.html           # Standalone calendar export page
+├── teams.html              # Teams hub
+├── myteam.html             # Squad builder
+├── bracket.html            # Bracket simulator
+├── guide.html              # World Cup guide
+├── data.js                 # Core schedule, groups, stadiums, flags
+├── styles.css              # Global styles
+├── theme.js                # Theme and nav helpers
+├── auth.js                 # Clerk integration
+└── package.json
 ```
-
-When editing the static pages, keep the root files and matching files in `public/` in sync because Vercel serves the static experience from `public/`.
-
-## Data
-
-All tournament schedule and venue data lives in `data.js`.
-
-- **Total matches:** 104
-- **Group stage:** 72 matches from June 11-27, 2026
-- **Knockout rounds:** 32 matches from June 28-July 19, 2026
-- **Teams:** 48 teams across 12 groups
-- **Stadiums:** 16 venues across the United States, Mexico, and Canada
-
-The schedule, stadium coordinates, capacities, groups, flags, and helper mappings are currently stored client-side.
-
-## Design
-
-- Dark mode is the default visual identity, with gold World Cup-inspired accents.
-- Light mode is supported across the main pages.
-- Navigation uses a compact mobile layout with auth controls, theme toggle, and menu access.
-- Cards, tables, filters, and modals are designed for quick scanning during the tournament.
-
-## Contributing Ideas
-
-- Saved user picks and bracket history
-- Account-based dashboard for saved teams and favorite matches
-- Stripe one-time payment for premium API-powered features
-- More tournament explainers for new fans
-- Historical World Cup stats and comparisons
-- Progressive Web App support for offline schedule access
 
 ## Credits
 
-Created by [Zach Andelman](https://linktr.ee/zachspam06).
+Created by [Zach Andelman](https://fevers.dev/links).
 
-Schedule and venue information is manually compiled from public World Cup sources. Live squad/player data is provided through [football-data.org](https://www.football-data.org).
-
-This project is not affiliated with FIFA or any official organization.
-
-## License
-
-MIT License, Zach James Andelman
+This is an independent fan project and is not affiliated with FIFA, EA SPORTS, EA SPORTS FC, or any national federation.
