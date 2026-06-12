@@ -457,34 +457,50 @@
     }
 
     @media (max-width: 600px) {
-      .score-bug { max-width: 100%; }
-      .bug-header {
-        max-width: 82%;
-        font-size: 0.52rem;
-        padding: 0.28rem 0.75rem 0.34rem;
+      .live-wrap { padding-left: 0.65rem; padding-right: 0.65rem; }
+      .score-bug {
+        width: calc(100% + 0.5rem);
+        max-width: none;
+        margin-left: -0.25rem;
+        margin-right: -0.25rem;
       }
-      .bug-stack { height: 2.35rem; }
-      .bug-stack::before { padding: 3px; }
-      .score-bug-abbr { font-size: 0.85rem; }
-      .score-bug-flag { font-size: 1.2rem; }
-      .score-bug-flag-img { width: 1.25rem; height: 0.92rem; box-shadow: 0 0 0 1.5px rgba(255,255,255,0.84), 0 0 0 2.5px rgba(0,0,0,0.85); }
-      .bug-pill { gap: 0.3rem; min-height: 2.35rem; }
-      .bug-pill.home { padding: 0.23rem 0.62rem 0.23rem 0.58rem; }
-      .bug-pill.away { padding: 0.23rem 0.58rem 0.23rem 0.62rem; }
-      .bug-team { gap: 0.35rem; }
-      .bug-dot { width: 5px; height: 5px; }
-      .bug-score { font-size: 0.95rem; min-width: 2.05rem; height: 2.15rem; padding: 0 0.25rem; }
-      .bug-score.home { padding-right: 0.62rem; }
-      .bug-score.away { padding-left: 0.62rem; }
-      .bug-emblem { height: 2.45rem; margin: -0.44rem -0.52rem; }
-      .bug-vs { font-size: 0.78rem; min-width: 3rem; height: 2.15rem; }
-      .bug-clock-wrap { margin-left: -1.1rem; }
-      .bug-clock { font-size: 0.74rem; min-height: 2.35rem; min-width: 5.45rem; padding: 0.2rem 0.55rem 0.2rem 1.65rem; }
-      .bug-clock.is-pre { font-size: 0.64rem; min-width: 4.3rem; }
+      .bug-header {
+        max-width: 86%;
+        font-size: 0.6rem;
+        padding: 0.3rem 1rem 0.36rem;
+      }
+      .bug-stack { height: 2.75rem; }
+      .bug-stack::before { padding: 3.5px; }
+      .score-bug-abbr { font-size: 1.08rem; }
+      .score-bug-flag { font-size: 1.35rem; }
+      .score-bug-flag-img { width: 1.48rem; height: 1.08rem; box-shadow: 0 0 0 1.5px rgba(255,255,255,0.84), 0 0 0 2.5px rgba(0,0,0,0.85); }
+      .bug-pill { gap: 0.36rem; min-height: 2.75rem; }
+      .bug-pill.home { padding: 0.28rem 0.78rem 0.28rem 0.72rem; }
+      .bug-pill.away { padding: 0.28rem 0.72rem 0.28rem 0.78rem; }
+      .bug-team { gap: 0.4rem; }
+      .bug-dot { width: 6px; height: 6px; }
+      .bug-score { font-size: 1.15rem; min-width: 2.35rem; height: 2.45rem; padding: 0 0.28rem; }
+      .bug-score.home { padding-right: 0.72rem; }
+      .bug-score.away { padding-left: 0.72rem; }
+      .bug-emblem { height: 2.85rem; margin: -0.5rem -0.58rem; }
+      .bug-vs { font-size: 0.9rem; min-width: 3.55rem; height: 2.45rem; }
+      .bug-clock-wrap { margin-left: -1.28rem; }
+      .bug-clock { font-size: 0.82rem; min-height: 2.75rem; min-width: 5.7rem; padding: 0.2rem 0.62rem 0.2rem 1.82rem; }
+      .bug-clock.is-pre { font-size: 0.7rem; min-width: 4.75rem; }
     }
     @media (max-width: 390px) {
+      .live-wrap { padding-left: 0.5rem; padding-right: 0.5rem; }
+      .score-bug { width: calc(100% + 0.4rem); margin-left: -0.2rem; margin-right: -0.2rem; }
+      .score-bug-abbr { font-size: 0.98rem; }
+      .score-bug-flag-img { width: 1.38rem; height: 1rem; }
+      .bug-pill { gap: 0.3rem; }
+      .bug-pill.home { padding-left: 0.62rem; padding-right: 0.68rem; }
+      .bug-pill.away { padding-left: 0.68rem; padding-right: 0.62rem; }
+      .bug-vs { min-width: 3.25rem; }
+      .bug-clock { font-size: 0.76rem; min-width: 5.25rem; padding-left: 1.68rem; }
+    }
+    @media (max-width: 340px) {
       .bug-clock { display: none; }
-      .score-bug-abbr { font-size: 0.78rem; }
     }
 
     /* Next match banner */
