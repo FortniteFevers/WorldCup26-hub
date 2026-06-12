@@ -397,7 +397,6 @@
     <div id="bracketMode" style="display:none;">
 
       <div style="margin-bottom:1.25rem;">
-        <button onclick="exitMode()" style="display:inline-flex;align-items:center;gap:0.35rem;margin-bottom:0.6rem;padding:0;background:none;border:none;cursor:pointer;font-size:0.78rem;font-weight:600;color:var(--text-muted);transition:color 0.15s;" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'"><span style="color:var(--gold);">←</span> My Team</button>
         <div class="section-header" style="margin-bottom:0;">
           <div>
             <div class="section-title">2026 World Cup Bracket</div>
@@ -571,7 +570,7 @@
       document.getElementById('squadMode').style.display   = mode === 'squad'   ? 'block' : 'none';
       document.getElementById('bracketMode').style.display = mode === 'bracket' ? 'block' : 'none';
       document.getElementById('draftMode').style.display   = mode === 'draft'   ? 'block' : 'none';
-      document.getElementById('backPill').classList.toggle('visible', mode !== 'bracket');
+      document.getElementById('backPill').classList.add('visible');
       if (mode === 'bracket') initBracketUI();
       if (mode === 'draft') {
         const f = document.getElementById('draftFrame');
