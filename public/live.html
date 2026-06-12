@@ -65,6 +65,31 @@
       gap: 0.42rem;
       flex-wrap: wrap;
     }
+    .live-tz-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.42rem;
+      min-height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      padding: 0 0.35rem 0 0.72rem;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .live-tz-select {
+      min-height: 28px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text-primary);
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 850;
+      cursor: pointer;
+    }
     .live-day-btn,
     .live-date-btn {
       min-height: 36px;
@@ -119,6 +144,12 @@
       .live-day-actions {
         justify-content: flex-start;
       }
+      .live-tz-control {
+        width: 100%;
+        justify-content: space-between;
+        padding: 0 0.6rem 0 0.85rem;
+      }
+      .live-tz-select { max-width: 62%; }
     }
 
     .cal-backdrop {
@@ -746,6 +777,126 @@
     .lv-md-num { font-size: 2rem; font-weight: 900; letter-spacing: -0.02em; white-space: nowrap; }
     .lv-md-status { text-align: center; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); margin-bottom: 1.25rem; }
     .lv-md-status.live { color: #ef4444; }
+    .lv-up-stage {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0.28rem 0.78rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-bright);
+      background: var(--input-bg);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.35rem;
+    }
+    .lv-up-teams {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 0.85rem 0 1.45rem;
+      text-align: center;
+    }
+    .lv-up-team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.55rem;
+      min-width: 0;
+    }
+    .lv-up-team img {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+    }
+    .lv-up-flag {
+      font-size: 3rem;
+      line-height: 1;
+    }
+    .lv-up-name {
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+    .lv-up-vs {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text-muted);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+    .lv-up-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.62rem;
+      padding: 1rem 1.1rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-base);
+      margin-bottom: 1rem;
+    }
+    .lv-up-info-row {
+      display: grid;
+      grid-template-columns: 1.55rem 1fr;
+      gap: 0.7rem;
+      align-items: start;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+    .lv-up-info-row strong {
+      color: var(--text-primary);
+      font-weight: 850;
+    }
+    .lv-up-icon {
+      text-align: center;
+      line-height: 1.35;
+    }
+    .lv-up-actions {
+      display: grid;
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+    .lv-up-cal-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(245,200,66,0.45);
+      background: var(--gold);
+      color: #0a0a0a;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 950;
+    }
+    .lv-up-cal-btn:hover {
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+    }
+    .lv-up-note {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      line-height: 1.4;
+    }
+    @media (max-width: 420px) {
+      .lv-up-teams { gap: 0.8rem; }
+      .lv-up-team img { width: 48px; height: 48px; }
+      .lv-up-flag { font-size: 2.5rem; }
+      .lv-up-name { font-size: 0.88rem; }
+    }
     .lv-share-row {
       display: flex;
       justify-content: center;
@@ -872,6 +1023,10 @@
             <button type="button" class="live-day-btn" id="btnTomorrow" onclick="setLiveDateRelative(1)">Tomorrow</button>
             <button type="button" class="live-day-btn" id="btnNextMatch" onclick="setLiveDateToNextMatch()">Next match</button>
             <button type="button" class="live-date-btn" id="liveDateBtn" onclick="openLiveCalPopup()">📅 All Dates</button>
+            <label class="live-tz-control">
+              <span>Timezone</span>
+              <select class="live-tz-select" id="liveTimeZoneSelect" onchange="setLiveTimeZone(this.value)"></select>
+            </label>
           </div>
         </div>
         <div id="selectedDayContent"></div>
@@ -935,6 +1090,24 @@
     let selectedLiveMode = 'date';
     let liveCalYear = 2026;
     let liveCalMonth = 5;
+    const liveEventsById = new Map();
+    const TIME_ZONE_OPTIONS = [
+      { value: 'America/New_York', label: 'Eastern Time', abbr: 'ET' },
+      { value: 'America/Chicago', label: 'Central Time', abbr: 'CT' },
+      { value: 'America/Denver', label: 'Mountain Time', abbr: 'MT' },
+      { value: 'America/Phoenix', label: 'Arizona Time', abbr: 'MST' },
+      { value: 'America/Los_Angeles', label: 'Pacific Time', abbr: 'PT' },
+      { value: 'America/Anchorage', label: 'Alaska Time', abbr: 'AKT' },
+      { value: 'Pacific/Honolulu', label: 'Hawaii Time', abbr: 'HST' },
+      { value: 'Europe/London', label: 'UK Time', abbr: 'UK' },
+      { value: 'Europe/Paris', label: 'Central Europe', abbr: 'CET' },
+      { value: 'UTC', label: 'UTC', abbr: 'UTC' },
+    ];
+    const guessTimeZone = () => {
+      try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York'; }
+      catch (_) { return 'America/New_York'; }
+    };
+    let selectedTimeZone = localStorage.getItem('liveTimeZone') || guessTimeZone();
 
     // ── Helpers ────────────────────────────────────
     function dateParam(d) {
@@ -943,6 +1116,19 @@
 
     function dateKey(d) {
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function dateKeyInTimeZone(d, timeZone = selectedTimeZone) {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).formatToParts(d).reduce((acc, part) => {
+        if (part.type !== 'literal') acc[part.type] = part.value;
+        return acc;
+      }, {});
+      return `${parts.year}-${parts.month}-${parts.day}`;
     }
 
     function dateFromKey(key) {
@@ -955,12 +1141,109 @@
       return x;
     }
 
+    function selectedTimeZoneMeta() {
+      return TIME_ZONE_OPTIONS.find(tz => tz.value === selectedTimeZone);
+    }
+
+    function selectedTimeZoneLabel() {
+      const meta = selectedTimeZoneMeta();
+      return meta ? meta.abbr : selectedTimeZone;
+    }
+
+    function timeZoneAbbr(dateInput, timeZone = selectedTimeZone) {
+      const meta = TIME_ZONE_OPTIONS.find(tz => tz.value === timeZone);
+      if (meta) return meta.abbr;
+      try {
+        const part = new Intl.DateTimeFormat('en-US', {
+          timeZone,
+          timeZoneName: 'short',
+        }).formatToParts(new Date(dateInput)).find(p => p.type === 'timeZoneName');
+        return part?.value || timeZone;
+      } catch (_) {
+        return timeZone;
+      }
+    }
+
     function localTime(iso) {
-      return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const d = new Date(iso);
+      return `${d.toLocaleTimeString([], {
+        timeZone: selectedTimeZone,
+        hour: 'numeric',
+        minute: '2-digit',
+      })} ${timeZoneAbbr(d)}`;
+    }
+
+    function localTimeLong(iso) {
+      const d = new Date(iso);
+      return `${d.toLocaleTimeString([], {
+        timeZone: selectedTimeZone,
+        hour: 'numeric',
+        minute: '2-digit',
+      })} ${selectedTimeZoneName()}`;
     }
 
     function localDate(iso) {
-      return new Date(iso).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+      return new Date(iso).toLocaleDateString([], {
+        timeZone: selectedTimeZone,
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+
+    function localDateLong(iso) {
+      return new Date(iso).toLocaleDateString([], {
+        timeZone: selectedTimeZone,
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    }
+
+    function selectedTimeZoneName() {
+      const meta = selectedTimeZoneMeta();
+      return meta ? meta.label : selectedTimeZone;
+    }
+
+    function localDateTimeParts(iso) {
+      const d = new Date(iso);
+      return {
+        date: d.toLocaleDateString([], {
+          timeZone: selectedTimeZone,
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+        }),
+        time: localTime(d),
+      };
+    }
+
+    function selectedTodayKey(offset = 0) {
+      const base = dateFromKey(dateKeyInTimeZone(new Date()));
+      return dateKey(addDays(base, offset));
+    }
+
+    function initTimeZonePicker() {
+      const select = document.getElementById('liveTimeZoneSelect');
+      if (!select) return;
+      const hasSelected = TIME_ZONE_OPTIONS.some(tz => tz.value === selectedTimeZone);
+      const options = hasSelected
+        ? TIME_ZONE_OPTIONS
+        : [{ value: selectedTimeZone, label: `Local (${selectedTimeZone})`, abbr: timeZoneAbbr(new Date()) }, ...TIME_ZONE_OPTIONS];
+      select.innerHTML = options.map(tz =>
+        `<option value="${tz.value}">${tz.label} (${tz.abbr})</option>`
+      ).join('');
+      select.value = selectedTimeZone;
+    }
+
+    function setLiveTimeZone(tz) {
+      if (!tz || tz === selectedTimeZone) return;
+      selectedTimeZone = tz;
+      localStorage.setItem('liveTimeZone', tz);
+      initTimeZonePicker();
+      updateLiveDateControls();
+      refresh();
     }
 
     function formatDateKey(key, opts = {}) {
@@ -1003,6 +1286,7 @@
     function matchCard(event) {
       const comp   = event.competitions?.[0];
       if (!comp) return '';
+      if (event.id) liveEventsById.set(String(event.id), event);
       const home   = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0];
       const away   = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1];
       if (!home || !away) return '';
@@ -1011,7 +1295,7 @@
       const state  = st.state;
       const isLive = state === 'in';
       const isPost = state === 'post';
-      const canOpen = isLive || isPost;
+      const canOpen = !!event.id;
 
       const homeAbbr = home.team?.abbreviation || (home.team?.displayName || 'HME').slice(0,3).toUpperCase();
       const awayAbbr = away.team?.abbreviation || (away.team?.displayName || 'AWY').slice(0,3).toUpperCase();
@@ -1124,8 +1408,7 @@
 
       const stad = STADIUMS[g.stadium] || {};
       const city = stad.city || g.stadium;
-      const dateStr = g.dt.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
-      const timeStr = g.dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const { date: dateStr, time: timeStr } = localDateTimeParts(g.dt);
       const pad = n => String(n).padStart(2, '0');
 
       banner.innerHTML = `
@@ -1187,7 +1470,7 @@
     function setInitialLiveDate() {
       if (selectedLiveDate) return;
       const next = findNextMatchFromData();
-      selectedLiveDate = next?.date || dateKey(new Date());
+      selectedLiveDate = next?.date || selectedTodayKey();
     }
 
     function updateLiveDateControls() {
@@ -1198,8 +1481,8 @@
         dateBtn.classList.toggle('active', !!isDateMode);
       }
 
-      const today = dateKey(new Date());
-      const tomorrow = dateKey(addDays(new Date(), 1));
+      const today = selectedTodayKey();
+      const tomorrow = selectedTodayKey(1);
       const next = findNextMatchFromData()?.date || '';
       const setActive = (id, active) => {
         const el = document.getElementById(id);
@@ -1218,7 +1501,7 @@
       if (sub && selectedLiveDate) {
         const gamesOnDate = GAMES.filter(g => g.date === selectedLiveDate).length;
         sub.textContent = gamesOnDate
-          ? `${formatDateKey(selectedLiveDate)} · ${gamesOnDate} match${gamesOnDate === 1 ? '' : 'es'}`
+          ? `${formatDateKey(selectedLiveDate)} · ${gamesOnDate} match${gamesOnDate === 1 ? '' : 'es'} · ${selectedTimeZoneLabel()}`
           : `${formatDateKey(selectedLiveDate)} · no scheduled matches`;
       }
     }
@@ -1232,7 +1515,7 @@
     }
 
     function setLiveDateRelative(offset) {
-      setLiveDate(dateKey(addDays(new Date(), offset)));
+      setLiveDate(selectedTodayKey(offset));
     }
 
     function setLiveDateToNextMatch() {
@@ -1370,8 +1653,7 @@
         setInitialLiveDate();
         updateLiveDateControls();
 
-        const today = new Date();
-        const todayKeyValue = dateKey(today);
+        const todayKeyValue = selectedTodayKey();
         const recentKey = previousMatchDateKey(selectedLiveDate);
         const isPastMode = selectedLiveMode === 'past';
         const fetches = new Map();
@@ -1403,7 +1685,12 @@
         }
 
         document.getElementById('liveUpdatedText').textContent =
-          'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+          'Updated ' + `${new Date().toLocaleTimeString([], {
+            timeZone: selectedTimeZone,
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit',
+          })} ${timeZoneAbbr(new Date())}`;
       } catch (err) {
         console.warn('Live fetch failed:', err);
         if (!document.getElementById('selectedDayContent').innerHTML) {
@@ -1442,12 +1729,13 @@
     // ESPN names later rounds by their feeder matches ("Round of 32 3 Winner at
     // Round of 32 1 Winner"), so the official tree is reconstructable.
     function bk2Match(ev, opts = {}) {
+      if (ev.id) liveEventsById.set(String(ev.id), ev);
       const comp = ev.competitions?.[0] || {};
       const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0];
       const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1];
       const st = ev.status?.type || {};
       const isLive = st.state === 'in', isPost = st.state === 'post';
-      const canOpen = isLive || isPost;
+      const canOpen = !!ev.id;
 
       const row = c => {
         if (!c) return `<div class="bk2-row tbd"><span class="bk2-nm">TBD</span></div>`;
@@ -1466,7 +1754,7 @@
       let meta;
       if (isLive)      meta = `<div class="bk2-meta live">● ${ev.status?.displayClock || 'LIVE'}</div>`;
       else if (isPost) meta = `<div class="bk2-meta">FT</div>`;
-      else meta = `<div class="bk2-meta">${new Date(ev.date).toLocaleDateString([], { month:'short', day:'numeric' })}</div>`;
+      else meta = `<div class="bk2-meta">${localDate(ev.date)}</div>`;
 
       return `<div class="bk2-match ${isLive ? 'is-live' : ''} ${canOpen ? 'clickable' : ''}"
         ${canOpen ? `onclick="openMatchModal('${ev.id}')"` : ''}>
@@ -1647,6 +1935,16 @@
 
     let liveShareMatch = null;
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[ch]));
+    }
+
     function modalTeamName(c) {
       return c?.team?.displayName || c?.team?.shortDisplayName || 'TBD';
     }
@@ -1671,6 +1969,63 @@
         : groupMatch ? groupMatch[0]
         : note.replace(/\s*-?\s*FIFA World Cup.*/i, '').trim();
       return `FIFA WORLD CUP 2026™${stage ? ' - ' + stage : ''}`.toUpperCase();
+    }
+
+    function upcomingTeamBlock(c) {
+      const name = modalTeamName(c);
+      const logo = c?.team?.logo || c?.team?.logos?.[0]?.href || '';
+      return `<div class="lv-up-team">
+        ${logo
+          ? `<img src="${escapeHtml(logo)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=lv-up-flag>${getFlag(name)}</span>'">`
+          : `<span class="lv-up-flag">${getFlag(name)}</span>`}
+        <div class="lv-up-name">${escapeHtml(name)}</div>
+      </div>`;
+    }
+
+    function renderUpcomingMatchModal(event, body) {
+      const comp = event.competitions?.[0] || {};
+      const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
+      const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
+      const venue = comp.venue || event.venue || {};
+      const venueName = venue.fullName || venue.name || 'Venue TBD';
+      const city = [venue.address?.city, venue.address?.state || venue.address?.country].filter(Boolean).join(', ');
+      const broadcasts = [...new Set((comp.broadcasts || [])
+        .flatMap(b => b.names || b.name || b.displayName || [])
+        .filter(Boolean))];
+      const stage = modalStageText(comp, home, away).replace(/^FIFA WORLD CUP 2026™\s*-\s*/i, '') || 'Match';
+      const dateText = localDateLong(event.date);
+      const timeText = localTimeLong(event.date);
+      const calendarHref = '/games?tab=calendar';
+
+      body.innerHTML = `
+        <div class="lv-up-stage">${escapeHtml(stage)}</div>
+        <div class="lv-up-teams">
+          ${upcomingTeamBlock(home)}
+          <div class="lv-up-vs">VS</div>
+          ${upcomingTeamBlock(away)}
+        </div>
+        <div class="lv-up-info">
+          <div class="lv-up-info-row">
+            <span class="lv-up-icon">📅</span>
+            <span><strong>${escapeHtml(dateText)}</strong></span>
+          </div>
+          <div class="lv-up-info-row">
+            <span class="lv-up-icon">🕘</span>
+            <span><strong>${escapeHtml(timeText)}</strong></span>
+          </div>
+          <div class="lv-up-info-row">
+            <span class="lv-up-icon">📍</span>
+            <span><strong>${escapeHtml(venueName)}</strong>${city ? ` · ${escapeHtml(city)}` : ''}</span>
+          </div>
+          ${broadcasts.length ? `<div class="lv-up-info-row">
+            <span class="lv-up-icon">📺</span>
+            <span>${broadcasts.map(escapeHtml).join(' · ')}</span>
+          </div>` : ''}
+        </div>
+        <div class="lv-up-actions">
+          <a class="lv-up-cal-btn" href="${calendarHref}">+ Add to Calendar</a>
+          <div class="lv-up-note">Opens Calendar &amp; Export so you can select this match or build a custom match calendar.</div>
+        </div>`;
     }
 
     function drawRoundRect(ctx, x, y, w, h, r) {
@@ -1971,6 +2326,12 @@
       lenis.stop();
 
       try {
+        const cachedEvent = liveEventsById.get(String(eventId));
+        if (cachedEvent?.status?.type?.state === 'pre') {
+          renderUpcomingMatchModal(cachedEvent, body);
+          return;
+        }
+
         const d = await fetch(SUMMARY + eventId).then(r => r.json());
         const comp = d.header?.competitions?.[0] || {};
         const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
@@ -2078,6 +2439,7 @@
     });
 
     // ── Kick everything off ────────────────────────
+    initTimeZonePicker();
     refresh();
     setInterval(() => {
       refresh();
