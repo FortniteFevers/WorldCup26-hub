@@ -474,6 +474,57 @@
     [data-theme="light"] .bug-vs     { background: #39b4d8; border-color: #0a2240; color: #0a2240; }
     [data-theme="light"] .score-bug-flag-img { box-shadow: 0 0 0 1.5px rgba(0,0,0,0.25); }
 
+    /* ── inline stats dropdown ──────────────────────── */
+    .bug-stats-toggle {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.4rem 0 0.2rem;
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); cursor: pointer;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      transition: color 0.15s; user-select: none;
+    }
+    .bug-stats-toggle:hover { color: rgba(255,255,255,0.65); }
+    .bug-stats-chevron { display: inline-block; transition: transform 0.3s ease; font-style: normal; }
+    .bug-stats-toggle.open .bug-stats-chevron { transform: rotate(180deg); }
+
+    .bug-stats-panel {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .bug-stats-panel.open { max-height: 600px; }
+
+    .bug-stats-inner {
+      padding: 0.7rem 0.9rem 0.85rem;
+      display: flex; flex-direction: column; gap: 0.55rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .bug-stat-row {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .bug-stat-val {
+      font-size: 0.82rem; font-weight: 800; min-width: 2.2rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .bug-stat-val.home { text-align: right; color: var(--home-primary); }
+    .bug-stat-val.away { text-align: left;  color: var(--away-primary); }
+    .bug-stat-center { flex: 1; min-width: 0; }
+    .bug-stat-label {
+      font-size: 0.62rem; font-weight: 700; text-align: center;
+      color: rgba(255,255,255,0.38); letter-spacing: 0.07em; text-transform: uppercase;
+      margin-bottom: 0.22rem;
+    }
+    .bug-stat-bars {
+      display: flex; height: 5px; border-radius: 3px; overflow: hidden;
+      background: rgba(255,255,255,0.08);
+    }
+    .bug-stat-bar { transition: width 0.5s ease; }
+    .bug-stat-bar.h { background: var(--home-primary); }
+    .bug-stat-bar.a { background: var(--away-primary); margin-left: auto; }
+    [data-theme="light"] .bug-stats-toggle { color: rgba(0,0,0,0.35); border-top-color: rgba(0,0,0,0.08); }
+    [data-theme="light"] .bug-stats-toggle:hover { color: rgba(0,0,0,0.65); }
+    [data-theme="light"] .bug-stat-label { color: rgba(0,0,0,0.38); }
+    [data-theme="light"] .bug-stats-inner { border-top-color: rgba(0,0,0,0.06); }
+
     .score-bug-flag { font-size: 1.8rem; line-height: 1; flex-shrink: 0; }
     .score-bug-flag-img {
       width: 2rem; height: 1.38rem; object-fit: cover;
@@ -1348,6 +1399,12 @@
         clockPre = 'is-pre';
       }
 
+      const statsSection = isLive ? `
+        <div class="bug-stats-toggle" onclick="event.stopPropagation();toggleBugStats('${event.id}',this)">
+          Stats <span class="bug-stats-chevron">▾</span>
+        </div>
+        <div class="bug-stats-panel" id="bugstats-${event.id}"></div>` : '';
+
       return `<div class="score-bug ${isLive ? 'is-live' : ''} ${isPost ? 'is-post' : ''} ${canOpen ? 'clickable' : ''}"
         style="${bugColors}" ${canOpen ? `onclick="openMatchModal('${event.id}')"` : ''}>
         <div class="bug-header">${headerTxt}</div>
@@ -1369,6 +1426,7 @@
             <div class="bug-clock ${clockPre}">${clockHtml}</div>
           </div>
         </div>
+        ${statsSection}
       </div>`;
     }
 
@@ -2314,6 +2372,59 @@
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = original;
+      }
+    }
+
+    const bugStatsCache = {};
+    async function toggleBugStats(id, toggleEl) {
+      const panel = document.getElementById('bugstats-' + id);
+      const isOpen = panel.classList.contains('open');
+      if (isOpen) {
+        panel.classList.remove('open');
+        toggleEl.classList.remove('open');
+        return;
+      }
+      toggleEl.classList.add('open');
+      panel.classList.add('open');
+      if (bugStatsCache[id]) { panel.innerHTML = bugStatsCache[id]; return; }
+      panel.innerHTML = '<div class="bug-stats-inner" style="justify-content:center;align-items:center;padding:0.9rem;color:rgba(255,255,255,0.3);font-size:0.75rem;">Loading…</div>';
+      try {
+        const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${id}&lang=en`);
+        const d = await r.json();
+        const ev = liveEventsById.get(String(id));
+        const comp = ev?.competitions?.[0];
+        const home = comp?.competitors?.find(c => c.homeAway === 'home') || comp?.competitors?.[0];
+        const away = comp?.competitors?.find(c => c.homeAway === 'away') || comp?.competitors?.[1];
+        const STATS = [
+          ['possessionPct','Possession %'],['totalShots','Shots'],
+          ['shotsOnTarget','On Target'],['wonCorners','Corners'],
+          ['yellowCards','Yellows'],['foulsCommitted','Fouls'],
+        ];
+        const bx = d.boxscore?.teams || [];
+        const statsOf = tid => { const t = bx.find(x => x.team?.id === tid) || {}; const m = {}; (t.statistics || []).forEach(s => m[s.name] = s.displayValue); return m; };
+        const hs = statsOf(home?.team?.id), as_ = statsOf(away?.team?.id);
+        let rows = '';
+        STATS.forEach(([key, label]) => {
+          if (hs[key] == null && as_[key] == null) return;
+          const hv = parseFloat(hs[key]) || 0, av = parseFloat(as_[key]) || 0;
+          const tot = hv + av || 1;
+          rows += `<div class="bug-stat-row">
+            <span class="bug-stat-val home">${hs[key] ?? '–'}</span>
+            <div class="bug-stat-center">
+              <div class="bug-stat-label">${label}</div>
+              <div class="bug-stat-bars">
+                <div class="bug-stat-bar h" style="width:${(hv/tot)*100}%"></div>
+                <div class="bug-stat-bar a" style="width:${(av/tot)*100}%"></div>
+              </div>
+            </div>
+            <span class="bug-stat-val away">${as_[key] ?? '–'}</span>
+          </div>`;
+        });
+        const html = rows ? `<div class="bug-stats-inner">${rows}</div>` : '<div class="bug-stats-inner" style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.75rem;">No stats yet</div>';
+        bugStatsCache[id] = html;
+        panel.innerHTML = html;
+      } catch(e) {
+        panel.innerHTML = '<div class="bug-stats-inner" style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.75rem;">Stats unavailable</div>';
       }
     }
 
