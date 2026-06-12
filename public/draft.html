@@ -44,6 +44,25 @@
       color: var(--text-muted);
       margin-top: 0.3rem;
     }
+    .mode-return {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+    .mode-return:hover {
+      border-color: var(--border-bright);
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
     .d-mode-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -687,6 +706,7 @@
     <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
       <li><a href="/">Home</a></li>
+      <li><a href="/live" class="nav-live">LIVE <span class="nav-live-dot"></span></a></li>
       <li><a href="/games">Browse Matches</a></li>
       <li><a href="/groups">Groups</a></li>
       <li><a href="/teams">Teams</a></li>
@@ -708,6 +728,7 @@
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
     <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/live" class="nav-live" onclick="closeMobileMenu()">LIVE <span class="nav-live-dot"></span></a>
     <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
     <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="/teams" onclick="closeMobileMenu()">Teams</a>
@@ -720,6 +741,7 @@
 
     <!-- ── Screen: Mode Select ───────────────────── -->
     <div id="screenMode" class="d-screen active">
+      <a class="mode-return" href="/my-team">← Back to Mode Select</a>
       <div class="d-hero">
         <div class="d-wordmark">104-0</div>
         <div class="d-tagline">Draft 11 players. Win the World Cup.</div>
@@ -752,9 +774,6 @@
           <div class="d-mode-desc">Draft legends from any era — Pelé, Maradona, Zidane, Ronaldo. Build the greatest squad in football history.</div>
           <button class="btn btn-outline" style="width:fit-content;margin-top:0.5rem;opacity:0.4;" disabled>Coming Soon</button>
         </div>
-      </div>
-      <div style="margin-top:1.5rem;text-align:center;">
-        <a href="/my-team" style="font-size:0.8rem;color:var(--text-muted);text-decoration:none;">← Back to My Team</a>
       </div>
     </div>
 

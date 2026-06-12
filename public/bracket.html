@@ -64,6 +64,30 @@
     .action-bar-title { font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; }
     .action-bar-sub   { font-size: 0.72rem; color: var(--text-muted); }
     .action-btns      { display: flex; gap: 0.5rem; flex-wrap: wrap; flex-shrink: 0; }
+    .mode-return-wrap {
+      max-width: 1180px;
+      margin: 1rem auto 0;
+      padding: 0 1.5rem;
+    }
+    .mode-return {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+    .mode-return:hover {
+      border-color: var(--border-bright);
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
 
     /* ── Group Stage ─────────────────────────────────── */
     .gs-wrap { padding: 1.5rem; }
@@ -583,6 +607,10 @@
     <a href="/players" onclick="closeMobileMenu()">Players</a>
     <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
     <a href="/guide" onclick="closeMobileMenu()">Guide</a>
+  </div>
+
+  <div class="mode-return-wrap">
+    <a class="mode-return" href="/my-team">← Back to Mode Select</a>
   </div>
 
   <!-- Phase indicator -->

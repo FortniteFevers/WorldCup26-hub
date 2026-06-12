@@ -115,6 +115,12 @@
     /* Two columns on mobile — use 50% not fixed px so nothing overflows */
     @media (max-width: 540px) {
       .players-wrap { padding-left: 0.75rem; padding-right: 0.75rem; overflow-x: hidden; }
+      .pl-filters { gap: 0.55rem; align-items: flex-start; }
+      .pl-nation-select { padding: 0.42rem 0.78rem; max-width: 100%; }
+      .pl-pos-tabs { gap: 0.35rem; flex-wrap: wrap; width: 100%; }
+      .pl-pos-tab { padding: 0.34rem 0.68rem; min-width: 0; }
+      #plSort { margin-left: 0 !important; }
+      .pl-count { margin-left: 0; align-self: center; }
       .pl-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
 
       /* Bottom-sheet modal on mobile — modal breaks out of flex overlay

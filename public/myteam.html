@@ -81,6 +81,9 @@
     .ptok .badge.mid { background: #3b82f6; color: #fff; }
     .ptok .badge.fwd { background: #ef4444; color: #fff; }
     .ptok .badge.empty { background: rgba(0,0,0,0.32); border-style: dashed; color: rgba(255,255,255,0.4); font-size: 1rem; }
+    .ptok-head { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: var(--bg-card); border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.55); transition: transform 0.15s; }
+    .ptok-head-fallback { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); color: #fff; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.55); font-size: 0.58rem; font-weight: 900; transition: transform 0.15s; }
+    .ptok:hover .ptok-head, .ptok:hover .ptok-head-fallback { transform: scale(1.2); }
     .ptok .pname { font-size: 0.5rem; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,1); white-space: nowrap; max-width: 56px; overflow: hidden; text-overflow: ellipsis; text-align: center; }
     .ptok .prole { font-size: 0.44rem; font-weight: 600; color: rgba(255,255,255,0.62); text-shadow: 0 1px 3px rgba(0,0,0,0.9); text-align: center; }
 
@@ -99,9 +102,13 @@
     .prow.used { opacity: 0.32; pointer-events: none; }
     .prow-num { width: 18px; text-align: center; font-size: 0.65rem; color: var(--text-muted); font-weight: 700; flex-shrink: 0; }
     .prow-name { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-head { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: var(--bg-base); border: 1px solid var(--border-bright); flex-shrink: 0; }
+    .player-head-fallback { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--input-bg); border: 1px solid var(--border-bright); color: var(--text-muted); font-size: 0.58rem; font-weight: 900; flex-shrink: 0; }
     .bench-wrap { margin-top: 0.75rem; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto; }
     .bench-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
     .bench-chip { display: flex; align-items: center; gap: 0.3rem; padding: 0.22rem 0.6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 100px; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); }
+    .bench-head { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; background: var(--bg-base); border: 1px solid var(--border); flex-shrink: 0; }
+    .bench-head-fallback { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.42rem; font-weight: 900; flex-shrink: 0; }
     .step-n { width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: #0a0a0a; display: flex; align-items: center; justify-content: center; font-size: 0.74rem; font-weight: 800; flex-shrink: 0; }
     .locked { opacity: 0.4; pointer-events: none; }
     .xi-count { font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 100px; background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(245,200,66,0.2); }
@@ -498,6 +505,16 @@
     function fc26Overall(playerName) {
       return FC26_RATINGS[normalizeName(playerName)] || null;
     }
+    function playerInitials(name) {
+      return (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+    }
+    function playerHead(player, imgClass = 'player-head', fallbackClass = 'player-head-fallback') {
+      const initials = playerInitials(player?.name);
+      if (player?.faceUrl) {
+        return `<img class="${imgClass}" src="${player.faceUrl}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span class="${fallbackClass}" style="display:none;">${initials}</span>`;
+      }
+      return `<span class="${fallbackClass}">${initials}</span>`;
+    }
 
     // ── Mode ─────────────────────────────────────────
     function enterMode(mode) {
@@ -621,7 +638,7 @@
         const tok=document.createElement('div'); tok.className='ptok';
         tok.style.left=slot.x+'%'; tok.style.top=slot.y+'%';
         if (player) {
-          tok.innerHTML=`<div class="badge ${posClass(cat)}">${player.shirtNumber??'#'}</div><div class="pname">${shortName(player.name)}</div><div class="prole">${slot.role}</div>`;
+          tok.innerHTML=`${playerHead(player, 'ptok-head', 'ptok-head-fallback')}<div class="pname">${shortName(player.name)}</div><div class="prole">${slot.role}</div>`;
           tok.onclick=()=>removeFromSlot(i);
         } else {
           tok.innerHTML=`<div class="badge empty">+</div><div class="prole" style="color:rgba(255,255,255,0.5);">${slot.role}</div>`;
@@ -652,6 +669,7 @@
         const ovrColor=ovr>=88?'#f5c842':ovr>=83?'#4ade80':ovr>=77?'#34d399':ovr>=70?'#60a5fa':'var(--text-muted)';
         return`<div class="prow ${used?'used':''}" onclick="quickAssign('${p.name.replace(/'/g,"\\'")}')">
           <div class="prow-num" style="color:${pc[cat]};">${p.shirtNumber??'—'}</div>
+          ${playerHead(p)}
           <span style="font-size:0.56rem;font-weight:700;padding:0.1rem 0.3rem;border-radius:4px;background:${pc[cat]}22;color:${pc[cat]};flex-shrink:0;">${cat}</span>
           <div class="prow-name">${p.name}</div>
           ${ovr?`<div style="font-size:0.72rem;font-weight:900;color:${ovrColor};flex-shrink:0;">${ovr}</div>`:`<div style="font-size:0.68rem;color:var(--text-muted);flex-shrink:0;">${age??'—'}</div>`}
@@ -678,6 +696,7 @@
         sorted.map(p=>{const cat=posCat(p.position),age=calcAge(p.dateOfBirth),used=inXI.has(p.name);
           return`<div class="sprow ${used?'used':''}" onclick="assignToSlot('${p.name.replace(/'/g,"\\'")}')">
             <span style="font-size:0.6rem;font-weight:700;padding:0.12rem 0.4rem;border-radius:4px;background:${pc[cat]}22;color:${pc[cat]};flex-shrink:0;">${cat}</span>
+            ${playerHead(p)}
             <div class="sprow-name">${p.name}</div>
             <div style="font-size:0.7rem;color:var(--text-muted);">#${p.shirtNumber??'—'} · ${age??'—'} yrs</div>
           </div>`;
@@ -709,7 +728,7 @@
       const squad=teamsData[currentTeam]?.squad||[], inXI=new Set(startingXI.filter(Boolean).map(p=>p.name));
       const bench=squad.filter(p=>!inXI.has(p.name));
       const pc={GK:'var(--gold)',DEF:'#22c55e',MID:'#60a5fa',FWD:'var(--red)'};
-      document.getElementById('benchChips').innerHTML=bench.slice(0,12).map(p=>`<div class="bench-chip"><span style="font-size:0.55rem;font-weight:700;color:${pc[posCat(p.position)]};">${posCat(p.position)}</span>${shortName(p.name)}</div>`).join('')+(bench.length>12?`<div class="bench-chip" style="color:var(--text-muted);">+${bench.length-12}</div>`:'');
+      document.getElementById('benchChips').innerHTML=bench.slice(0,12).map(p=>`<div class="bench-chip">${playerHead(p, 'bench-head', 'bench-head-fallback')}<span style="font-size:0.55rem;font-weight:700;color:${pc[posCat(p.position)]};">${posCat(p.position)}</span>${shortName(p.name)}</div>`).join('')+(bench.length>12?`<div class="bench-chip" style="color:var(--text-muted);">+${bench.length-12}</div>`:'');
     }
     function updateXICount() {
       const n=startingXI.filter(Boolean).length, el=document.getElementById('xiCount');

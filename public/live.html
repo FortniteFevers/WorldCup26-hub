@@ -35,6 +35,210 @@
     .live-updated.refreshing .refresh-spin { animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .live-day-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem;
+      margin: 0 0 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .live-day-title {
+      font-size: 0.74rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+    .live-day-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.18rem;
+    }
+    .live-day-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.42rem;
+      flex-wrap: wrap;
+    }
+    .live-day-btn,
+    .live-date-btn {
+      min-height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text-secondary);
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: border-color 0.16s, color 0.16s, background 0.16s, transform 0.16s;
+    }
+    .live-day-btn {
+      padding: 0.45rem 0.75rem;
+    }
+    .live-date-btn {
+      padding: 0.45rem 0.78rem;
+      white-space: nowrap;
+    }
+    .live-day-btn:hover,
+    .live-date-btn:hover {
+      border-color: var(--border-bright);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+    .live-day-btn.active {
+      background: var(--gold-dim);
+      border-color: rgba(245,200,66,0.45);
+      color: var(--gold);
+    }
+    .live-date-btn.active {
+      background: var(--gold-dim);
+      border-color: rgba(245,200,66,0.45);
+      color: var(--gold);
+    }
+    .live-day-empty {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      font-size: 0.82rem;
+      margin-top: 0.75rem;
+    }
+    @media (max-width: 720px) {
+      .live-day-panel {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .live-day-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    .cal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .cal-backdrop.open { display: flex; }
+    .cal-popup {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      min-width: 280px;
+      width: min(92vw, 360px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .cal-title { font-size: 0.9rem; font-weight: 800; color: var(--text-primary); }
+    .cal-nav {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .cal-nav:hover { background: var(--bg-base); color: var(--text-primary); }
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7,1fr);
+      gap: 2px;
+      margin-bottom: 4px;
+    }
+    .cal-weekday {
+      text-align: center;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 0.2rem;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7,1fr);
+      gap: 2px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-weight: 650;
+      color: var(--text-muted);
+      position: relative;
+    }
+    .cal-day.has-game {
+      color: var(--text-primary);
+      cursor: pointer;
+      background: var(--bg-base);
+    }
+    .cal-day.has-game:hover { background: var(--input-bg); }
+    .cal-day.selected {
+      background: var(--gold-dim) !important;
+      color: var(--gold) !important;
+    }
+    .cal-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--gold);
+      position: absolute;
+      bottom: 3px;
+    }
+    .cal-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .cal-clear {
+      background: none;
+      border: none;
+      font: inherit;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.45rem 0;
+    }
+    .cal-clear:hover { color: var(--text-primary); }
+    .cal-close {
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      border-radius: 10px;
+      padding: 0.45rem 0.9rem;
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 850;
+      cursor: pointer;
+    }
+    .cal-close:hover { border-color: var(--border-bright); }
+
     .live-section-title {
       font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--text-muted);
@@ -639,8 +843,23 @@
       </div>
 
       <div id="viewScores">
+        <div id="liveNowContent"></div>
         <div id="nextMatchBanner"></div>
-        <div id="liveContent"></div>
+        <div class="live-day-panel">
+          <div>
+            <div class="live-day-title">Match day viewer</div>
+            <div class="live-day-sub" id="liveDaySub">Choose any tournament date</div>
+          </div>
+          <div class="live-day-actions">
+            <button type="button" class="live-day-btn" id="btnPast" onclick="setPastMatchesView()">Past matches</button>
+            <button type="button" class="live-day-btn" id="btnToday" onclick="setLiveDateRelative(0)">Today</button>
+            <button type="button" class="live-day-btn" id="btnTomorrow" onclick="setLiveDateRelative(1)">Tomorrow</button>
+            <button type="button" class="live-day-btn" id="btnNextMatch" onclick="setLiveDateToNextMatch()">Next match</button>
+            <button type="button" class="live-date-btn" id="liveDateBtn" onclick="openLiveCalPopup()">📅 All Dates</button>
+          </div>
+        </div>
+        <div id="selectedDayContent"></div>
+        <div id="recentFinalsContent"></div>
       </div>
 
       <div id="viewBracket" style="display:none">
@@ -654,6 +873,27 @@
     <div class="lv-modal" data-lenis-prevent>
       <button class="lv-modal-close" onclick="closeMatchModal()">✕</button>
       <div id="lvModalBody"></div>
+    </div>
+  </div>
+
+  <div class="cal-backdrop" id="liveCalBackdrop" onclick="handleLiveCalBackdropClick(event)">
+    <div class="cal-popup">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="changeLiveCalMonth(-1)">◀</button>
+        <span class="cal-title" id="liveCalTitle"></span>
+        <button class="cal-nav" onclick="changeLiveCalMonth(1)">▶</button>
+      </div>
+      <div class="cal-weekdays">
+        <span class="cal-weekday">Su</span><span class="cal-weekday">Mo</span>
+        <span class="cal-weekday">Tu</span><span class="cal-weekday">We</span>
+        <span class="cal-weekday">Th</span><span class="cal-weekday">Fr</span>
+        <span class="cal-weekday">Sa</span>
+      </div>
+      <div class="cal-grid" id="liveCalGrid"></div>
+      <div class="cal-footer">
+        <button class="cal-clear" onclick="clearLiveDateSelection()">Clear selection</button>
+        <button class="cal-close" onclick="closeLiveCalPopup()">Close</button>
+      </div>
     </div>
   </div>
 
@@ -673,10 +913,30 @@
     const SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
     const REFRESH_MS = 45000;          // 45s between refreshes
     const OPENER_UTC = '2026-06-11T19:00:00Z'; // Mexico vs South Africa kickoff
+    const MATCH_DATES = [...new Set(GAMES.map(g => g.date))].sort();
+    const MATCH_DATE_SET = new Set(MATCH_DATES);
+    let selectedLiveDate = null;
+    let selectedLiveMode = 'date';
+    let liveCalYear = 2026;
+    let liveCalMonth = 5;
 
     // ── Helpers ────────────────────────────────────
     function dateParam(d) {
       return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function dateKey(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function dateFromKey(key) {
+      return new Date(`${key}T12:00:00`);
+    }
+
+    function addDays(d, n) {
+      const x = new Date(d);
+      x.setDate(x.getDate() + n);
+      return x;
     }
 
     function localTime(iso) {
@@ -685,6 +945,28 @@
 
     function localDate(iso) {
       return new Date(iso).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+
+    function formatDateKey(key, opts = {}) {
+      return dateFromKey(key).toLocaleDateString([], {
+        weekday: opts.short ? 'short' : 'long',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+
+    function previousMatchDateKey(refKey) {
+      return MATCH_DATES.filter(d => d < refKey).sort().pop() || null;
+    }
+
+    function splitEvents(events) {
+      const byTime = (a, b) => new Date(a.date) - new Date(b.date);
+      return {
+        live: events.filter(e => e.status?.type?.state === 'in').sort(byTime),
+        upcoming: events.filter(e => e.status?.type?.state === 'pre').sort(byTime),
+        done: events.filter(e => e.status?.type?.state === 'post').sort(byTime),
+        other: events.filter(e => !['in','pre','post'].includes(e.status?.type?.state)).sort(byTime),
+      };
     }
 
     function teamHtml(comp, side) {
@@ -698,34 +980,6 @@
       </div>`;
     }
 
-    // Per-team bug layer colors [primary, secondary] — vibrant flag tones in
-    // the FWC26 broadcast palette. MEX + RSA are locked to the reference comp.
-    const BUG_COLORS = {
-      MEX: ['#f4504a', '#2fb344'],  RSA: ['#9b59f5', '#8ad32a'],
-      KOR: ['#f4504a', '#3f6ef7'],  CZE: ['#3f6ef7', '#f4504a'],
-      CAN: ['#f4504a', '#ff7a00'],  BIH: ['#3f6ef7', '#ffd43b'],
-      QAT: ['#b02a4c', '#f06595'],  SUI: ['#f4504a', '#c92a2a'],
-      USA: ['#3f6ef7', '#f4504a'],  PAR: ['#f4504a', '#3f6ef7'],
-      AUS: ['#ffd43b', '#2fb344'],  TUR: ['#f4504a', '#c92a2a'],
-      CIV: ['#ff7a00', '#2fb344'],  ECU: ['#ffd43b', '#3f6ef7'],
-      GER: ['#f4504a', '#ffcc00'],  CUW: ['#3f6ef7', '#ffd43b'],
-      NED: ['#ff7a00', '#3f6ef7'],  JPN: ['#f4504a', '#c92a2a'],
-      SWE: ['#3f6ef7', '#ffcc00'],  TUN: ['#f4504a', '#c92a2a'],
-      ESP: ['#f4504a', '#ffcc00'],  CPV: ['#3f6ef7', '#ffd43b'],
-      KSA: ['#2fb344', '#8ad32a'],  URU: ['#45c4f9', '#ffd43b'],
-      BEL: ['#f4504a', '#ffcc00'],  EGY: ['#f4504a', '#ffd43b'],
-      IRN: ['#2fb344', '#f4504a'],  NZL: ['#3f6ef7', '#f4504a'],
-      FRA: ['#3f6ef7', '#f4504a'],  SEN: ['#2fb344', '#ffd43b'],
-      IRQ: ['#f4504a', '#2fb344'],  NOR: ['#f4504a', '#3f6ef7'],
-      ARG: ['#45c4f9', '#ffd43b'],  ALG: ['#2fb344', '#f4504a'],
-      AUT: ['#f4504a', '#c92a2a'],  JOR: ['#2fb344', '#f4504a'],
-      GHA: ['#f4504a', '#ffd43b'],  PAN: ['#f4504a', '#3f6ef7'],
-      ENG: ['#f4504a', '#3f6ef7'],  CRO: ['#f4504a', '#3f6ef7'],
-      BRA: ['#2fb344', '#ffd43b'],  MAR: ['#f4504a', '#2fb344'],
-      HAI: ['#3f6ef7', '#f4504a'],  SCO: ['#3f6ef7', '#45c4f9'],
-      POR: ['#2fb344', '#f4504a'],  COL: ['#ffd43b', '#3f6ef7'],
-      UZB: ['#45c4f9', '#2fb344'],  UAE: ['#2fb344', '#f4504a'],
-    };
     function teamBugColors(team) {
       return BUG_COLORS[team?.abbreviation] || ['#f4504a', '#8ad32a'];
     }
@@ -905,37 +1159,239 @@
       return j.events || [];
     }
 
+    async function fetchDateRange(startKey, endKey) {
+      const start = dateParam(dateFromKey(startKey));
+      const end = dateParam(dateFromKey(endKey));
+      const r = await fetch(`${SCOREBOARD}?dates=${start}-${end}&limit=200`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      return j.events || [];
+    }
+
+    function setInitialLiveDate() {
+      if (selectedLiveDate) return;
+      const next = findNextMatchFromData();
+      selectedLiveDate = next?.date || dateKey(new Date());
+    }
+
+    function updateLiveDateControls() {
+      const dateBtn = document.getElementById('liveDateBtn');
+      if (dateBtn) {
+        const isDateMode = selectedLiveMode === 'date' && selectedLiveDate;
+        dateBtn.textContent = isDateMode ? `📅 ${formatDateKey(selectedLiveDate, { short: true })}` : '📅 All Dates';
+        dateBtn.classList.toggle('active', !!isDateMode);
+      }
+
+      const today = dateKey(new Date());
+      const tomorrow = dateKey(addDays(new Date(), 1));
+      const next = findNextMatchFromData()?.date || '';
+      const setActive = (id, active) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', !!active);
+      };
+      setActive('btnPast', selectedLiveMode === 'past');
+      setActive('btnToday', selectedLiveMode === 'date' && selectedLiveDate === today);
+      setActive('btnTomorrow', selectedLiveMode === 'date' && selectedLiveDate === tomorrow);
+      setActive('btnNextMatch', selectedLiveMode === 'date' && selectedLiveDate === next);
+
+      const sub = document.getElementById('liveDaySub');
+      if (sub && selectedLiveMode === 'past') {
+        sub.textContent = 'Final scores from most recent to oldest';
+        return;
+      }
+      if (sub && selectedLiveDate) {
+        const gamesOnDate = GAMES.filter(g => g.date === selectedLiveDate).length;
+        sub.textContent = gamesOnDate
+          ? `${formatDateKey(selectedLiveDate)} · ${gamesOnDate} match${gamesOnDate === 1 ? '' : 'es'}`
+          : `${formatDateKey(selectedLiveDate)} · no scheduled matches`;
+      }
+    }
+
+    function setLiveDate(key) {
+      if (!key) return;
+      selectedLiveMode = 'date';
+      selectedLiveDate = key;
+      updateLiveDateControls();
+      refresh();
+    }
+
+    function setLiveDateRelative(offset) {
+      setLiveDate(dateKey(addDays(new Date(), offset)));
+    }
+
+    function setLiveDateToNextMatch() {
+      const next = findNextMatchFromData();
+      if (next) setLiveDate(next.date);
+    }
+
+    function setPastMatchesView() {
+      selectedLiveMode = 'past';
+      updateLiveDateControls();
+      refresh();
+    }
+
+    function openLiveCalPopup() {
+      if (selectedLiveDate) {
+        const d = dateFromKey(selectedLiveDate);
+        liveCalYear = d.getFullYear();
+        liveCalMonth = d.getMonth();
+      }
+      renderLiveCalPopup();
+      document.getElementById('liveCalBackdrop')?.classList.add('open');
+    }
+
+    function closeLiveCalPopup() {
+      document.getElementById('liveCalBackdrop')?.classList.remove('open');
+    }
+
+    function handleLiveCalBackdropClick(e) {
+      if (e.target === document.getElementById('liveCalBackdrop')) closeLiveCalPopup();
+    }
+
+    function renderLiveCalPopup() {
+      const title = document.getElementById('liveCalTitle');
+      const grid = document.getElementById('liveCalGrid');
+      if (!title || !grid) return;
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      title.textContent = `${months[liveCalMonth]} ${liveCalYear}`;
+      const daysInMonth = new Date(liveCalYear, liveCalMonth + 1, 0).getDate();
+      const firstDay = new Date(liveCalYear, liveCalMonth, 1).getDay();
+      let html = '';
+      for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${liveCalYear}-${String(liveCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const hasGame = MATCH_DATE_SET.has(dateStr);
+        const isSelected = selectedLiveMode === 'date' && selectedLiveDate === dateStr;
+        html += `<div class="cal-day ${hasGame ? 'has-game' : ''} ${isSelected ? 'selected' : ''}"
+          ${hasGame ? `onclick="selectLiveCalendarDate('${dateStr}')"` : ''}>
+          ${d}${hasGame ? '<div class="cal-dot"></div>' : ''}
+        </div>`;
+      }
+      grid.innerHTML = html;
+    }
+
+    function changeLiveCalMonth(dir) {
+      liveCalMonth += dir;
+      if (liveCalMonth < 0) { liveCalMonth = 11; liveCalYear--; }
+      if (liveCalMonth > 11) { liveCalMonth = 0; liveCalYear++; }
+      if (liveCalYear < 2026 || (liveCalYear === 2026 && liveCalMonth < 5)) { liveCalYear = 2026; liveCalMonth = 5; }
+      if (liveCalYear > 2026 || (liveCalYear === 2026 && liveCalMonth > 6)) { liveCalYear = 2026; liveCalMonth = 6; }
+      renderLiveCalPopup();
+    }
+
+    function selectLiveCalendarDate(dateStr) {
+      setLiveDate(dateStr);
+      closeLiveCalPopup();
+    }
+
+    function clearLiveDateSelection() {
+      setLiveDateToNextMatch();
+      renderLiveCalPopup();
+      closeLiveCalPopup();
+    }
+
+    function renderDateSection(title, events, opts = {}) {
+      const visible = events.filter(e => !(opts.excludeLive && e.status?.type?.state === 'in'));
+      if (!visible.length) return '';
+      return section(title, visible.sort((a, b) => new Date(a.date) - new Date(b.date)), opts.liveTitle);
+    }
+
+    function renderSelectedDay(events, todayKeyValue) {
+      const el = document.getElementById('selectedDayContent');
+      if (!el) return;
+      const split = splitEvents(events);
+      const all = [...split.live, ...split.upcoming, ...split.done, ...split.other];
+      const excludeLive = selectedLiveDate === todayKeyValue;
+      const visible = excludeLive ? all.filter(e => e.status?.type?.state !== 'in') : all;
+      const dateLabel = formatDateKey(selectedLiveDate);
+      const hasLocalGames = GAMES.some(g => g.date === selectedLiveDate);
+
+      if (!visible.length) {
+        el.innerHTML = `<div class="live-section-title">${dateLabel}</div>
+          <div class="live-day-empty">${hasLocalGames ? 'No ESPN cards are available for this date yet.' : 'No World Cup matches are scheduled for this date.'}</div>`;
+        return;
+      }
+
+      const hasOnlyFinals = visible.every(e => e.status?.type?.state === 'post');
+      const hasOnlyUpcoming = visible.every(e => e.status?.type?.state === 'pre');
+      const title = hasOnlyFinals
+        ? `${dateLabel} results`
+        : hasOnlyUpcoming
+          ? `${dateLabel} upcoming`
+          : `${dateLabel} matches`;
+      el.innerHTML = renderDateSection(title, visible, { excludeLive: false });
+    }
+
+    function renderRecentFinals(events, key) {
+      const el = document.getElementById('recentFinalsContent');
+      if (!el) return;
+      const finals = splitEvents(events).done;
+      if (!key || key === selectedLiveDate || !finals.length) {
+        el.innerHTML = '';
+        return;
+      }
+      el.innerHTML = renderDateSection(`Recent finals · ${formatDateKey(key, { short: true })}`, finals);
+    }
+
+    function renderPastMatches(events) {
+      const el = document.getElementById('selectedDayContent');
+      if (!el) return;
+      const finals = events
+        .filter(e => e.status?.type?.state === 'post')
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+      if (!finals.length) {
+        el.innerHTML = `<div class="live-section-title">Past matches</div>
+          <div class="live-day-empty">No final scores are available yet.</div>`;
+        return;
+      }
+      el.innerHTML = section(`Past matches · ${finals.length} final${finals.length === 1 ? '' : 's'}`, finals, false);
+    }
+
     async function refresh() {
       const updated = document.getElementById('liveUpdated');
       updated.classList.add('refreshing');
       try {
+        setInitialLiveDate();
+        updateLiveDateControls();
+
         const today = new Date();
-        const events = await fetchDay(today);
+        const todayKeyValue = dateKey(today);
+        const recentKey = previousMatchDateKey(selectedLiveDate);
+        const isPastMode = selectedLiveMode === 'past';
+        const fetches = new Map();
+        const getEvents = key => {
+          if (!key) return Promise.resolve([]);
+          if (!fetches.has(key)) fetches.set(key, fetchDay(dateFromKey(key)));
+          return fetches.get(key);
+        };
+
+        const [todayEvents, selectedEvents, recentEvents, pastEvents] = await Promise.all([
+          getEvents(todayKeyValue),
+          isPastMode ? Promise.resolve([]) : getEvents(selectedLiveDate),
+          isPastMode ? Promise.resolve([]) : getEvents(recentKey),
+          isPastMode ? fetchDateRange(MATCH_DATES[0], todayKeyValue) : Promise.resolve([]),
+        ]);
 
         // Always show next-match banner from local data (no extra API call)
         renderNextMatchBanner(findNextMatchFromData());
 
-        // Show today's match list (or nothing if no matches today)
-        const live     = events.filter(e => e.status?.type?.state === 'in');
-        const upcoming = events.filter(e => e.status?.type?.state === 'pre');
-        const done     = events.filter(e => e.status?.type?.state === 'post');
-        const known    = live.length + upcoming.length + done.length;
-
-        document.getElementById('liveContent').innerHTML = events.length
-          ? (known > 0
-              ? section('Live now', live, true) +
-                section('Upcoming today', upcoming, false) +
-                section('Full time', done, false)
-              : section("Today's matches", events, false)) ||
-            '<div class="live-error">No matches today.</div>'
-          : '';
+        const liveNow = splitEvents(todayEvents).live;
+        document.getElementById('liveNowContent').innerHTML =
+          liveNow.length ? renderDateSection('Live now', liveNow, { liveTitle: true }) : '';
+        if (isPastMode) {
+          renderPastMatches(pastEvents);
+          document.getElementById('recentFinalsContent').innerHTML = '';
+        } else {
+          renderSelectedDay(selectedEvents, todayKeyValue);
+          renderRecentFinals(recentEvents, recentKey);
+        }
 
         document.getElementById('liveUpdatedText').textContent =
           'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
       } catch (err) {
         console.warn('Live fetch failed:', err);
-        if (!document.getElementById('liveContent').innerHTML) {
-          document.getElementById('liveContent').innerHTML =
+        if (!document.getElementById('selectedDayContent').innerHTML) {
+          document.getElementById('selectedDayContent').innerHTML =
             '<div class="live-error">⚠️ Couldn\'t load live scores right now. Retrying automatically…</div>';
         }
         document.getElementById('liveUpdatedText').textContent = 'Connection issue — retrying…';
@@ -1602,6 +2058,7 @@
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && document.getElementById('lvBackdrop').classList.contains('open')) closeMatchModal();
+      if (e.key === 'Escape' && document.getElementById('liveCalBackdrop').classList.contains('open')) closeLiveCalPopup();
     });
 
     // ── Kick everything off ────────────────────────

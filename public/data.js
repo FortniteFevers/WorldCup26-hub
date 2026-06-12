@@ -48,6 +48,35 @@ const COUNTRY_FLAGS = {
   'TBD': '🏳️'
 };
 
+// Per-team scorebug layer colors [primary, secondary].
+// MEX + RSA are locked to the reference FWC26 broadcast comp.
+const BUG_COLORS = {
+  MEX: ['#f4504a', '#2fb344'],  RSA: ['#9b59f5', '#8ad32a'],
+  KOR: ['#f4504a', '#3f6ef7'],  CZE: ['#3f6ef7', '#f4504a'],
+  CAN: ['#f4504a', '#f0f0f0'],  BIH: ['#3f6ef7', '#ffd43b'],
+  QAT: ['#b02a4c', '#f06595'],  SUI: ['#f4504a', '#c92a2a'],
+  USA: ['#3f6ef7', '#f4504a'],  PAR: ['#f4504a', '#3f6ef7'],
+  AUS: ['#ffd43b', '#2fb344'],  TUR: ['#f4504a', '#c92a2a'],
+  CIV: ['#ff7a00', '#2fb344'],  ECU: ['#ffd43b', '#3f6ef7'],
+  GER: ['#f4504a', '#ffcc00'],  CUW: ['#3f6ef7', '#ffd43b'],
+  NED: ['#ff7a00', '#3f6ef7'],  JPN: ['#f4504a', '#c92a2a'],
+  SWE: ['#3f6ef7', '#ffcc00'],  TUN: ['#f4504a', '#c92a2a'],
+  ESP: ['#f4504a', '#ffcc00'],  CPV: ['#3f6ef7', '#ffd43b'],
+  KSA: ['#2fb344', '#8ad32a'],  URU: ['#45c4f9', '#ffd43b'],
+  BEL: ['#f4504a', '#ffcc00'],  EGY: ['#f4504a', '#ffd43b'],
+  IRN: ['#2fb344', '#f4504a'],  NZL: ['#3f6ef7', '#f4504a'],
+  FRA: ['#3f6ef7', '#f4504a'],  SEN: ['#2fb344', '#ffd43b'],
+  IRQ: ['#f4504a', '#2fb344'],  NOR: ['#f4504a', '#3f6ef7'],
+  ARG: ['#45c4f9', '#ffd43b'],  ALG: ['#2fb344', '#f4504a'],
+  AUT: ['#f4504a', '#c92a2a'],  JOR: ['#2fb344', '#f4504a'],
+  GHA: ['#f4504a', '#ffd43b'],  PAN: ['#f4504a', '#3f6ef7'],
+  ENG: ['#f4504a', '#3f6ef7'],  CRO: ['#f4504a', '#3f6ef7'],
+  BRA: ['#2fb344', '#ffd43b'],  MAR: ['#f4504a', '#2fb344'],
+  HAI: ['#3f6ef7', '#f4504a'],  SCO: ['#3f6ef7', '#45c4f9'],
+  POR: ['#2fb344', '#f4504a'],  COL: ['#ffd43b', '#3f6ef7'],
+  UZB: ['#45c4f9', '#2fb344'],  UAE: ['#2fb344', '#f4504a'],
+};
+
 function getTeamGroup(team) {
   for (const [grp, teams] of Object.entries(GROUPS)) {
     if (teams.includes(team)) return grp;
