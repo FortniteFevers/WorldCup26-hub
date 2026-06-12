@@ -40,16 +40,21 @@
     .mode-card-feat { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
     .mode-card-feat::before { content: '→'; color: var(--gold); font-weight: 700; }
 
-    /* Back bar */
-    .back-bar {
-      display: flex; align-items: center; gap: 0.75rem;
-      margin-bottom: 1.5rem; padding: 0.75rem 1rem;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 12px; cursor: pointer; transition: all 0.2s;
+    /* Floating back pill — top-left corner when a mode is active */
+    .back-pill {
+      display: none;
+      position: sticky; top: 1rem; z-index: 50;
       width: fit-content;
+      margin-bottom: 1.25rem;
+      align-items: center; gap: 0.55rem;
+      padding: 0.55rem 1.1rem;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 999px; cursor: pointer; transition: all 0.18s;
+      font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
-    .back-bar:hover { border-color: var(--border-bright); background: var(--bg-card-hover); }
-    .back-bar-label { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+    .back-pill.visible { display: flex; }
+    .back-pill:hover { border-color: var(--border-bright); background: var(--bg-card-hover); transform: translateX(-2px); }
 
     /* ── Pitch ─────────────────────────────────────── */
     .pitch-outer { width: 100%; max-width: 320px; margin: 0 auto; }
@@ -263,7 +268,7 @@
           </div>
           <button class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="enterMode('squad');event.stopPropagation()">Start Building →</button>
         </div>
-        <div class="mode-card" onclick="window.location.href='/bracket'">
+        <div class="mode-card" onclick="enterMode('bracket')">
           <div class="mode-card-icon">🏆</div>
           <div class="mode-card-title">Bracket Simulator</div>
           <div class="mode-card-desc">Simulate the complete 2026 World Cup — all 12 groups, standings, 8 best 3rd-place teams, and the full knockout bracket.</div>
@@ -273,9 +278,9 @@
             <div class="mode-card-feat">R32 → R16 → QF → SF → Final</div>
             <div class="mode-card-feat">Click to pick or auto-simulate any match</div>
           </div>
-          <a href="/bracket" class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="event.stopPropagation()">Open Bracket →</a>
+          <button class="btn" style="margin-top:0.5rem;width:fit-content;" onclick="enterMode('bracket');event.stopPropagation()">Open Bracket →</button>
         </div>
-        <div class="mode-card" onclick="window.location.href='/104-0'" style="position:relative;overflow:hidden;">
+        <div class="mode-card" onclick="enterMode('draft')" style="position:relative;overflow:hidden;">
           <div style="position:absolute;top:1rem;right:1rem;font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.55rem;border-radius:100px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,200,66,0.3);">NEW</div>
           <div class="mode-card-icon">🎰</div>
           <div class="mode-card-title" style="background:linear-gradient(135deg,var(--gold) 0%,#ff8c00 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">104-0</div>
@@ -286,17 +291,19 @@
             <div class="mode-card-feat">Classic mode + Scout mode (names hidden)</div>
             <div class="mode-card-feat">Simulate 8 games from group to Final</div>
           </div>
-          <a href="/104-0" class="btn" style="margin-top:0.5rem;width:fit-content;background:linear-gradient(135deg,var(--gold),#e8a000);color:#0a0a0a;" onclick="event.stopPropagation()">Play 104-0 →</a>
+          <button class="btn" style="margin-top:0.5rem;width:fit-content;background:linear-gradient(135deg,var(--gold),#e8a000);color:#0a0a0a;" onclick="enterMode('draft');event.stopPropagation()">Play 104-0 →</button>
         </div>
       </div>
     </div>
 
+    <!-- shared floating back pill — shown by enterMode(), hidden by exitMode() -->
+    <div class="back-pill" id="backPill" onclick="exitMode()">
+      <span style="color:var(--gold);font-weight:700;">←</span>
+      Back to Mode Select
+    </div>
+
     <!-- ── Squad Builder ────────────────────────────── -->
     <div id="squadMode" style="display:none;">
-      <div class="back-bar" onclick="exitMode()">
-        <span style="color:var(--gold);font-weight:700;">←</span>
-        <span class="back-bar-label">Back to Mode Select</span>
-      </div>
 
       <!-- API banner -->
       <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;">
@@ -388,19 +395,18 @@
 
     <!-- ── Bracket Simulator ─────────────────────────── -->
     <div id="bracketMode" style="display:none;">
-      <div class="back-bar" onclick="exitMode()">
-        <span style="color:var(--gold);font-weight:700;">←</span>
-        <span class="back-bar-label">Back to Mode Select</span>
-      </div>
 
-      <div class="section-header" style="margin-bottom:1.25rem;">
-        <div>
-          <div class="section-title">2026 World Cup Bracket</div>
-          <div class="section-sub">Simulate each match or let the engine decide</div>
-        </div>
-        <div style="display:flex;gap:0.5rem;">
-          <button class="btn btn-outline btn-sm" onclick="simAllGroups()">⚡ Sim All Groups</button>
-          <button class="btn btn-outline btn-sm" onclick="resetBracket()" style="color:var(--red);border-color:var(--red);">↺ Reset</button>
+      <div style="margin-bottom:1.25rem;">
+        <button onclick="exitMode()" style="display:inline-flex;align-items:center;gap:0.35rem;margin-bottom:0.6rem;padding:0;background:none;border:none;cursor:pointer;font-size:0.78rem;font-weight:600;color:var(--text-muted);transition:color 0.15s;" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'"><span style="color:var(--gold);">←</span> My Team</button>
+        <div class="section-header" style="margin-bottom:0;">
+          <div>
+            <div class="section-title">2026 World Cup Bracket</div>
+            <div class="section-sub">Simulate each match or let the engine decide</div>
+          </div>
+          <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+            <button class="btn btn-outline btn-sm" onclick="simAllGroups()">⚡ Sim All Groups</button>
+            <button class="btn btn-outline btn-sm" onclick="resetBracket()" style="color:var(--red);border-color:var(--red);">↺ Reset</button>
+          </div>
         </div>
       </div>
 
@@ -458,7 +464,16 @@
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- ── 104-0 Draft ──────────────────────────────── -->
+    <div id="draftMode" style="display:none;">
+      <iframe id="draftFrame" src="" style="width:100%;height:500px;border:none;background:transparent;display:block;"
+        scrolling="no"
+        onload="initDraftFrame(this)">
+      </iframe>
+    </div>
+
+  </div><!-- /.container -->
 
   <!-- Slot Picker Modal -->
   <div class="modal-backdrop" id="slotPickerBackdrop" onclick="handleSlotBdClick(event)">
@@ -516,17 +531,60 @@
       return `<span class="${fallbackClass}">${initials}</span>`;
     }
 
+    // ── Draft iframe init ────────────────────────────
+    function initDraftFrame(frame) {
+      try {
+        const d = frame.contentDocument;
+        const s = d.createElement('style');
+        s.textContent = 'nav,footer,.announce-bar,.mobile-menu-backdrop,.mobile-menu-modal,.back-bar,.back-pill,.mode-return{display:none!important}body{padding-top:0!important}.container{padding-top:1rem!important}';
+        d.head.appendChild(s);
+
+        const resize = () => { const h = d.documentElement.scrollHeight; if (h > 100) frame.style.height = h + 'px'; };
+        resize();
+        new ResizeObserver(resize).observe(d.documentElement);
+
+        function inScrollable(el) {
+          while (el && el !== d.body) {
+            const cs = d.defaultView.getComputedStyle(el);
+            if (el.scrollHeight > el.clientHeight && /auto|scroll/.test(cs.overflowY)) return true;
+            el = el.parentElement;
+          }
+          return false;
+        }
+        let ty = 0;
+        d.addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, { passive: true });
+        d.addEventListener('touchmove', e => {
+          if (inScrollable(e.target)) return;
+          const dy = ty - e.touches[0].clientY;
+          ty = e.touches[0].clientY;
+          window.parent.scrollBy(0, dy);
+        }, { passive: true });
+        d.addEventListener('wheel', e => {
+          if (!inScrollable(e.target)) window.parent.scrollBy(e.deltaX, e.deltaY);
+        }, { passive: true });
+      } catch(e) {}
+    }
+
     // ── Mode ─────────────────────────────────────────
     function enterMode(mode) {
-      document.getElementById('modePicker').style.display = 'none';
+      document.getElementById('modePicker').style.display  = 'none';
       document.getElementById('squadMode').style.display   = mode === 'squad'   ? 'block' : 'none';
       document.getElementById('bracketMode').style.display = mode === 'bracket' ? 'block' : 'none';
+      document.getElementById('draftMode').style.display   = mode === 'draft'   ? 'block' : 'none';
+      document.getElementById('backPill').classList.toggle('visible', mode !== 'bracket');
       if (mode === 'bracket') initBracketUI();
+      if (mode === 'draft') {
+        const f = document.getElementById('draftFrame');
+        if (!f.src || f.src === window.location.href) f.src = 'draft.html';
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function exitMode() {
-      document.getElementById('modePicker').style.display   = 'block';
-      document.getElementById('squadMode').style.display    = 'none';
-      document.getElementById('bracketMode').style.display  = 'none';
+      document.getElementById('modePicker').style.display  = 'block';
+      document.getElementById('squadMode').style.display   = 'none';
+      document.getElementById('bracketMode').style.display = 'none';
+      document.getElementById('draftMode').style.display   = 'none';
+      document.getElementById('backPill').classList.remove('visible');
     }
 
     // ── Helpers ──────────────────────────────────────
