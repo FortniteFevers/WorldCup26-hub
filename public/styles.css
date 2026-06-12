@@ -1182,10 +1182,11 @@ nav a.active { color: var(--text-primary); background: var(--border); }
 .game-select-meta { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem; }
 
 .cal-sidebar {
-  position: sticky;
-  top: 80px;
+  /* position handled by JS — Lenis breaks native sticky */
+  will-change: transform;
   align-self: start;
 }
+@media (max-width: 900px) { .cal-sidebar { transform: none !important; } }
 .cal-summary-box {
   background: var(--bg-card);
   border: 1px solid var(--border);

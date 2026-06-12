@@ -669,7 +669,12 @@
     }
     .game-date-separator:first-child { padding-top: 0.25rem; }
 
-    .cal-sidebar { position: sticky; top: 80px; }
+    .cal-sidebar {
+      /* position handled by JS — Lenis breaks native sticky */
+      will-change: transform;
+      align-self: start;
+    }
+    @media (max-width: 840px) { .cal-sidebar { transform: none !important; } }
     .cal-summary-box {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 16px; padding: 1.5rem;
@@ -978,9 +983,38 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const lenis = new Lenis();
-    lenis.on('scroll', () => {});
+    lenis.on('scroll', ({ scroll }) => updateCalendarSidebarPosition(scroll));
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
+
+    // ── Calendar summary: follow scroll (Lenis-compatible sticky) ─
+    const calendarSidebar = document.querySelector('.cal-sidebar');
+    const calendarListCol = calendarSidebar?.previousElementSibling;
+    const calendarSidebarGap = 96;
+    let calendarSidebarDocTop = 0;
+
+    function measureCalendarSidebar() {
+      if (!calendarSidebar || window.getComputedStyle(calendarSidebar).display === 'none') return;
+      calendarSidebar.style.transform = '';
+      calendarSidebarDocTop = calendarSidebar.getBoundingClientRect().top + (lenis.scroll || window.scrollY || 0);
+      updateCalendarSidebarPosition(lenis.scroll || window.scrollY || 0);
+    }
+
+    function updateCalendarSidebarPosition(scroll) {
+      if (!calendarSidebar) return;
+      if (window.innerWidth <= 840) {
+        calendarSidebar.style.transform = '';
+        return;
+      }
+      const maxY = calendarListCol
+        ? Math.max(0, calendarListCol.offsetHeight - calendarSidebar.offsetHeight - 32)
+        : 9999;
+      const y = Math.min(Math.max(0, scroll - calendarSidebarDocTop + calendarSidebarGap), maxY);
+      calendarSidebar.style.transform = `translateY(${y}px)`;
+    }
+
+    window.addEventListener('scroll', () => updateCalendarSidebarPosition(window.scrollY), { passive: true });
+    window.addEventListener('resize', measureCalendarSidebar);
 
     // ── FC26 team strength ─────────────────────────
     let FC26_TEAM_STATS = {};
@@ -1136,7 +1170,12 @@
       document.getElementById('tabBrowse').classList.toggle('active',   v === 'browse');
       document.getElementById('tabCalendar').classList.toggle('active', v === 'calendar');
       document.getElementById('tabVenues').classList.toggle('active',   v === 'venues');
-      if (v === 'calendar') { setCalViewMode(calViewMode); initCalFilters(); renderList(); }
+      if (v === 'calendar') {
+        setCalViewMode(calViewMode);
+        initCalFilters();
+        renderList();
+        requestAnimationFrame(measureCalendarSidebar);
+      }
       if (v === 'venues')   initVenueMap();
       // Update URL without reload
       const url = new URL(window.location);
@@ -1946,6 +1985,7 @@
       document.getElementById('gamesList').innerHTML = html;
       updateSidebar();
       updateExportBadge();
+      updateCalendarSidebarPosition(lenis.scroll || window.scrollY || 0);
     }
 
     function toggleGame(id) {

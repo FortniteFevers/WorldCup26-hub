@@ -177,9 +177,39 @@
   <script>
     // Initialize Lenis smooth scrolling
     const lenis = new Lenis();
-    lenis.on('scroll', (e) => {});
+    lenis.on('scroll', ({ scroll }) => updateCalendarSidebarPosition(scroll));
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
+
+    // ── Calendar summary: follow scroll (Lenis-compatible sticky) ─
+    const calendarSidebar = document.querySelector('.cal-sidebar');
+    const calendarListCol = calendarSidebar?.previousElementSibling;
+    const calendarSidebarGap = 96;
+    let calendarSidebarDocTop = 0;
+
+    function measureCalendarSidebar() {
+      if (!calendarSidebar) return;
+      calendarSidebar.style.transform = '';
+      calendarSidebarDocTop = calendarSidebar.getBoundingClientRect().top + (lenis.scroll || window.scrollY || 0);
+      updateCalendarSidebarPosition(lenis.scroll || window.scrollY || 0);
+    }
+
+    function updateCalendarSidebarPosition(scroll) {
+      if (!calendarSidebar) return;
+      if (window.innerWidth <= 900) {
+        calendarSidebar.style.transform = '';
+        return;
+      }
+      const maxY = calendarListCol
+        ? Math.max(0, calendarListCol.offsetHeight - calendarSidebar.offsetHeight - 32)
+        : 9999;
+      const y = Math.min(Math.max(0, scroll - calendarSidebarDocTop + calendarSidebarGap), maxY);
+      calendarSidebar.style.transform = `translateY(${y}px)`;
+    }
+
+    requestAnimationFrame(measureCalendarSidebar);
+    window.addEventListener('scroll', () => updateCalendarSidebarPosition(window.scrollY), { passive: true });
+    window.addEventListener('resize', measureCalendarSidebar);
 
     let selected = new Set();
     let filteredIds = GAMES.map(g => g.id);
@@ -210,6 +240,7 @@
         </div>`;
       }).join('');
       updateSidebar();
+      updateCalendarSidebarPosition(lenis.scroll || window.scrollY || 0);
     }
 
     function toggleGame(id) {
