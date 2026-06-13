@@ -1534,9 +1534,15 @@
     }
 
     function applyFilters() {
-      const search  = document.getElementById('searchInput').value.toLowerCase().trim();
-      const stadium = document.getElementById('stadiumFilter').value;
-      const type    = document.getElementById('typeFilter').value;
+      const searchEl  = document.getElementById('searchInput');
+      const stadiumEl = document.getElementById('stadiumFilter');
+      const typeEl    = document.getElementById('typeFilter');
+      const container = document.getElementById('gamesContainer');
+      if (!searchEl || !stadiumEl || !typeEl || !container) return;
+
+      const search  = searchEl.value.toLowerCase().trim();
+      const stadium = stadiumEl.value;
+      const type    = typeEl.value;
 
       const filtered = GAMES.filter(g =>
         (!search  || g.team1.toLowerCase().includes(search) || g.team2.toLowerCase().includes(search)) &&
@@ -1549,10 +1555,10 @@
         const rank = s => s?.state === 'in' ? 0 : s?.state === 'post' ? 2 : 1;
         const r = rank(sa) - rank(sb);
         if (r) return r;
-        return parseGameDateTime(a) - parseGameDateTime(b);
+        const d = parseGameDateTime(a) - parseGameDateTime(b);
+        return sa?.state === 'post' ? -d : d;
       });
 
-      const container = document.getElementById('gamesContainer');
       const noResults = document.getElementById('noResults');
       const count     = document.getElementById('resultsCount');
       const pastJump  = document.getElementById('pastGamesJump');
@@ -1624,6 +1630,12 @@
 
     applyFilters();
     refreshBrowseScores();
+    // Safety re-render: if the container is still empty after 600ms (e.g. due to a
+    // timing/Clerk race that silently killed the first render), try again.
+    setTimeout(() => {
+      const c = document.getElementById('gamesContainer');
+      if (c && !c.innerHTML.trim()) applyFilters();
+    }, 600);
     setInterval(refreshBrowseScores, 45000);
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) refreshBrowseScores();

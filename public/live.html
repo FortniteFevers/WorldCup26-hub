@@ -144,11 +144,6 @@
       .live-day-actions {
         justify-content: flex-start;
       }
-      .live-tz-control {
-        width: 100%;
-        justify-content: space-between;
-        padding: 0 0.6rem 0 0.85rem;
-      }
       .live-tz-select { max-width: 62%; }
     }
 
@@ -658,6 +653,18 @@
     .nm-meta {
       font-size: 0.72rem; color: var(--text-muted); margin-top: 0.9rem;
     }
+    .nm-cal-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      margin-top: 1rem; padding: 0.42rem 1rem;
+      border-radius: 999px; border: 1px solid var(--border);
+      background: var(--input-bg); color: var(--text-secondary);
+      font: inherit; font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .nm-cal-btn:hover {
+      border-color: var(--gold); color: var(--gold); background: var(--gold-dim);
+    }
     .live-card.is-post {
       opacity: 0.45;
     }
@@ -1130,7 +1137,7 @@
             <button type="button" class="live-day-btn" id="btnNextMatch" onclick="setLiveDateToNextMatch()">Next match</button>
             <button type="button" class="live-date-btn" id="liveDateBtn" onclick="openLiveCalPopup()">📅 All Dates</button>
             <label class="live-tz-control">
-              <span>Timezone</span>
+              <span>🕐</span>
               <select class="live-tz-select" id="liveTimeZoneSelect" onchange="setLiveTimeZone(this.value)"></select>
             </label>
           </div>
@@ -1357,7 +1364,7 @@
         ? TIME_ZONE_OPTIONS
         : [{ value: selectedTimeZone, label: `Local (${selectedTimeZone})`, abbr: timeZoneAbbr(new Date()) }, ...TIME_ZONE_OPTIONS];
       select.innerHTML = options.map(tz =>
-        `<option value="${tz.value}">${tz.label} (${tz.abbr})</option>`
+        `<option value="${tz.value}">${tz.abbr}</option>`
       ).join('');
       select.value = selectedTimeZone;
     }
@@ -1583,6 +1590,7 @@
             <div class="countdown-unit"><div class="countdown-num" id="cdSeconds">--</div><div class="countdown-unit-label">Seconds</div></div>
           </div>
           <div class="nm-meta">${dateStr} · ${timeStr} · ${g.stadium}${city ? ', ' + city : ''}</div>
+          <a href="/games?tab=calendar" class="nm-cal-btn">📅 Add to Calendar</a>
         </div>`;
 
       function tick() {
@@ -2132,12 +2140,22 @@
       </div>`;
     }
 
+    function findGameInData(event) {
+      const etMs = new Date(event.date).getTime() - 4 * 60 * 60 * 1000;
+      const etDate = new Date(etMs);
+      const dateStr = etDate.toISOString().slice(0, 10);
+      const h = etDate.getUTCHours(), m = etDate.getUTCMinutes();
+      const timeStr = `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
+      return GAMES.find(g => g.date === dateStr && g.time === timeStr) || null;
+    }
+
     function renderUpcomingMatchModal(event, body) {
       const comp = event.competitions?.[0] || {};
       const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
       const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
       const venue = comp.venue || event.venue || {};
-      const venueName = venue.fullName || venue.name || 'Venue TBD';
+      const dataGame = findGameInData(event);
+      const venueName = dataGame?.stadium || venue.fullName || venue.name || 'Venue TBD';
       const city = [venue.address?.city, venue.address?.state || venue.address?.country].filter(Boolean).join(', ');
       const broadcasts = [...new Set((comp.broadcasts || [])
         .flatMap(b => b.names || b.name || b.displayName || [])
