@@ -877,6 +877,9 @@
         <button id="calDateBtn" class="date-btn" onclick="openCalPopup('export')">📅 All Dates</button>
         <button class="btn btn-outline btn-sm" onclick="selectAll()">Select All</button>
         <button class="btn btn-outline btn-sm" onclick="selectNone()">Clear All</button>
+        <button class="past-games-jump" id="calPastGamesJump" onclick="document.getElementById('calPastGamesSection')?.scrollIntoView({behavior:'smooth',block:'start'})" style="display:none">
+          Past games <span id="calPastGamesCount">0</span>
+        </button>
       </div>
 
       <div class="cal-page-grid">
@@ -1526,6 +1529,13 @@
       if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function gameIsPast(g) {
+      const s = scoreStateFor(g);
+      if (s?.state === 'post') return true;
+      if (s?.state === 'in') return false;
+      return parseGameDateTime(g).getTime() + 2 * 60 * 60 * 1000 < Date.now();
+    }
+
     function applyFilters() {
       const searchEl  = document.getElementById('searchInput');
       const stadiumEl = document.getElementById('stadiumFilter');
@@ -1536,15 +1546,6 @@
       const search  = searchEl.value.toLowerCase().trim();
       const stadium = stadiumEl.value;
       const type    = typeEl.value;
-
-      const now = Date.now();
-      function gameIsPast(g) {
-        const s = scoreStateFor(g);
-        if (s?.state === 'post') return true;
-        if (s?.state === 'in') return false;
-        // No ESPN data — treat as past if scheduled time + 2h buffer has elapsed
-        return parseGameDateTime(g).getTime() + 2 * 60 * 60 * 1000 < now;
-      }
 
       const filtered = GAMES.filter(g =>
         (!search  || g.team1.toLowerCase().includes(search) || g.team2.toLowerCase().includes(search)) &&
@@ -2027,15 +2028,18 @@
         return `${days[d.getDay()].toUpperCase()} ${d.getDate()} ${months[d.getMonth()].toUpperCase()}`;
       }
 
+      const upcoming = filtered.filter(g => !gameIsPast(g));
+      const past     = filtered.filter(g =>  gameIsPast(g));
+      const sorted   = [...upcoming, ...past];
+      filteredIds = sorted.map(g => g.id);
+
       let html = '';
       let lastDate = null;
-      filtered.forEach(game => {
-        if (game.date !== lastDate) {
-          html += `<div class="game-date-separator">${sepLabel(game.date)}</div>`;
-          lastDate = game.date;
-        }
+      let pastInserted = false;
+
+      function gameCard(game) {
         const isSel = selected.has(game.id);
-        html += `<div class="game-select-card ${isSel ? 'selected' : ''}" onclick="toggleGame(${game.id})">
+        return `<div class="game-select-card ${isSel ? 'selected' : ''}" onclick="toggleGame(${game.id})">
           <div class="game-checkbox">${isSel ? '✓' : ''}</div>
           <div class="game-select-info" style="flex:1;min-width:0;">
             <div class="game-select-teams">${getFlag(game.team1)} ${game.team1} <span style="color:var(--text-muted);font-weight:400;">vs</span> ${game.team2} ${getFlag(game.team2)}</div>
@@ -2046,8 +2050,33 @@
             Google Cal
           </a>
         </div>`;
+      }
+
+      sorted.forEach(game => {
+        if (!pastInserted && gameIsPast(game)) {
+          lastDate = null;
+          html += `<div class="game-date-separator past-games-anchor" id="calPastGamesSection"
+            style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+            <span>PAST GAMES · ${past.length} result${past.length !== 1 ? 's' : ''}</span>
+            <button type="button" onclick="document.getElementById('viewCalendar').scrollIntoView({behavior:'smooth'})"
+              style="background:none;border:1px solid var(--border);border-radius:999px;padding:0.2rem 0.65rem;
+                font:inherit;font-size:0.62rem;font-weight:700;color:var(--text-muted);cursor:pointer;white-space:nowrap;">
+              Back to top ↑
+            </button>
+          </div>`;
+          pastInserted = true;
+        }
+        if (game.date !== lastDate) {
+          html += `<div class="game-date-separator">${sepLabel(game.date)}</div>`;
+          lastDate = game.date;
+        }
+        html += gameCard(game);
       });
       document.getElementById('gamesList').innerHTML = html;
+      const calJump = document.getElementById('calPastGamesJump');
+      const calJumpCount = document.getElementById('calPastGamesCount');
+      if (calJump) { calJump.style.display = past.length ? 'inline-flex' : 'none'; }
+      if (calJumpCount) calJumpCount.textContent = past.length;
       updateSidebar();
       updateExportBadge();
       updateCalendarSidebarPosition(lenis.scroll || window.scrollY || 0);
