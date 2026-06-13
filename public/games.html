@@ -1210,13 +1210,6 @@
       history.replaceState(null, '', url);
     }
 
-    // On load, honour ?tab= param
-    (function() {
-      const tab = new URLSearchParams(window.location.search).get('tab');
-      if (tab === 'calendar') setView('calendar');
-      else if (tab === 'venues') setView('venues');
-    })();
-
     // ── Country flag images ────────────────────────
     const COUNTRY_CODES = {
       'Mexico':'mx','South Africa':'za','South Korea':'kr','Czechia':'cz',
@@ -1640,6 +1633,7 @@
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) refreshBrowseScores();
     });
+
 
     // ── Small calendar popup (date filter) ────────
     function openCalPopup(mode = 'browse')  {
@@ -2275,6 +2269,13 @@
       else if (document.getElementById('dayGamesBackdrop').classList.contains('open')) closeDayModal();
       else if (document.getElementById('calBackdrop').classList.contains('open')) closeCalPopup();
     });
+
+    // Honour ?tab= param — runs last so all let declarations (calViewMode etc.) are initialized
+    (function() {
+      const tab = new URLSearchParams(window.location.search).get('tab');
+      if (tab === 'calendar') setView('calendar');
+      else if (tab === 'venues') setView('venues');
+    })();
   </script>
 </body>
 </html>
