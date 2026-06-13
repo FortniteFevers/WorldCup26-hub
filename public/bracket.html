@@ -1660,8 +1660,26 @@
   <footer>
     <div class="footer-inner">
       <p>© 2026 World Cup Field Guide &nbsp;·&nbsp; Created by <a href="https://Fevers.dev/links" target="_blank" rel="noopener noreferrer">Zach Andelman</a></p>
-      <p>WorldCupFieldGuide.com is an independent fan project and is not affiliated with FIFA, EA SPORTS, EA SPORTS FC, or any national federation. Player ratings and football data are used for informational and entertainment purposes.</p>
+      <p style="font-size:0.72rem">Not affiliated with FIFA or any national federation.</p>
+      <p style="margin-top:0.65rem">
+        <button class="footer-tab-btn" onclick="openFooterModal('cookies')">Cookies</button>
+        <span style="color:var(--border);margin:0 0.4rem">·</span>
+        <button class="footer-tab-btn" onclick="openFooterModal('disclaimers')">Disclaimers</button>
+      </p>
     </div>
   </footer>
+
+  <div class="footer-modal-backdrop" id="footerModalBackdrop" onclick="if(event.target===this)closeFooterModal()">
+    <div class="footer-modal">
+      <div class="footer-modal-header">
+        <div class="footer-modal-tabs">
+          <button class="footer-modal-tab active" id="ftab-cookies" onclick="switchFooterTab('cookies')">Cookies</button>
+          <button class="footer-modal-tab" id="ftab-disclaimers" onclick="switchFooterTab('disclaimers')">Disclaimers</button>
+        </div>
+        <button class="footer-modal-close" onclick="closeFooterModal()">✕</button>
+      </div>
+      <div class="footer-modal-body" id="footerModalBody"></div>
+    </div>
+  </div>
 </body>
 </html>

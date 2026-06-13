@@ -22,15 +22,15 @@
 </head>
 <body>
   <nav>
-    <a href="index.html" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
+    <a href="/" class="logo">⚽ <span>World Cup</span> <span class="logo-tail">Field Guide</span></a>
     <ul id="navMenu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="games.html">Browse Matches</a></li>
-      <li><a href="groups.html">Groups</a></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/games">Browse Matches</a></li>
+      <li><a href="/groups">Groups</a></li>
       <li><a href="locations.html" class="active">Locations</a></li>
-      <li><a href="teams.html">Teams</a></li>
-      <li><a href="myteam.html">My Team</a></li>
-      <li><a href="guide.html">Guide</a></li>
+      <li><a href="/teams">Teams</a></li>
+      <li><a href="/my-team">My Team</a></li>
+      <li><a href="/guide">Guide</a></li>
     </ul>
     <div class="nav-right">
       <div class="clerk-auth signed-out" id="authControls">
@@ -46,13 +46,13 @@
   <!-- Mobile Menu Modal -->
   <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu-modal" id="mobileMenuModal">
-    <a href="index.html" onclick="closeMobileMenu()">Home</a>
-    <a href="games.html" onclick="closeMobileMenu()">Browse Matches</a>
-    <a href="groups.html" onclick="closeMobileMenu()">Groups</a>
+    <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/games" onclick="closeMobileMenu()">Browse Matches</a>
+    <a href="/groups" onclick="closeMobileMenu()">Groups</a>
     <a href="locations.html" class="active" onclick="closeMobileMenu()">Locations</a>
-    <a href="teams.html" onclick="closeMobileMenu()">Teams</a>
-    <a href="myteam.html" onclick="closeMobileMenu()">My Team</a>
-    <a href="guide.html" onclick="closeMobileMenu()">Guide</a>
+    <a href="/teams" onclick="closeMobileMenu()">Teams</a>
+    <a href="/my-team" onclick="closeMobileMenu()">My Team</a>
+    <a href="/guide" onclick="closeMobileMenu()">Guide</a>
   </div>
 
   <div class="container">
@@ -89,10 +89,28 @@
 
   <footer>
     <div class="footer-inner">
-      <p>© 2026 FIFA World Cup Fan Site &nbsp;·&nbsp; Created by <a href="https://Fevers.dev/links" target="_blank" rel="noopener noreferrer">Zach Andelman</a></p>
-      <p>Not affiliated with FIFA or any official organization.</p>
+      <p>© 2026 World Cup Field Guide &nbsp;·&nbsp; Created by <a href="https://Fevers.dev/links" target="_blank" rel="noopener noreferrer">Zach Andelman</a></p>
+      <p style="font-size:0.72rem">Not affiliated with FIFA or any national federation.</p>
+      <p style="margin-top:0.65rem">
+        <button class="footer-tab-btn" onclick="openFooterModal('cookies')">Cookies</button>
+        <span style="color:var(--border);margin:0 0.4rem">·</span>
+        <button class="footer-tab-btn" onclick="openFooterModal('disclaimers')">Disclaimers</button>
+      </p>
     </div>
   </footer>
+
+  <div class="footer-modal-backdrop" id="footerModalBackdrop" onclick="if(event.target===this)closeFooterModal()">
+    <div class="footer-modal">
+      <div class="footer-modal-header">
+        <div class="footer-modal-tabs">
+          <button class="footer-modal-tab active" id="ftab-cookies" onclick="switchFooterTab('cookies')">Cookies</button>
+          <button class="footer-modal-tab" id="ftab-disclaimers" onclick="switchFooterTab('disclaimers')">Disclaimers</button>
+        </div>
+        <button class="footer-modal-close" onclick="closeFooterModal()">✕</button>
+      </div>
+      <div class="footer-modal-body" id="footerModalBody"></div>
+    </div>
+  </div>
 
   <script src="data.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

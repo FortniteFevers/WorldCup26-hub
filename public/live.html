@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LIVE — World Cup 2026 Scores &amp; Results</title>
-  <meta name="description" content="Live World Cup 2026 scores, results, and match clocks — updated automatically throughout every match day.">
+  <meta name="description" content="Follow every 2026 World Cup match in real time — live scores, match stats, kickoff times, and market-implied win probabilities.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>⚽</text></svg>">
   <link rel="stylesheet" href="styles.css?v=4">
   <script src="https://cdn.jsdelivr.net/gh/darkroomengineering/lenis@latest/bundled/lenis.js"></script>
@@ -377,10 +377,11 @@
     }
     .bug-pill.away {
       border-radius: 0 999px 999px 0;
-      flex-direction: row-reverse;
       padding: 0.36rem 1.05rem 0.36rem 1.25rem;
       justify-content: flex-start;
     }
+    .score-bug.is-pre .bug-pill.home,
+    .score-bug.is-pre .bug-pill.away { justify-content: center; }
     .score-bug.is-live .bug-pill.home { animation: bugPulse 1.8s ease-in-out infinite; }
     .score-bug.is-live .bug-pill.away { animation: bugPulse 1.8s ease-in-out infinite 0.9s; }
     @keyframes bugPulse { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.18)} }
@@ -524,6 +525,41 @@
     [data-theme="light"] .bug-stats-toggle:hover { color: rgba(0,0,0,0.65); }
     [data-theme="light"] .bug-stat-label { color: rgba(0,0,0,0.38); }
     [data-theme="light"] .bug-stats-inner { border-top-color: rgba(0,0,0,0.06); }
+
+    /* ── Match odds row (market-implied probability) ── */
+    .bug-odds {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0.5rem 1rem 0.55rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      gap: 0.22rem;
+    }
+    .bug-odds-probs {
+      display: flex; align-items: center; gap: 0.55rem;
+      font-size: 0.82rem; font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .bug-odds-home { color: var(--home-primary); }
+    .bug-odds-away { color: var(--away-primary); }
+    .bug-odds-draw { color: var(--text-secondary); }
+    .bug-odds-sep { color: rgba(255,255,255,0.2); font-weight: 400; }
+    .bug-odds-meta {
+      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.03em;
+      color: rgba(255,255,255,0.2);
+    }
+    .bug-odds-prematch {
+      color: rgba(255,255,255,0.35); font-style: italic;
+    }
+    [data-theme="light"] .bug-odds-prematch { color: rgba(0,0,0,0.3); }
+    .bug-odds-meta a {
+      color: inherit; text-decoration: underline;
+      text-underline-offset: 2px; text-decoration-color: rgba(255,255,255,0.15);
+      transition: color 0.15s;
+    }
+    .bug-odds-meta a:hover { color: rgba(255,255,255,0.45); }
+    [data-theme="light"] .bug-odds { border-top-color: rgba(0,0,0,0.07); }
+    [data-theme="light"] .bug-odds-sep { color: rgba(0,0,0,0.2); }
+    [data-theme="light"] .bug-odds-meta { color: rgba(0,0,0,0.25); }
+    [data-theme="light"] .bug-odds-meta a:hover { color: rgba(0,0,0,0.5); }
 
     .score-bug-flag { font-size: 1.8rem; line-height: 1; flex-shrink: 0; }
     .score-bug-flag-img {
@@ -801,14 +837,14 @@
 
     .lv-modal {
       background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: 18px; width: 100%; max-width: 480px;
-      max-height: 85dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      border-radius: 20px; width: 100%; max-width: 480px;
+      max-height: 88dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
       padding: 1.5rem; position: relative;
       animation: modalSlideUp 0.28s cubic-bezier(0.34,1.2,0.64,1) both;
     }
     @media (max-width: 600px) {
-      .lv-modal-backdrop { align-items: flex-end; padding: 0; }
-      .lv-modal { max-width: 100%; border-radius: 20px 20px 0 0; max-height: 90dvh;
+      .lv-modal-backdrop { align-items: center; padding: 1rem; }
+      .lv-modal { max-width: 100%; border-radius: 20px; max-height: 88dvh;
         animation: modalSlideUpMobile 0.3s cubic-bezier(0.34,1.1,0.64,1) both; }
     }
     .lv-modal-close {
@@ -942,6 +978,25 @@
       font-size: 0.68rem;
       line-height: 1.4;
     }
+    .lv-up-context {
+      margin-top: 1.25rem;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.1rem 0.9rem;
+    }
+    .lv-up-context-label {
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.55rem;
+    }
+    .lv-up-context-text {
+      font-size: 0.78rem; color: var(--text-secondary); line-height: 1.65;
+      margin: 0 0 0.6rem;
+    }
+    .lv-up-context-source {
+      font-size: 0.6rem; color: var(--text-muted); font-weight: 600;
+      text-align: right; opacity: 0.7;
+    }
     @media (max-width: 420px) {
       .lv-up-teams { gap: 0.8rem; }
       .lv-up-team img { width: 48px; height: 48px; }
@@ -1047,7 +1102,7 @@
     <div class="hero" style="padding:3rem 1.5rem 1.5rem;">
       <div class="hero-eyebrow"><span class="live-dot"></span>Live Scores</div>
       <h1 style="font-size:clamp(2rem,5vw,3rem);">World Cup <em>LIVE</em></h1>
-      <p class="hero-sub" style="margin-bottom:0;">Real-time scores and results from every 2026 World Cup match — updates automatically.</p>
+      <p class="hero-sub" style="margin-bottom:0;">Follow every 2026 World Cup match in real time — live scores, match stats, kickoff times, and market-implied win probabilities.</p>
     </div>
 
     <div class="live-wrap">
@@ -1122,9 +1177,28 @@
   <footer>
     <div class="footer-inner">
       <p>© 2026 World Cup Field Guide &nbsp;·&nbsp; Created by <a href="https://Fevers.dev/links" target="_blank" rel="noopener noreferrer">Zach Andelman</a></p>
-      <p>WorldCupFieldGuide.com is an independent fan project and is not affiliated with FIFA, EA SPORTS, EA SPORTS FC, or any national federation. Player ratings and football data are used for informational and entertainment purposes.</p>
+      <p style="font-size:0.72rem">Not affiliated with FIFA or any national federation.</p>
+      <p style="margin-top:0.65rem">
+        <button class="footer-tab-btn" onclick="openFooterModal('cookies')">Cookies</button>
+        <span style="color:var(--border);margin:0 0.4rem">·</span>
+        <button class="footer-tab-btn" onclick="openFooterModal('disclaimers')">Disclaimers</button>
+      </p>
     </div>
   </footer>
+
+  <!-- Footer info modal -->
+  <div class="footer-modal-backdrop" id="footerModalBackdrop" onclick="if(event.target===this)closeFooterModal()">
+    <div class="footer-modal">
+      <div class="footer-modal-header">
+        <div class="footer-modal-tabs">
+          <button class="footer-modal-tab active" id="ftab-cookies" onclick="switchFooterTab('cookies')">Cookies</button>
+          <button class="footer-modal-tab" id="ftab-disclaimers" onclick="switchFooterTab('disclaimers')">Disclaimers</button>
+        </div>
+        <button class="footer-modal-close" onclick="closeFooterModal()">✕</button>
+      </div>
+      <div class="footer-modal-body" id="footerModalBody"></div>
+    </div>
+  </div>
 
   <script>
     const lenis = new Lenis();
@@ -1217,11 +1291,11 @@
 
     function localTime(iso) {
       const d = new Date(iso);
-      return `${d.toLocaleTimeString([], {
+      return d.toLocaleTimeString([], {
         timeZone: selectedTimeZone,
         hour: 'numeric',
         minute: '2-digit',
-      })} ${timeZoneAbbr(d)}`;
+      });
     }
 
     function localTimeLong(iso) {
@@ -1399,13 +1473,28 @@
         clockPre = 'is-pre';
       }
 
+      const polySlug = buildPolySlug(homeAbbr, awayAbbr, event.date);
+      const oddsRow = !isPost ? `
+        <div class="bug-odds" id="odds-${event.id}" data-slug="${polySlug}">
+          <div class="bug-odds-probs" id="odds-probs-${event.id}">
+            <span class="bug-odds-home" style="color:var(--home-primary)">${homeAbbr} <strong>—</strong></span>
+            <span class="bug-odds-sep">·</span>
+            <span class="bug-odds-draw">Draw <strong>—</strong></span>
+            <span class="bug-odds-sep">·</span>
+            <span class="bug-odds-away" style="color:var(--away-primary)">${awayAbbr} <strong>—</strong></span>
+          </div>
+          <div class="bug-odds-meta">
+            ${!isLive ? '<span class="bug-odds-prematch">Pre-match</span> · ' : ''}Market-implied probability
+          </div>
+        </div>` : '';
+
       const statsSection = isLive ? `
         <div class="bug-stats-toggle" onclick="event.stopPropagation();toggleBugStats('${event.id}',this)">
           Stats <span class="bug-stats-chevron">▾</span>
         </div>
         <div class="bug-stats-panel" id="bugstats-${event.id}"></div>` : '';
 
-      return `<div class="score-bug ${isLive ? 'is-live' : ''} ${isPost ? 'is-post' : ''} ${canOpen ? 'clickable' : ''}"
+      return `<div class="score-bug ${isLive ? 'is-live' : ''} ${isPost ? 'is-post' : ''} ${!isLive && !isPost ? 'is-pre' : ''} ${canOpen ? 'clickable' : ''}"
         style="${bugColors}" ${canOpen ? `onclick="openMatchModal('${event.id}')"` : ''}>
         <div class="bug-header">${headerTxt}</div>
         <div class="bug-row">
@@ -1426,6 +1515,7 @@
             <div class="bug-clock ${clockPre}">${clockHtml}</div>
           </div>
         </div>
+        ${oddsRow}
         ${statsSection}
       </div>`;
     }
@@ -1741,6 +1831,8 @@
           renderSelectedDay(selectedEvents, todayKeyValue);
           renderRecentFinals(recentEvents, recentKey);
         }
+
+        updateAllMatchOdds();
 
         document.getElementById('liveUpdatedText').textContent =
           'Updated ' + `${new Date().toLocaleTimeString([], {
@@ -2083,7 +2175,13 @@
         <div class="lv-up-actions">
           <a class="lv-up-cal-btn" href="${calendarHref}">+ Add to Calendar</a>
           <div class="lv-up-note">Opens Calendar &amp; Export so you can select this match or build a custom match calendar.</div>
-        </div>`;
+        </div>
+        ${(matchOddsCache[event.id]?.context) ? `
+        <div class="lv-up-context">
+          <div class="lv-up-context-label">Match outlook</div>
+          <p class="lv-up-context-text">${escapeHtml(matchOddsCache[event.id].context)}</p>
+          <div class="lv-up-context-source">via Polymarket</div>
+        </div>` : ''}`;
     }
 
     function drawRoundRect(ctx, x, y, w, h, r) {
@@ -2458,7 +2556,7 @@
         // Key events: goals + cards
         const events = (d.keyEvents || []).filter(k =>
           k.scoringPlay || /card/i.test(k.type?.text || ''));
-        const evHtml = events.length ? events.map(k => {
+        const evHtml = events.length ? [...events].reverse().map(k => {
           const who = k.participants?.[0]?.athlete?.displayName || '';
           const assist = k.scoringPlay && !/penalty|own goal/i.test(k.type?.text || '')
             ? k.participants?.[1]?.athlete?.displayName : null;
@@ -2547,6 +2645,114 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && document.getElementById('lvBackdrop').classList.contains('open')) closeMatchModal();
       if (e.key === 'Escape' && document.getElementById('liveCalBackdrop').classList.contains('open')) closeLiveCalPopup();
+    });
+
+    // ── Match-level market odds (Polymarket) ───────
+    // ESPN abbreviation → Polymarket slug code overrides
+    const POLY_ABBR_MAP = {
+      'sui': 'che', // Switzerland (ESPN: SUI, Polymarket: CHE)
+      'ned': 'nld', // Netherlands if ESPN uses NED
+      'cpv': 'cvi', // Cabo Verde
+      'sa':  'rsa', // South Africa shorthand
+      'kr':  'kor', // Korea shorthand
+    };
+    function toPolyCode(abbr) {
+      const lower = (abbr || '').toLowerCase();
+      return POLY_ABBR_MAP[lower] || lower;
+    }
+    function buildPolySlug(homeAbbr, awayAbbr, eventDate) {
+      // Convert UTC to ET (UTC-4 during summer tournament) to get local match date
+      const etMs = new Date(eventDate).getTime() - 4 * 60 * 60 * 1000;
+      const date = new Date(etMs).toISOString().slice(0, 10);
+      return `fifwc-${toPolyCode(homeAbbr)}-${toPolyCode(awayAbbr)}-${date}`;
+    }
+
+    const matchOddsCache = {}; // eventId -> { home, draw, away } | 'fetching'
+    function applyMatchOdds(eventId) {
+      const v = matchOddsCache[eventId];
+      if (!v || v === 'fetching') return;
+      const el = document.getElementById(`odds-probs-${eventId}`);
+      if (!el) return;
+      const spans = el.querySelectorAll('strong');
+      if (spans[0]) spans[0].textContent = Math.round(v.home * 100) + '%';
+      if (spans[1]) spans[1].textContent = Math.round(v.draw * 100) + '%';
+      if (spans[2]) spans[2].textContent = Math.round(v.away * 100) + '%';
+    }
+    async function fetchMatchOdds(eventId, slug) {
+      if (matchOddsCache[eventId]) { applyMatchOdds(eventId); return; }
+      matchOddsCache[eventId] = 'fetching';
+      try {
+        const r = await fetch(`https://gamma-api.polymarket.com/events?slug=${slug}`);
+        const arr = await r.json();
+        if (!arr || !arr.length || !arr[0].markets) { delete matchOddsCache[eventId]; return; }
+        let home = null, draw = null, away = null;
+        arr[0].markets.forEach(m => {
+          let prices = m.outcomePrices;
+          if (typeof prices === 'string') try { prices = JSON.parse(prices); } catch(e) { return; }
+          const prob = parseFloat(Array.isArray(prices) ? prices[0] : prices) || 0;
+          const title = (m.groupItemTitle || '').toLowerCase();
+          if (title.includes('draw')) draw = prob;
+          else if (home === null) home = prob;
+          else away = prob;
+        });
+        if (home === null || draw === null || away === null) { delete matchOddsCache[eventId]; return; }
+        const total = home + draw + away;
+        matchOddsCache[eventId] = { home: home/total, draw: draw/total, away: away/total, context: arr[0].eventMetadata?.context_description || null };
+        applyMatchOdds(eventId);
+      } catch(e) {
+        delete matchOddsCache[eventId];
+      }
+    }
+    function updateAllMatchOdds() {
+      document.querySelectorAll('.bug-odds[data-slug]').forEach(el => {
+        const slug = el.dataset.slug;
+        const eventId = el.id.replace('odds-', '');
+        fetchMatchOdds(eventId, slug);
+      });
+    }
+
+    // ── Footer info modal ─────────────────────────
+    const FOOTER_CONTENT = {
+      cookies: `
+        <h4>What we store</h4>
+        <p>We use minimal local storage to remember your timezone preference and theme selection. No tracking cookies are set by this site.</p>
+        <h4>Third-party scripts</h4>
+        <p>This page loads Google AdSense and Vercel Analytics. These services may set their own cookies to serve ads and measure traffic. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's privacy policy</a> for details.</p>
+        <h4>Your control</h4>
+        <p>You can clear site data at any time via your browser settings. We don't use cookies for login or payment — there's nothing sensitive stored here.</p>
+      `,
+      disclaimers: `
+        <h4>Independence</h4>
+        <p>World Cup Field Guide is an independent fan-made site. We are not affiliated with FIFA, EA SPORTS, EA SPORTS FC, or any national football federation.</p>
+        <h4>Market-implied odds</h4>
+        <p>Match probabilities displayed on this site are sourced from <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer">Polymarket</a>, a prediction market platform. These figures reflect market pricing — not guaranteed outcomes. This site does not provide betting, financial, or gambling advice.</p>
+        <h4>Affiliate links</h4>
+        <p>Some outbound links on this site may be affiliate links. If you click one and make a purchase, we may earn a small commission at no extra cost to you.</p>
+        <h4>Data sources</h4>
+        <p>Live scores and match data are sourced from ESPN. Player ratings are used for informational and entertainment purposes only.</p>
+      `,
+    };
+    let footerActiveTab = 'cookies';
+    function openFooterModal(tab) {
+      footerActiveTab = tab;
+      document.getElementById('footerModalBackdrop').classList.add('open');
+      renderFooterTab(tab);
+    }
+    function closeFooterModal() {
+      document.getElementById('footerModalBackdrop').classList.remove('open');
+    }
+    function switchFooterTab(tab) {
+      footerActiveTab = tab;
+      renderFooterTab(tab);
+    }
+    function renderFooterTab(tab) {
+      document.querySelectorAll('.footer-modal-tab').forEach(t => {
+        t.classList.toggle('active', t.id === `ftab-${tab}`);
+      });
+      document.getElementById('footerModalBody').innerHTML = FOOTER_CONTENT[tab] || '';
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('footerModalBackdrop').classList.contains('open')) closeFooterModal();
     });
 
     // ── Kick everything off ────────────────────────
