@@ -1537,6 +1537,15 @@
       const stadium = stadiumEl.value;
       const type    = typeEl.value;
 
+      const now = Date.now();
+      function gameIsPast(g) {
+        const s = scoreStateFor(g);
+        if (s?.state === 'post') return true;
+        if (s?.state === 'in') return false;
+        // No ESPN data — treat as past if scheduled time + 2h buffer has elapsed
+        return parseGameDateTime(g).getTime() + 2 * 60 * 60 * 1000 < now;
+      }
+
       const filtered = GAMES.filter(g =>
         (!search  || g.team1.toLowerCase().includes(search) || g.team2.toLowerCase().includes(search)) &&
         (!selectedDate || g.date === selectedDate) &&
@@ -1545,18 +1554,18 @@
       ).sort((a, b) => {
         const sa = scoreStateFor(a);
         const sb = scoreStateFor(b);
-        const rank = s => s?.state === 'in' ? 0 : s?.state === 'post' ? 2 : 1;
-        const r = rank(sa) - rank(sb);
+        const rank = g => scoreStateFor(g)?.state === 'in' ? 0 : gameIsPast(g) ? 2 : 1;
+        const r = rank(a) - rank(b);
         if (r) return r;
         const d = parseGameDateTime(a) - parseGameDateTime(b);
-        return sa?.state === 'post' ? -d : d;
+        return gameIsPast(a) ? -d : d;
       });
 
       const noResults = document.getElementById('noResults');
       const count     = document.getElementById('resultsCount');
       const pastJump  = document.getElementById('pastGamesJump');
       const pastCount = document.getElementById('pastGamesCount');
-      const doneCount = filtered.filter(g => scoreStateFor(g)?.state === 'post').length;
+      const doneCount = filtered.filter(g => gameIsPast(g)).length;
 
       if (filtered.length === 0) {
         container.innerHTML = '';
@@ -1585,7 +1594,7 @@
         }
 
         filtered.forEach(g => {
-          if (!pastInserted && scoreStateFor(g)?.state === 'post') {
+          if (!pastInserted && gameIsPast(g)) {
             flushDay();
             lastDate = null;
             html += `<div class="browse-date-header past-games-anchor" id="pastGamesSection">
