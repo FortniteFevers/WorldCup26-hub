@@ -1482,7 +1482,7 @@
 
       const polySlug = buildPolySlug(homeAbbr, awayAbbr, event.date);
       const oddsRow = !isPost ? `
-        <div class="bug-odds" id="odds-${event.id}" data-slug="${polySlug}">
+        <div class="bug-odds" id="odds-${event.id}" data-slug="${polySlug}" data-home-name="${(home.team?.displayName || homeAbbr).toLowerCase()}">
           <div class="bug-odds-probs" id="odds-probs-${event.id}">
             <span class="bug-odds-home" style="color:var(--home-primary)">${homeAbbr} <strong>—</strong></span>
             <span class="bug-odds-sep">·</span>
@@ -2696,7 +2696,7 @@
       if (spans[1]) spans[1].textContent = Math.round(v.draw * 100) + '%';
       if (spans[2]) spans[2].textContent = Math.round(v.away * 100) + '%';
     }
-    async function fetchMatchOdds(eventId, slug) {
+    async function fetchMatchOdds(eventId, slug, homeName) {
       if (matchOddsCache[eventId]) { applyMatchOdds(eventId); return; }
       matchOddsCache[eventId] = 'fetching';
       try {
@@ -2704,15 +2704,29 @@
         const arr = await r.json();
         if (!arr || !arr.length || !arr[0].markets) { delete matchOddsCache[eventId]; return; }
         let home = null, draw = null, away = null;
+        const homeKey = (homeName || '').toLowerCase();
         arr[0].markets.forEach(m => {
           let prices = m.outcomePrices;
           if (typeof prices === 'string') try { prices = JSON.parse(prices); } catch(e) { return; }
           const prob = parseFloat(Array.isArray(prices) ? prices[0] : prices) || 0;
           const title = (m.groupItemTitle || '').toLowerCase();
           if (title.includes('draw')) draw = prob;
-          else if (home === null) home = prob;
+          else if (homeKey && title.includes(homeKey)) home = prob;
           else away = prob;
         });
+        // Fallback: if name matching left home unset, assign by order
+        if (home === null && away === null) {
+          arr[0].markets.forEach(m => {
+            let prices = m.outcomePrices;
+            if (typeof prices === 'string') try { prices = JSON.parse(prices); } catch(e) { return; }
+            const prob = parseFloat(Array.isArray(prices) ? prices[0] : prices) || 0;
+            const title = (m.groupItemTitle || '').toLowerCase();
+            if (!title.includes('draw')) {
+              if (home === null) home = prob;
+              else away = prob;
+            }
+          });
+        }
         if (home === null || draw === null || away === null) { delete matchOddsCache[eventId]; return; }
         const total = home + draw + away;
         matchOddsCache[eventId] = { home: home/total, draw: draw/total, away: away/total, context: arr[0].eventMetadata?.context_description || null };
@@ -2725,7 +2739,8 @@
       document.querySelectorAll('.bug-odds[data-slug]').forEach(el => {
         const slug = el.dataset.slug;
         const eventId = el.id.replace('odds-', '');
-        fetchMatchOdds(eventId, slug);
+        const homeName = el.dataset.homeName || '';
+        fetchMatchOdds(eventId, slug, homeName);
       });
     }
 
